@@ -21,7 +21,7 @@ def train_data_split(patient_name="BDP", data_info_path="../preprocess/data_info
     :return:
     '''
 
-    data = pd.read_csv(data_info_path)
+    data = pd.read_csv(data_info_path, sep=',')
     ratio = 0.7
     val = {'path': [], 'label': [], 'patient': []}
     paths = data['path']
@@ -29,13 +29,16 @@ def train_data_split(patient_name="BDP", data_info_path="../preprocess/data_info
     patient = data['patient']
     for i in range(len(paths)):
         if patient[i] == patient_name:
-            val['path'] += paths[i]
+            val['path'] += [paths[i]]
             paths.pop(i)
-            val['label'] += label[i]
+            val['label'] += [label[i]]
             label.pop(i)
-            val['patient'] += patient[i]
+            val['patient'] += [patient[i]]
             patient.pop(i)
-    print(len(paths))
+    # 对于数据需要进行乱序的处理
+    paths = paths.tolist()
+    label = label.tolist()
+    patient = patient.tolist()
     time_seed = random.randint(0, 100)
     random.seed(time_seed)
     random.shuffle(paths)
@@ -53,11 +56,11 @@ def train_data_split(patient_name="BDP", data_info_path="../preprocess/data_info
     test_path = './test.csv'
     val_path = './val.csv'
     with open(train_path, 'w') as f:
-        train_data.to_csv(f)
+        train_data.to_csv(f, index=None)
     with open(test_path, 'w') as f:
-        test_data.to_csv(f)
+        test_data.to_csv(f, index=None)
     with open(val_path, 'w') as f:
-        val_data.to_csv(f)
+        val_data.to_csv(f, index=None)
     print("数据划分完成")
 
 

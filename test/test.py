@@ -10,17 +10,15 @@ import numpy as np
 from collections import Counter
 import pandas as pd
 import uuid
+import random
 
 if __name__ == '__main__':
-    # res = generate_data(duration=1200, wins=(2, 16), k=3000)
-    # print(res)
-    # print(Counter(res))
-    # a = np.random.randint(0, 10)
-    # print(a)
-    s_1= uuid.uuid1()
-    print(s_1)
-    channel_path="/home/cbd109-3/Users/data/yh/Program/Python/SEEG/data/data_slice/channels_info/BDP_seq.csv"
-    data = pd.read_csv(channel_path, sep=',')
-    names = list(data['chan_name'])
-    print(names)
+    a = list(range(100))
+    b = list(range(100))
 
+    time_seed = random.randint(0, 100)
+    random.seed(time_seed)
+    random.shuffle(a)
+    random.shuffle(b)
+    print(a)
+    print(b)
