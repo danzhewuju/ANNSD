@@ -99,11 +99,30 @@ def process_data(config_path="./config/config.json"):
 
 def get_data_info(path_dir="../data/"):
     '''
-    :function: 主要生成数据相关的统计信息，用于标签的训练 
+    :function: 主要生成数据相关的统计信息，用于标签的训练
     :param path_dir:
     :return:
     '''
+    save_path = "./data_info.csv"
+    data_result = {"id": [], "path": [], "label": [], "patient": []}
+    patients = os.listdir(path_dir)
+    for p in patients:
+        path_tmp_dir = os.path.join(path_dir, p)
+        labels = os.listdir(path_tmp_dir)
+        for l in labels:
+            data_label_dir = os.path.join(path_tmp_dir, l)
+            data_ids = os.listdir(data_label_dir)
+            data_paths = [os.path.join(data_label_dir, x) for x in data_ids]
+            data_result["id"] += data_ids
+            data_result["path"] += data_paths
+            data_result['label'] += [l] * len(data_ids)
+            data_result['patient'] += [p] * len(data_ids)
+    with open(save_path, 'w') as f:
+        data_frame = pd.DataFrame(data_result)
+        data_frame.to_csv(f)
+    print("文件已经保存完成！")
 
 
 if __name__ == '__main__':
-    process_data()  # 数据的生成, 主要是用与生成时序数据
+    # process_data()  # 数据的生成, 主要是用与生成时序数据
+    get_data_info()
