@@ -11,6 +11,8 @@ import pandas as pd
 import numpy as np
 import json
 import random
+from torch.utils.data import Dataset
+from util.util_file import matrix_normalization
 
 
 def train_data_split(patient_name="BDP", data_info_path="../preprocess/data_info.csv"):
@@ -64,4 +66,33 @@ def train_data_split(patient_name="BDP", data_info_path="../preprocess/data_info
     print("数据划分完成")
 
 
-train_data_split()
+class Data_info():
+    def __init__(self, path_train):
+        dict_label = {"pre_seizure": 1, "non_seizure": 0}
+        data = pd.read_csv(path_train)
+        data_path = data['path'].tolist()
+        label = data['label'].tolist()
+        self.data = []
+        for i in range(len(data_path)):
+            self.data.append((data_path[i], dict_label[label[i]]))
+        self.data_length = len(self.data)
+
+
+class MyDataset(Dataset):  # 重写dateset的相关类
+    def __init__(self, imgs, transform=None, target_transform=None):
+        self.imgs = imgs
+        self.transform = transform
+        self.target_transform = target_transform
+
+    def __getitem__(self, index):
+        fn, label = self.imgs[index]
+        data = np.load(fn)
+        # data = self.transform(data)
+        result = matrix_normalization(data, (100, 1000))
+        result = result.astype('float32')
+        result = result[np.newaxis, :]
+        # result = trans_data(vae_model, result)
+        return result, label
+
+    def __len__(self):
+        return len(self.imgs)

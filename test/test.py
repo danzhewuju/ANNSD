@@ -13,12 +13,10 @@ import uuid
 import random
 
 if __name__ == '__main__':
-    a = list(range(100))
-    b = list(range(100))
-
-    time_seed = random.randint(0, 100)
-    random.seed(time_seed)
-    random.shuffle(a)
-    random.shuffle(b)
-    print(a)
-    print(b)
+    a = np.random.randint(0, 100, (100, 999))
+    b = np.pad(a, ((0,0), (0, 1)), constant_values=(0, 0))
+    print(b.shape)
+    a = [1, 2, 3 ]
+    print(np.mean(a))
+    # print(a)
+    # print(b)
