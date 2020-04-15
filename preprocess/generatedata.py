@@ -13,6 +13,7 @@ import os
 import pandas as pd
 from tqdm import tqdm
 import json
+import re
 
 
 class GenData:
@@ -104,7 +105,7 @@ def get_data_info(path_dir="../data/"):
     :return:
     '''
     save_path = "./data_info.csv"
-    data_result = {"id": [], "path": [], "label": [], "patient": []}
+    data_result = {"id": [], "path": [], "label": [], "patient": [], "duration": []}
     patients = os.listdir(path_dir)
     for p in patients:
         path_tmp_dir = os.path.join(path_dir, p)
@@ -115,8 +116,17 @@ def get_data_info(path_dir="../data/"):
             data_paths = [os.path.join(data_label_dir, x) for x in data_ids]
             data_result["id"] += data_ids
             data_result["path"] += data_paths
+
             data_result['label'] += [l] * len(data_ids)
             data_result['patient'] += [p] * len(data_ids)
+            duration = []
+            for data_p in data_paths:
+                d_d = re.findall('\d+_\d+', data_p)[0]
+                int_d = d_d.split("_")
+                dur = int(int_d[1]) - int(int_d[0])
+                duration.append(dur)
+            data_result['duration'] += duration
+
     with open(save_path, 'w') as f:
         data_frame = pd.DataFrame(data_result)
         data_frame.to_csv(f)

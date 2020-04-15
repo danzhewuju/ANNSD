@@ -128,7 +128,7 @@ for epoch in range(EPOCH):
             accuracy = sum(result) / len(result)
             print('Epoch: ', epoch, '| train loss: %.4f' % loss.data.numpy(), '| test accuracy: %.2f' % accuracy)
 
-torch.save(rnn.state_dict(), "./model/lstm.pkl")
+torch.save(rnn.state_dict(), "./save_model/lstm.pkl")
 acc = []
 count = 10
 for step, (b_x, b_y) in enumerate(test_loader):
