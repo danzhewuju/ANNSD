@@ -3,7 +3,7 @@
 # @Time    : 2020/4/22 13:07
 # @Author  : Alex
 # @Site    : 
-# @File    : clstm.py
+# @File    : clstm_train.py
 # @Software: PyCharm
 
 
@@ -122,5 +122,19 @@ for epoch in range(EPOCH):
             print('Epoch: ', epoch, '| train loss: %.4f' % loss.data.numpy(), '| test accuracy: %.2f' % accuracy)
 
 torch.save(clstm.state_dict(), "./save_model/clstm.pkl")
+print("模型被正常加载！")
+
+acc = []
+count = 100
+for step, (b_x, b_y) in enumerate(test_loader):
+    if step < count:
+        test_output = clstm(b_x)  # (samples, time_step, input_size)
+        pred_y = torch.max(test_output, 1)[1].data.numpy()
+        result = [1 if x == y else 0 for x, y in zip(pred_y, b_y)]
+        accuracy = sum(result) / len(result)
+        acc.append(accuracy)
+    else:
+        break
+print(np.mean(acc))
 
 
