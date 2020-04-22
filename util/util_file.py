@@ -81,10 +81,10 @@ def matrix_normalization(data, resize_shape=(130, 200)):
                 channels_del = random.sample(range(1, data_shape[0] - 1), d)
                 data = np.delete(data, channels_del, axis=0)
     # 利用数据的截断
-    if data_shape[1] > resize_shape[1]:
-        data = data[:, :resize_shape[1]]
-    else:
-        data = np.pad(data, ((0, 0), (0,resize_shape[1]-data_shape[1] )), constant_values=(0, 0))
+    # if data_shape[1] > resize_shape[1]:
+    #     data = data[:, :resize_shape[1]]
+    # else:
+    #     data = np.pad(data, ((0, 0), (0,resize_shape[1]-data_shape[1] )), constant_values=(0, 0))
     return data
 
 

@@ -23,7 +23,6 @@ BATCH_SIZE = 8
 TIME_STEP = 100  # rnn time step / image height
 INPUT_SIZE = 1000  # rnn input size / image width
 LR = 0.001  # learning rate
-DOWNLOAD_MNIST = False  # set to True if haven't download the data
 
 TRAIN_PATH = "/home/cbd109-3/Users/data/yh/Program/Python/SEEG_Timing/preprocess/train.csv"
 TEST_PATH = "/home/cbd109-3/Users/data/yh/Program/Python/SEEG_Timing/preprocess/test.csv"
@@ -114,7 +113,7 @@ for epoch in range(EPOCH):
     for step, (b_x, b_y) in enumerate(train_loader):  # gives batch data
         # b_x = b_x
         # b_y = b_y
-        b_x = b_x.view(-1, 100, 1000)  # reshape x to (batch, time_step, input_size)
+        # b_x = b_x.view(-1, 100, 1000)  # reshape x to (batch, time_step, input_size)
         output = rnn(b_x)  # rnn output
         loss = loss_func(output, b_y)  # cross entropy loss
         optimizer.zero_grad()  # clear gradients for this training step
