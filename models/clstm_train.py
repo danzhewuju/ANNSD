@@ -39,7 +39,7 @@ test_loader = DataLoader(test_data, batch_size=BATCH_SIZE, shuffle=True)
 
 
 class clstm(nn.Module):
-    def __init__(self):
+    def __init__(self, gpu=None):
         super(clstm, self).__init__()
         self.layer1 = nn.Sequential(
             nn.Conv2d(in_channels=1, out_channels=16, kernel_size=5, stride=1, padding=2),
@@ -76,12 +76,17 @@ class clstm(nn.Module):
             batch_first=True,  # input & output will has batch size as 1s dimension. e.g. (batch, time_step, input_size)
         )
         self.out = nn.Linear(64, 2)
+        if gpu != None:
+            self.gpu = gpu
 
     def forward(self, x):
         # res = []
         # batch_size = x.size(0)
         # 需要对数据进行处理
-        res = torch.zeros((1, 15, 100))
+        if self.gpu is not None:
+            res = torch.zeros((1, 15, 100)).cuda(self.gpu)
+        else:
+            res = torch.zeros((1, 15, 100))
         length = x.size(-1) / Resampling
         for i in range(int(length)):
             tmx = x[:, :, :, i*500:(i+1)*500]
@@ -99,42 +104,35 @@ class clstm(nn.Module):
         return out
 
 
-clstm = clstm()
+clstm = clstm(gpu=0).cuda(0)
 optimizer = torch.optim.Adam(clstm.parameters(), lr=LR)  # optimize all cnn parameters
 loss_func = nn.CrossEntropyLoss()  # the target label is not one-hotted
-
+acc = []
 for epoch in range(EPOCH):
     for step, (b_x, b_y) in enumerate(train_loader):  # gives batch data
-        # b_x = b_x
-        # b_y = b_y
+        b_x_g = b_x.cuda(0)
+        b_y_g = b_y.cuda(0)
         # b_x = b_x.view(-1, 100, 1000)  # reshape x to (batch, time_step, input_size)
-        output = clstm(b_x)  # rnn output
-        loss = loss_func(output, b_y)  # cross entropy loss
+        output = clstm(b_x_g)  # rnn output
+        loss = loss_func(output, b_y_g)  # cross entropy loss
         optimizer.zero_grad()  # clear gradients for this training step
         loss.backward()  # backpropagation, compute gradients
         optimizer.step()  # apply gradients
 
+        pred_y = torch.max(output, 1)[1].data
+        if pred_y[0] == b_y_g[0]:
+            acc.append(1)
+        else:
+            acc.append(0)
         if step % 50 == 0:
-            test_output = clstm(b_x)  # (samples, time_step, input_size)
-            pred_y = torch.max(test_output, 1)[1].data.numpy()
-            result = [1 if x == y else 0 for x, y in zip(pred_y, b_y)]
-            accuracy = sum(result) / len(result)
-            print('Epoch: ', epoch, '| train loss: %.4f' % loss.data.numpy(), '| test accuracy: %.2f' % accuracy)
+            accuracy = sum(acc)/len(acc)
+            print('Epoch: ', epoch, '| train loss: %.4f' % loss.data.cpu().numpy(), '| test accuracy: %.2f' % accuracy)
+            acc.clear()
 
-torch.save(clstm.state_dict(), "./save_model/clstm.pkl")
-print("模型被正常加载！")
+    torch.save(clstm.state_dict(), "./save_model/clstm.pkl")
+    print("模型被正常保存！")
 
-acc = []
-count = 100
-for step, (b_x, b_y) in enumerate(test_loader):
-    if step < count:
-        test_output = clstm(b_x)  # (samples, time_step, input_size)
-        pred_y = torch.max(test_output, 1)[1].data.numpy()
-        result = [1 if x == y else 0 for x, y in zip(pred_y, b_y)]
-        accuracy = sum(result) / len(result)
-        acc.append(accuracy)
-    else:
-        break
-print(np.mean(acc))
+
+
 
 
