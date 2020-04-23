@@ -76,8 +76,7 @@ class clstm(nn.Module):
             batch_first=True,  # input & output will has batch size as 1s dimension. e.g. (batch, time_step, input_size)
         )
         self.out = nn.Linear(64, 2)
-        if gpu != None:
-            self.gpu = gpu
+        self.gpu = gpu
 
     def forward(self, x):
         # res = []
@@ -107,6 +106,7 @@ class clstm(nn.Module):
 clstm = clstm(gpu=0).cuda(0)
 optimizer = torch.optim.Adam(clstm.parameters(), lr=LR)  # optimize all cnn parameters
 loss_func = nn.CrossEntropyLoss()  # the target label is not one-hotted
+
 acc = []
 for epoch in range(EPOCH):
     for step, (b_x, b_y) in enumerate(train_loader):  # gives batch data
@@ -124,7 +124,7 @@ for epoch in range(EPOCH):
             acc.append(1)
         else:
             acc.append(0)
-        if step % 50 == 0:
+        if step % 200 == 0:
             accuracy = sum(acc)/len(acc)
             print('Epoch: ', epoch, '| train loss: %.4f' % loss.data.cpu().numpy(), '| test accuracy: %.2f' % accuracy)
             acc.clear()
