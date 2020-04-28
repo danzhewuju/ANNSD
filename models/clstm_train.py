@@ -14,28 +14,47 @@ import torchvision.transforms as transforms
 import matplotlib.pyplot as plt
 from util.util_tool import *
 from torch.utils.data import Dataset, DataLoader
+import torch.nn.functional as F
 
 # torch.manual_seed(1)    # reproducible
 
 # Hyper Parameters
 EPOCH = 10  # train the training data n times, to save time, we just train 1 epoch
-BATCH_SIZE = 1
+BATCH_SIZE = 16
 # 数据首先需要经过CNN
 TIME_STEP = 15  # rnn time step / image height 数据输入的高度
 INPUT_SIZE = 100  # rnn input size / image width 数据输入的宽度
 LR = 0.001  # learning rate
-Resampling  = 500  # resampling
+Resampling = 500  # resampling
 
 # 数据处理
-TRAIN_PATH = "/home/cbd109-3/Users/data/yh/Program/Python/SEEG_Timing/preprocess/train.csv"
-TEST_PATH = "/home/cbd109-3/Users/data/yh/Program/Python/SEEG_Timing/preprocess/test.csv"
+TRAIN_PATH = "/home/cbd109-3/Users/data/yh/Program/Python/SEEG_Timing/preprocess/train_BDP.csv"
+TEST_PATH = "/home/cbd109-3/Users/data/yh/Program/Python/SEEG_Timing/preprocess/test_BDP.csv"
+
+
+def collate_fn(data):
+    # 主要是用数据的对齐
+    data.sort(key=lambda x: x[0].shape[-1], reverse=True)
+    max_shape = data[0][0].shape
+    labels = []
+    for i, (d, label) in enumerate(data):
+        d_shape = d.shape
+        if d_shape[-1] < max_shape[-1]:
+            tmp_d = np.pad(d, ((0, 0), (0, 0), (0, max_shape[-1] - d_shape[-1])), 'constant')
+            data[i] = tmp_d
+        else:
+            data[i] = d
+        labels.append(label)
+
+    return torch.from_numpy(np.array(data)), torch.tensor(labels)
+
 
 data_train = Data_info(TRAIN_PATH)
 data_test = Data_info(TEST_PATH)
 train_data = MyDataset(data_train.data)  # 作为训练集
 test_data = MyDataset(data_test.data)  # 作为测试集
-train_loader = DataLoader(train_data, batch_size=BATCH_SIZE, shuffle=True)
-test_loader = DataLoader(test_data, batch_size=BATCH_SIZE, shuffle=True)
+train_loader = DataLoader(train_data, batch_size=BATCH_SIZE, shuffle=True, collate_fn=collate_fn)
+test_loader = DataLoader(test_data, batch_size=BATCH_SIZE, shuffle=True, collate_fn=collate_fn)
 
 
 class clstm(nn.Module):
@@ -88,7 +107,7 @@ class clstm(nn.Module):
             res = torch.zeros((1, 15, 100))
         length = x.size(-1) / Resampling
         for i in range(int(length)):
-            tmx = x[:, :, :, i*500:(i+1)*500]
+            tmx = x[:, :, :, i * 500:(i + 1) * 500]
             tmx = self.layer1(tmx)
             tmx = self.layer2(tmx)
             tmx = self.layer3(tmx)
@@ -125,14 +144,9 @@ for epoch in range(EPOCH):
         else:
             acc.append(0)
         if step % 200 == 0:
-            accuracy = sum(acc)/len(acc)
+            accuracy = sum(acc) / len(acc)
             print('Epoch: ', epoch, '| train loss: %.4f' % loss.data.cpu().numpy(), '| test accuracy: %.2f' % accuracy)
             acc.clear()
 
     torch.save(clstm.state_dict(), "./save_model/clstm.pkl")
     print("模型被正常保存！")
-
-
-
-
-

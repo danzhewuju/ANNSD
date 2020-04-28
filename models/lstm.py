@@ -21,10 +21,10 @@ from torch.utils.data import Dataset, DataLoader
 EPOCH = 10  # train the training data n times, to save time, we just train 1 epoch
 BATCH_SIZE = 8
 TIME_STEP = 100  # rnn time step / image height
-INPUT_SIZE = 1000  # rnn input size / image width
+INPUT_SIZE = 500  # rnn input size / image width
 LR = 0.001  # learning rate
 
-TRAIN_PATH = "/home/cbd109-3/Users/data/yh/Program/Python/SEEG_Timing/preprocess/train.csv"
+TRAIN_PATH = "/home/cbd109-3/Users/data/yh/Program/Python/SEEG_Timing/preprocess/train_BDP.csv"
 TEST_PATH = "/home/cbd109-3/Users/data/yh/Program/Python/SEEG_Timing/preprocess/test.csv"
 
 data_train = Data_info(TRAIN_PATH)

@@ -13,6 +13,7 @@ import json
 import random
 from torch.utils.data import Dataset
 from util.util_file import matrix_normalization
+import torch.nn.utils.rnn as rnn_utils
 
 
 def train_data_split(patient_name="BDP", data_info_path="../preprocess/data_info.csv"):
@@ -54,9 +55,9 @@ def train_data_split(patient_name="BDP", data_info_path="../preprocess/data_info
     train_data = pd.DataFrame(train_data)
     test_data = pd.DataFrame(test_data)
     val_data = pd.DataFrame(val)
-    train_path = './train.csv'
-    test_path = './test.csv'
-    val_path = './val.csv'
+    train_path = './train_{}.csv'.format(patient_name)
+    test_path = './test_{}.csv'.format(patient_name)
+    val_path = './val_{}.csv'.format(patient_name)
     with open(train_path, 'w') as f:
         train_data.to_csv(f, index=None)
     with open(test_path, 'w') as f:
@@ -96,3 +97,6 @@ class MyDataset(Dataset):  # 重写dateset的相关类
 
     def __len__(self):
         return len(self.imgs)
+
+
+

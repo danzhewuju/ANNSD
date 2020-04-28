@@ -56,7 +56,7 @@ class GenData:
             os.makedirs(save_dir)  # 递归的构建文件夹
         fz = get_sampling_hz(self.data)  # 获得该数据的采样率
         for s, e in tqdm(self.gen_time):
-            name = str(uuid.uuid1()) + "_pre-{}_{}.npy".format(s, e)
+            name = str(uuid.uuid1()) + "-{}_{}.npy".format(s, e)
             path = os.path.join(save_dir, name)
             s = int(s * fz)
             e = int(e * fz)
@@ -135,4 +135,4 @@ def get_data_info(path_dir="../data/"):
 
 if __name__ == '__main__':
     # process_data()  # 数据的生成, 主要是用与生成时序数据
-    get_data_info()
+    get_data_info()  # 生成数据的划分文件·
