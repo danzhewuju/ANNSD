@@ -148,5 +148,5 @@ for epoch in range(EPOCH):
             print('Epoch: ', epoch, '| train loss: %.4f' % loss.data.cpu().numpy(), '| test accuracy: %.2f' % accuracy)
             acc.clear()
 
-    torch.save(clstm.state_dict(), "./save_model/clstm.pkl")
+    torch.save(clstm.state_dict(), "../save_model/clstm.pkl")
     print("模型被正常保存！")
