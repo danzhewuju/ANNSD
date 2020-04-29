@@ -13,6 +13,7 @@ import torchvision.datasets as dsets
 import torchvision.transforms as transforms
 import matplotlib.pyplot as plt
 import sys
+
 sys.path.append("../")
 from util.util_tool import *
 from torch.utils.data import Dataset, DataLoader
@@ -114,18 +115,23 @@ test_data = MyDataset(data_test.data)  # 作为测试集
 train_loader = DataLoader(train_data, batch_size=BATCH_SIZE, shuffle=True, collate_fn=collate_fn)
 test_loader = DataLoader(test_data, batch_size=BATCH_SIZE, shuffle=True, collate_fn=collate_fn)
 
-encoder_path = "../save_model/autoencoder_back.pkl"
+encoder_path = "../save_model/autoencoder.pkl"
 encoder = AutoEncoder().cuda(GPU)
 encoder.load_state_dict(torch.load(encoder_path))
 
+rnn_code_path = "../save_model/auto_encoder_lstm.pkl"
 rnn = RNN().cuda(GPU)
 optimizer = torch.optim.Adam(rnn.parameters(), lr=LR)  # optimize all cnn parameters
 loss_func = nn.CrossEntropyLoss()  # the target label is not one-hotted
+if os.path.exists(rnn_code_path):
+    rnn.state_dict(torch.load(rnn_code_path))
+    print("检测存在模型，进行加载......")
 
 acc = []
 for epoch in range(EPOCH):
     for step, (b_x, b_y, length) in enumerate(train_loader):  # gives batch data
-        res_x = torch.zeros((BATCH_SIZE, TIME_STEP, INPUT_SIZE))
+        bat = b_x.shape[0]
+        res_x = torch.zeros((bat, TIME_STEP, INPUT_SIZE))
         res_x = res_x.cuda(GPU)
         for i in range(b_x.shape[0]):  # batch size
             x = b_x[i][0]
@@ -148,14 +154,13 @@ for epoch in range(EPOCH):
 
         pred_y = torch.max(output, 1)[1].data
         pred_y = pred_y.cpu()
-        res_tmp = [1 if pred_y[i] == b_y[i] else 0 for  i in range(len(pred_y))]
+        res_tmp = [1 if pred_y[i] == b_y[i] else 0 for i in range(len(b_y))]
         acc += res_tmp
-        if step % 100 == 0:
+        if step > 0 and step % 50 == 0:
             accuracy = sum(acc) / len(acc)
             print('Epoch: ', epoch, '| train loss: %.4f' % loss.data.cpu().numpy(), '| test accuracy: %.2f' % accuracy)
             acc.clear()
             torch.save(rnn.state_dict(), "../save_model/auto_encoder_lstm.pkl")
             print("step:{} 模型保存成功！".format(step))
-
 
     print("模型被正常保存！")

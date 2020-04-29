@@ -109,8 +109,8 @@ class RNN(nn.Module):
 
 # 数据处理
 data_val = Data_info(VAL_PATH)
-test_data = MyDataset(data_val.data)  # 作为测试集
-test_loader = DataLoader(test_data, batch_size=BATCH_SIZE, shuffle=True, collate_fn=collate_fn)
+val_data = MyDataset(data_val.data)  # 作为测试集
+val_loader = DataLoader(val_data, batch_size=BATCH_SIZE, shuffle=True, collate_fn=collate_fn)
 
 encoder_path = "../save_model/autoencoder_back.pkl"
 encoder = AutoEncoder().cuda(GPU)
@@ -123,7 +123,8 @@ rnn.load_state_dict(torch.load(encoder_lstm_path))
 acc = []
 
 for step, (b_x, b_y, length) in enumerate(val_loader):  # gives batch data
-    res_x = torch.zeros((BATCH_SIZE, TIME_STEP, INPUT_SIZE))
+    bat = b_x.shape[0]
+    res_x = torch.zeros((bat, TIME_STEP, INPUT_SIZE))
     res_x = res_x.cuda(GPU)
     for i in range(b_x.shape[0]):  # batch size
         x = b_x[i][0]
