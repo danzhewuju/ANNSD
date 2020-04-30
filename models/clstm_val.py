@@ -29,7 +29,7 @@ LR = 0.001  # learning rate
 Resampling = 500  # resampling
 
 # 数据处理
-TRAIN_PATH = "/home/cbd109-3/Users/data/yh/Program/Python/SEEG_Timing/preprocess/train_BDP.csv"
+TEST_PATH = "/home/cbd109-3/Users/data/yh/Program/Python/SEEG_Timing/preprocess/test_BDP.csv"
 VAL_PATH = "/home/cbd109-3/Users/data/yh/Program/Python/SEEG_Timing/preprocess/val_BDP.csv"
 
 
@@ -56,6 +56,9 @@ data_val = Data_info(VAL_PATH)
 val_data = MyDataset(data_val.data)  # 作为测试集
 val_loader = DataLoader(val_data, batch_size=BATCH_SIZE, shuffle=True, collate_fn=collate_fn)
 
+data_test = Data_info(TEST_PATH)
+test_data = MyDataset(data_test.data)  # 作为测试集
+test_loader = DataLoader(test_data, batch_size=BATCH_SIZE, shuffle=True, collate_fn=collate_fn)
 
 class clstm(nn.Module):
     def __init__(self, gpu=None):
@@ -109,8 +112,8 @@ class clstm(nn.Module):
         for i in range(bat):
             tmp_x = x[i][0]
             length = tmp_x.shape[-1] / Resampling
-            for j in range(int(length)-1):
-                tmp_split = tmp_x[:, Resampling*j:(j+1)*Resampling]
+            for j in range(int(length) - 1):
+                tmp_split = tmp_x[:, Resampling * j:(j + 1) * Resampling]
                 tmp_split = torch.reshape(tmp_split, (1, 1, 100, Resampling))
                 tmx = self.layer1(tmp_split)
                 tmx = self.layer2(tmx)
@@ -126,26 +129,29 @@ class clstm(nn.Module):
         return out
 
 
+model_path = "../save_model/clstm.pkl"
 clstm = clstm(gpu=0).cuda(GPU)
-optimizer = torch.optim.Adam(clstm.parameters(), lr=LR)  # optimize all cnn parameters
-loss_func = nn.CrossEntropyLoss()  # the target label is not one-hotted
+clstm.load_state_dict(torch.load(model_path))
+print("loading model...")
+loss_func = nn.CrossEntropyLoss()
 
 acc = []
-for step, (b_x, b_y, length) in enumerate(val_loader):  # gives batch data
-    b_x_g = b_x.cuda(GPU)
-    b_y_g = b_y.cuda(GPU)
-    # b_x = b_x.view(-1, 100, 1000)  # reshape x to (batch, time_step, input_size)
-    output = clstm(b_x_g)  # rnn output
-    loss = loss_func(output, b_y_g)  # cross entropy loss
-    optimizer.zero_grad()  # clear gradients for this training step
-    loss.backward()  # backpropagation, compute gradients
-    optimizer.step()  # apply gradients
+for step, (b_x, b_y, length) in enumerate(test_loader):  # gives batch data
+    if step < 100:
+        b_x_g = b_x.cuda(GPU)
+        b_y_g = b_y.cuda(GPU)
+        # b_x = b_x.view(-1, 100, 1000)  # reshape x to (batch, time_step, input_size)
+        with torch.no_grad():
+            output = clstm(b_x_g)  # rnn output
+            loss = loss_func(output, b_y_g)  # cross entropy loss
 
-    pred_y = torch.max(output, 1)[1].data
-    pred_y = pred_y.cpu()
-    res_tmp = [1 if pred_y[i] == b_y[i] else 0 for i in range(len(b_y))]
-    acc += res_tmp
+            pred_y = torch.max(output, 1)[1].data
+            pred_y = pred_y.cpu()
+            res_tmp = [1 if pred_y[i] == b_y[i] else 0 for i in range(len(b_y))]
+            acc += res_tmp
+    else:
+        break
 
 accuracy = sum(acc) / len(acc)
-print('number of test data: ', len(acc), '| train loss: %.4f' % loss.data.cpu().numpy(), '| test accuracy: %.2f' % accuracy)
-print("模型被正常保存！")
+print('number of test data: ', len(acc), '| validation loss: %.4f' % loss.data.cpu().numpy(),
+      '| test accuracy: %.4f' % accuracy)
