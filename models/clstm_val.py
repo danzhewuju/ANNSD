@@ -1,10 +1,11 @@
 #!/usr/bin/env python
 # -*- coding: utf-8 -*-
-# @Time    : 2020/4/22 17:08
+# @Time    : 2020/4/22 13:07
 # @Author  : Alex
-# @Site    : 
-# @File    : clstm_val.py
+# @Site    :
+# @File    : clstm_train.py
 # @Software: PyCharm
+
 
 import torch
 from torch import nn
@@ -13,17 +14,47 @@ import torchvision.transforms as transforms
 import matplotlib.pyplot as plt
 from util.util_tool import *
 from torch.utils.data import Dataset, DataLoader
+import torch.nn.functional as F
 
+GPU = 0
 # torch.manual_seed(1)    # reproducible
 
 # Hyper Parameters
 EPOCH = 10  # train the training data n times, to save time, we just train 1 epoch
-BATCH_SIZE = 1
+BATCH_SIZE = 16
 # 数据首先需要经过CNN
 TIME_STEP = 15  # rnn time step / image height 数据输入的高度
-INPUT_SIZE = 100  # rnn input size / image width 数据输入的宽度
+INPUT_SIZE = 32  # rnn input size / image width 数据输入的宽度
 LR = 0.001  # learning rate
 Resampling = 500  # resampling
+
+# 数据处理
+TRAIN_PATH = "/home/cbd109-3/Users/data/yh/Program/Python/SEEG_Timing/preprocess/train_BDP.csv"
+VAL_PATH = "/home/cbd109-3/Users/data/yh/Program/Python/SEEG_Timing/preprocess/val_BDP.csv"
+
+
+def collate_fn(data):
+    # 主要是用数据的对齐
+    data.sort(key=lambda x: x[0].shape[-1], reverse=True)
+    max_shape = data[0][0].shape
+    labels = []  # 每个数据对应的标签
+    length = []  # 记录真实的数目长度
+    for i, (d, label) in enumerate(data):
+        d_shape = d.shape
+        length.append(d.shape[-1])
+        if d_shape[-1] < max_shape[-1]:
+            tmp_d = np.pad(d, ((0, 0), (0, 0), (0, max_shape[-1] - d_shape[-1])), 'constant')
+            data[i] = tmp_d
+        else:
+            data[i] = d
+        labels.append(label)
+
+    return torch.from_numpy(np.array(data)), torch.tensor(labels), length
+
+
+data_val = Data_info(VAL_PATH)
+val_data = MyDataset(data_val.data)  # 作为测试集
+val_loader = DataLoader(val_data, batch_size=BATCH_SIZE, shuffle=True, collate_fn=collate_fn)
 
 
 class clstm(nn.Module):
@@ -55,7 +86,7 @@ class clstm(nn.Module):
             nn.ReLU(),
             nn.MaxPool2d(kernel_size=2, stride=2)
         )
-        self.fc1 = nn.Linear(6 * 31 * 32, 100)  # x_ y_ 和你输入的矩阵有关系
+        self.fc1 = nn.Linear(6 * 31 * 32, 32)  # x_ y_ 和你输入的矩阵有关系
 
         self.rnn = nn.LSTM(  # if use nn.RNN(), it hardly learns
             input_size=INPUT_SIZE,
@@ -70,20 +101,24 @@ class clstm(nn.Module):
         # res = []
         # batch_size = x.size(0)
         # 需要对数据进行处理
+        bat = x.shape[0]
         if self.gpu is not None:
-            res = torch.zeros((1, 15, 100)).cuda(self.gpu)
+            res = torch.zeros((bat, 15, 32)).cuda(self.gpu)
         else:
-            res = torch.zeros((1, 15, 100))
-        length = x.size(-1) / Resampling
-        for i in range(int(length)):
-            tmx = x[:, :, :, i * 500:(i + 1) * 500]
-            tmx = self.layer1(tmx)
-            tmx = self.layer2(tmx)
-            tmx = self.layer3(tmx)
-            tmx = self.layer4(tmx)
-            tmx = tmx.reshape(1, -1)  # 这里面的-1代表的是自适应的意思。
-            tmx = self.fc1(tmx)
-            res[0][i] = tmx
+            res = torch.zeros((bat, 15, 32))
+        for i in range(bat):
+            tmp_x = x[i][0]
+            length = tmp_x.shape[-1] / Resampling
+            for j in range(int(length)-1):
+                tmp_split = tmp_x[:, Resampling*j:(j+1)*Resampling]
+                tmp_split = torch.reshape(tmp_split, (1, 1, 100, Resampling))
+                tmx = self.layer1(tmp_split)
+                tmx = self.layer2(tmx)
+                tmx = self.layer3(tmx)
+                tmx = self.layer4(tmx)
+                tmx = tmx.reshape(1, -1)  # 这里面的-1代表的是自适应的意思。
+                tmx = self.fc1(tmx)
+                res[i][j] = tmx
 
         r_out, (h_n, h_c) = self.rnn(res, None)  # None represents zero initial hidden state
         # choose r_out at the last time step
@@ -91,25 +126,26 @@ class clstm(nn.Module):
         return out
 
 
-VAL_PATH = "/home/cbd109-3/Users/data/yh/Program/Python/SEEG_Timing/preprocess/val.csv"
-model_path = "../save_model/clstm.pkl"
-data_val = Data_info(VAL_PATH)
-val_data = MyDataset(data_val.data)  # 作为验证集
-val_loader = DataLoader(val_data, batch_size=BATCH_SIZE, shuffle=True)
+clstm = clstm(gpu=0).cuda(GPU)
+optimizer = torch.optim.Adam(clstm.parameters(), lr=LR)  # optimize all cnn parameters
+loss_func = nn.CrossEntropyLoss()  # the target label is not one-hotted
 
-clstm = clstm(gpu=0).cuda(0)
-clstm.load_state_dict(torch.load(model_path))
 acc = []
-count = 1000
-for step, (b_x, b_y) in enumerate(val_loader):
-    if step < count:
-        b_x, b_y = b_x.cuda(0), b_y.cuda(0)
-        test_output = clstm(b_x)  # (samples, time_step, input_size)
-        pred_y = torch.max(test_output, 1)[1].data
-        if pred_y[0] == b_y[0]:
-            acc.append(1)
-        else:
-            acc.append(0)
-    else:
-        break
-print(np.mean(acc))
+for step, (b_x, b_y, length) in enumerate(val_loader):  # gives batch data
+    b_x_g = b_x.cuda(GPU)
+    b_y_g = b_y.cuda(GPU)
+    # b_x = b_x.view(-1, 100, 1000)  # reshape x to (batch, time_step, input_size)
+    output = clstm(b_x_g)  # rnn output
+    loss = loss_func(output, b_y_g)  # cross entropy loss
+    optimizer.zero_grad()  # clear gradients for this training step
+    loss.backward()  # backpropagation, compute gradients
+    optimizer.step()  # apply gradients
+
+    pred_y = torch.max(output, 1)[1].data
+    pred_y = pred_y.cpu()
+    res_tmp = [1 if pred_y[i] == b_y[i] else 0 for i in range(len(b_y))]
+    acc += res_tmp
+
+accuracy = sum(acc) / len(acc)
+print('number of test data: ', len(acc), '| train loss: %.4f' % loss.data.cpu().numpy(), '| test accuracy: %.2f' % accuracy)
+print("模型被正常保存！")
