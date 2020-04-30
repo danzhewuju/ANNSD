@@ -154,4 +154,4 @@ for step, (b_x, b_y, length) in enumerate(test_loader):  # gives batch data
 
 accuracy = sum(acc) / len(acc)
 print('number of test data: ', len(acc), '| validation loss: %.4f' % loss.data.cpu().numpy(),
-      '| test accuracy: %.4f' % accuracy)
+      '| validation accuracy: %.4f' % accuracy)
