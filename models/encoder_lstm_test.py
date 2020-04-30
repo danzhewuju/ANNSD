@@ -108,17 +108,18 @@ class RNN(nn.Module):
 
 
 # 数据处理
-data_val = Data_info(VAL_PATH)
+data_val = Data_info(TEST_PATH)
 val_data = MyDataset(data_val.data)  # 作为测试集
 val_loader = DataLoader(val_data, batch_size=BATCH_SIZE, shuffle=True, collate_fn=collate_fn)
 
-encoder_path = "../save_model/autoencoder_back.pkl"
+encoder_path = "../save_model/autoencoder.pkl"
 encoder = AutoEncoder().cuda(GPU)
 encoder.load_state_dict(torch.load(encoder_path))
 
 encoder_lstm_path = "../save_model/auto_encoder_lstm.pkl"
 rnn = RNN().cuda(GPU)
 rnn.load_state_dict(torch.load(encoder_lstm_path))
+print("模型被成功加载！")
 
 acc = []
 
@@ -145,10 +146,12 @@ for step, (b_x, b_y, length) in enumerate(val_loader):  # gives batch data
     pred_y = pred_y.cpu()
     res_tmp = [1 if pred_y[i] == b_y[i] else 0 for i in range(len(pred_y))]
     acc += res_tmp
-    if step != 0 and step % 1000 == 0:
+    if step >= 1000:
+        print("{} 条数据被测试！".format(len(acc)))
         accuracy = sum(acc) / len(acc)
-        print(' Step: ' + step + '| test accuracy: %.2f' % accuracy)
-        acc.clear()
+        print('data: ', len(acc), '| test accuracy: %.4f' % accuracy)
         break
 
-print("模型被正常保存！")
+
+
+
