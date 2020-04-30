@@ -136,8 +136,8 @@ print("loading model...")
 loss_func = nn.CrossEntropyLoss()
 
 acc = []
-for step, (b_x, b_y, length) in enumerate(test_loader):  # gives batch data
-    if step < 100:
+for step, (b_x, b_y, length) in enumerate(val_loader):  # gives batch data
+    if step < 10000:
         b_x_g = b_x.cuda(GPU)
         b_y_g = b_y.cuda(GPU)
         # b_x = b_x.view(-1, 100, 1000)  # reshape x to (batch, time_step, input_size)
