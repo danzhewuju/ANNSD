@@ -13,6 +13,7 @@ import torchvision.datasets as dsets
 import torchvision.transforms as transforms
 import matplotlib.pyplot as plt
 import sys
+
 sys.path.append('../')
 from util.util_tool import *
 from torch.utils.data import Dataset, DataLoader
@@ -114,8 +115,8 @@ class clstm(nn.Module):
         for i in range(bat):
             tmp_x = x[i][0]
             length = tmp_x.shape[-1] / Resampling
-            for j in range(int(length)-1):
-                tmp_split = tmp_x[:, Resampling*j:(j+1)*Resampling]
+            for j in range(int(length) - 1):
+                tmp_split = tmp_x[:, Resampling * j:(j + 1) * Resampling]
                 tmp_split = torch.reshape(tmp_split, (1, 1, 100, Resampling))
                 tmx = self.layer1(tmp_split)
                 tmx = self.layer2(tmx)
@@ -153,9 +154,25 @@ for epoch in range(EPOCH):
         acc += res_tmp
         if step > 0 and step % 50 == 0:
             accuracy = sum(acc) / len(acc)
-            print('Epoch: ', epoch, '| train loss: %.4f' % loss.data.cpu().numpy(), '| test accuracy: %.6f' % accuracy)
+            print('Epoch: ', epoch, '| train loss: %.6f' % loss.data.cpu().numpy(), '| train accuracy: %.6f' % accuracy)
             acc.clear()
             torch.save(clstm.state_dict(), "../save_model/auto_encoder_lstm.pkl")
             print("step:{} 模型保存成功！".format(step))
 
     print("模型被正常保存！")
+    acc.clear()
+    for step, (b_x, b_y, length) in enumerate(test_loader):  # gives batch data
+        b_x_g = b_x.cuda(0)
+        b_y_g = b_y.cuda(0)
+        # b_x = b_x.view(-1, 100, 1000)  # reshape x to (batch, time_step, input_size)
+        with torch.no_grad():
+
+            output = clstm(b_x_g)  # rnn output
+            loss = loss_func(output, b_y_g)  # cross entropy loss
+            pred_y = torch.max(output, 1)[1].data
+            pred_y = pred_y.cpu()
+            res_tmp = [1 if pred_y[i] == b_y[i] else 0 for i in range(len(b_y))]
+            acc += res_tmp
+        accuracy = sum(acc) / len(acc)
+        print('Epoch: ', epoch, '| test loss: %.6f' % loss.data.cpu().numpy(), '| test accuracy: %.6f' % accuracy)
+        acc.clear()

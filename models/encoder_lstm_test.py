@@ -38,6 +38,11 @@ GPU = 0
 
 
 def collate_fn(data):  #
+    '''
+    用于自己构造时序数据，包含数据对齐以及数据长度
+    :param data: torch dataloader 的返回形式
+    :return:
+    '''
     # 主要是用数据的对齐
     data.sort(key=lambda x: x[0].shape[-1], reverse=True)
     max_shape = data[0][0].shape
@@ -146,4 +151,4 @@ for step, (b_x, b_y, length) in enumerate(val_loader):  # gives batch data
     res_tmp = [1 if pred_y[i] == b_y[i] else 0 for i in range(len(pred_y))]
     acc += res_tmp
 accuracy = sum(acc) / len(acc)
-print(' 测试数据： ' ,  len(acc) , '| test accuracy: %.2f' % accuracy)
+print(' 测试数据： ', len(acc), '| test accuracy: %.2f' % accuracy)

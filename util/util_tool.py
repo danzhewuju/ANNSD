@@ -13,6 +13,7 @@ import json
 import random
 from torch.utils.data import Dataset
 from util.util_file import matrix_normalization
+import torch
 import torch.nn.utils.rnn as rnn_utils
 
 
@@ -66,6 +67,29 @@ def train_data_split(patient_name="BDP", data_info_path="../preprocess/data_info
         val_data.to_csv(f, index=None)
     print("数据划分完成")
 
+
+def collate_fn(data):  #
+    '''
+    用于自己构造时序数据，包含数据对齐以及数据长度
+    :param data: torch dataloader 的返回形式
+    :return:
+    '''
+    # 主要是用数据的对齐
+    data.sort(key=lambda x: x[0].shape[-1], reverse=True)
+    max_shape = data[0][0].shape
+    labels = []  # 每个数据对应的标签
+    length = []  # 记录真实的数目长度
+    for i, (d, label) in enumerate(data):
+        d_shape = d.shape
+        length.append(d.shape[-1])
+        if d_shape[-1] < max_shape[-1]:
+            tmp_d = np.pad(d, ((0, 0), (0, 0), (0, max_shape[-1] - d_shape[-1])), 'constant')
+            data[i] = tmp_d
+        else:
+            data[i] = d
+        labels.append(label)
+
+    return torch.from_numpy(np.array(data)), torch.tensor(labels), length
 
 class Data_info():
     def __init__(self, path_train):
