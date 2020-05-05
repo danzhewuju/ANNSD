@@ -37,7 +37,7 @@ class DAN(nn.Module):
             nn.MaxPool2d(kernel_size=2, stride=2),
 
         )
-        self.fc1 = nn.Linear(nn.Linear(6 * 31 * 32, c_dim))  # x_ y_ 和你输入的矩阵有关系
+        self.fc1 = nn.Linear(6 * 31 * 32, c_dim)  # x_ y_ 和你输入的矩阵有关系
 
         self.label_classifier = nn.LSTM(
             input_size=c_dim,
@@ -84,11 +84,11 @@ class DAN(nn.Module):
     def forward(self, x, label, domain, length, alpha=1):
         code = self.trans_data(x, length)
         label_tmp, (_, _) = self.label_classifier(code)
-        y_label = self.label_fc(label_tmp)
+        y_label = self.label_fc(label_tmp[:, -1, :])
         if self.model == 'train':
             reverse_feature = ReverseLayerF.apply(code, alpha)  # 对抗样本需要经过GRL模块
             domain_tmp,(_, _) = self.domain_classifier(reverse_feature)
-            y_domain = self.domain_fc(domain_tmp)
+            y_domain = self.domain_fc(domain_tmp[:, -1, :])
             return y_label, y_domain
         else:
             return y_label

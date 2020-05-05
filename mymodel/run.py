@@ -1,13 +1,13 @@
-from .run_model import DanTrainer
+from run_model import DanTrainer
 import argparse
 
 if __name__ == '__main__':
     parser = argparse.ArgumentParser()
     parser.add_argument('-lr', '--learning_ratio', type=float, default=0.001, help='learning ratio of model')
     parser.add_argument('-dim', '--output_dim', type=int, default=32, help='number of hidden units in encoder')
-    parser.add_argument('-bs', '--batch_size', type=int, default=26, help='number of bath size')
+    parser.add_argument('-bs', '--batch_size', type=int, default=16, help='number of bath size')
     parser.add_argument('-gpu', '--GPU', type=int, default=0, help='GPU ID')
-    parser.add_argument('-ep', '--epoch', type=int, default=26, help='number of epoch')
+    parser.add_argument('-ep', '--epoch', type=int, default=10, help='number of epoch')
 
     parser.add_argument('-trp', '--train_path', type=str, default="../preprocess/train_{}.csv",
                         help='training data path')
@@ -25,6 +25,8 @@ if __name__ == '__main__':
     batch_size = args.batch_size
     epoch = args.epoch
     gpu = args.GPU
+    patient = args.patient
+    train_path, test_path, val_path = train_path.format(patient), test_path.format(patient), val_path.format(patient)
 
     dan_train = DanTrainer(epoch, bath_size=batch_size, lr=lr, GPU=gpu, train_path=train_path, test_path=test_path, val_path= val_path)
     dan_train.train()

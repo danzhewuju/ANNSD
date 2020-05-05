@@ -1,12 +1,12 @@
 import torch
-from .data_util import MyData
-from .model_util import DAN
+from data_util import MyData
+from model_util import DAN
 import torch.nn as nn
 from tqdm import tqdm
 import os
 
 
-class DanTrainer():
+class DanTrainer:
     def __init__(self, epoch=10, bath_size=16, lr=0.001, GPU=0, train_path=None, test_path=None, val_path=None):
         self.epoch = epoch
         self.batch_size = bath_size
@@ -21,7 +21,7 @@ class DanTrainer():
             self.model = DAN(gpu=GPU, model='train')  # 放入内存中
 
     def save_mode(self, save_path='../save_model'):
-        if os.path.exists(save_path):
+        if not os.path.exists(save_path):
             os.mkdir(save_path)
         save_full_path = os.path.join(save_path, 'DAN.pkl')
         torch.save(self.model.state_dict(), save_full_path)
@@ -57,29 +57,29 @@ class DanTrainer():
                 label_output, domain_output = self.model(x, label, domain, length)
                 loss_label = loss_func(label_output, label)
                 loss_domain = loss_func(domain_output, domain)
-                loss_total = loss_label + loss_domain
+                loss_total = (loss_label + loss_domain) * 0.5
                 optimizer.zero_grad()
                 loss_total.backward()
                 optimizer.step()
 
-                pre_y = torch.max(label_output, 1).values.data.cpu()
+                pre_y = torch.max(label_output, 1)[1].data.cpu()
                 y = label.cpu()
                 acc += [1 if pre_y[i] == y[i] else 0 for i in range(len(y))]
                 loss.append(loss_total.data.cpu())
                 if step > 0 and step % 50 == 0:
                     acc_test, test_loss = [], []
-                    for x_test, label_test, domain_test, length in next(mydata.next_batch_test_data()):
+                    for x_test, label_test, domain_test, length_test in next(mydata.next_batch_test_data()):
                         if self.gpu is not None:
-                            x, label, domain, length = x.cuda(self.gpu), label.cuda(self.gpu), domain.cuda(
-                                self.gpu), length.cuda(
-                                self.gpu)
+                            x_test, label_test, domain_test, length_test = x_test.cuda(self.gpu), label_test.cuda(
+                                self.gpu), domain_test.cuda(
+                                self.gpu), length_test.cuda(self.gpu)
                         with torch.no_grad():
-                            label_output, domain_output = self.model(x, label, domain, length)
-                            loss_label = loss_func(label_output, label)
-                            loss_domain = loss_func(domain_output, domain)
+                            label_output, domain_output = self.model(x_test, label_test, domain_test, length_test)
+                            loss_label = loss_func(label_output, label_test)
+                            loss_domain = loss_func(domain_output, domain_test)
                             loss_total = loss_label + loss_domain
 
-                            y = label.cpu()
+                            y = label_test.cpu()
                             acc_test += [1 if pre_y[i] == y[i] else 0 for i in range(len(y))]
                             test_loss.append(loss_total.data.cpu())
                     test_accuracy_avg = sum(acc_test) / len(acc_test)

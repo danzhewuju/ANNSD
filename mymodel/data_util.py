@@ -1,6 +1,8 @@
 import pandas as pd
 from torch.utils.data import Dataset, DataLoader
 import numpy as np
+import sys
+sys.path.append('../')
 from util.util_tool import matrix_normalization, collate_fn
 import torch
 
@@ -38,7 +40,7 @@ class MyDataset(Dataset):  # 重写dateset的相关类
         self.target_transform = target_transform
 
     def __getitem__(self, index):
-        fn, label, domain = self.imgs[index]
+        fn, label, domain = self.data[index]
         data = np.load(fn)
         # data = self.transform(data)
         result = matrix_normalization(data, (100, 1000))
@@ -48,7 +50,7 @@ class MyDataset(Dataset):  # 重写dateset的相关类
         return result, label, domain
 
     def __len__(self):
-        return len(self.imgs)
+        return len(self.data)
 
 
 class MyData():
@@ -89,7 +91,7 @@ class MyData():
             labels.append(label)
             domains.append(patient)
 
-        return torch.from_numpy(np.array(data)), torch.tensor(labels), torch.tensor(domains), length
+        return torch.from_numpy(np.array(data)), torch.tensor(labels), torch.tensor(domains), torch.tensor(length)
 
     def data_loader(self, mode='train'):
         if mode == 'train':
