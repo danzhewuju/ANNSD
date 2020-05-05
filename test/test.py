@@ -17,19 +17,33 @@ from torch import nn
 import torch.nn.functional as F
 from torch.utils.data import Dataset, DataLoader
 import torch.nn.utils.rnn as rnn_utils
-from util.util_tool import Data_info, MyDataset,collate_fn
-
-
+from util.util_tool import Data_info, MyDataset, collate_fn
 
 if __name__ == '__main__':
-    BATCH_SIZE = 16
-    TEST_PATH = "/home/cbd109-3/Users/data/yh/Program/Python/SEEG_Timing/preprocess/test_BDP.csv"
-    VAL_PATH = "/home/cbd109-3/Users/data/yh/Program/Python/SEEG_Timing/preprocess/val_BDP.csv"
-    data_val = Data_info(VAL_PATH)
-    val_data = MyDataset(data_val.data)  # 作为测试集
-    # data = val_data[1]
-    # print(data)
-    val_loader = DataLoader(val_data, batch_size=BATCH_SIZE, shuffle=True, collate_fn=collate_fn)
-    data_iter = list(val_loader)
-    d = data_iter[1]
-    print(d)
+    TRAIN_PATH = "/home/cbd109-3/Users/data/yh/Program/Python/SEEG_Timing/preprocess/train_BDP.csv"
+    datainfo = Data_info(TRAIN_PATH)
+    p = datainfo.next_batch_data(16)
+    print(p)
+    mydataset = MyDataset(next(p))
+    dataLoader = DataLoader(mydataset, shuffle=True, batch_size=8, collate_fn=collate_fn)
+    for ima, l , _ in dataLoader:
+        print(ima, l)
+    # a = np.random.randint(0, 5, 1)
+    # print(a)
+    d = datainfo.next_batch_data(16)
+    data = MyDataset(next(d))
+    dataLoader = DataLoader(data, shuffle=True, batch_size=16, collate_fn = collate_fn)
+    ima, l, _ =  dataLoader
+    print("IMA, l")
+
+    # a = np.random.randint(0, 5, 1)
+    # # print(a)
+    # a = 0
+    # if a :
+    #     print("True")
+    # else:
+    #     print("False")
+    # a = torch.randn((5, 2))
+    # b = torch.max(a, 1).values
+    # print(b)
+

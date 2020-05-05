@@ -102,6 +102,18 @@ class Data_info():
             self.data.append((data_path[i], dict_label[label[i]]))
         self.data_length = len(self.data)
 
+    def next_batch_data(self, batch_size):  # 用于返回一个batch的数据
+        N = self.data_length
+        start = 0
+        end = batch_size
+        while end < N:
+            yield self.data[start:batch_size]
+            start = end
+            end += batch_size
+            if end >= N:
+                start = 0
+                end = batch_size
+
 
 class MyDataset(Dataset):  # 重写dateset的相关类
     def __init__(self, imgs, transform=None, target_transform=None):
@@ -113,7 +125,7 @@ class MyDataset(Dataset):  # 重写dateset的相关类
         fn, label = self.imgs[index]
         data = np.load(fn)
         # data = self.transform(data)
-        result = matrix_normalization(data, (100, 1000))
+        result = matrix_normalization(data, (100, 500))
         result = result.astype('float32')
         result = result[np.newaxis, :]
         # result = trans_data(vae_model, result)

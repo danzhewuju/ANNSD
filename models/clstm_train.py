@@ -144,6 +144,7 @@ for epoch in range(EPOCH):
         # b_x = b_x.view(-1, 100, 1000)  # reshape x to (batch, time_step, input_size)
         output = clstm(b_x_g)  # rnn output
         loss = loss_func(output, b_y_g)  # cross entropy loss
+
         optimizer.zero_grad()  # clear gradients for this training step
         loss.backward()  # backpropagation, compute gradients
         optimizer.step()  # apply gradients
