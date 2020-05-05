@@ -74,13 +74,15 @@ class DanTrainer:
                                 self.gpu), domain_test.cuda(
                                 self.gpu), length_test.cuda(self.gpu)
                         with torch.no_grad():
-                            label_output, domain_output = self.model(x_test, label_test, domain_test, length_test)
-                            loss_label = loss_func(label_output, label_test)
-                            loss_domain = loss_func(domain_output, domain_test)
-                            loss_total = loss_label + loss_domain
+                            label_output_test, domain_output_test = self.model(x_test, label_test, domain_test,
+                                                                               length_test)
+                            loss_label = loss_func(label_output_test, label_test)
+                            loss_domain = loss_func(domain_output_test, domain_test)
+                            loss_total = (loss_label + loss_domain) * 0.5
 
-                            y = label_test.cpu()
-                            acc_test += [1 if pre_y[i] == y[i] else 0 for i in range(len(y))]
+                            y_test = label_test.cpu()
+                            pre_y_test = torch.max(label_output_test, 1)[1].data
+                            acc_test += [1 if pre_y_test[i] == y_test[i] else 0 for i in range(len(y_test))]
                             test_loss.append(loss_total.data.cpu())
                     test_accuracy_avg = sum(acc_test) / len(acc_test)
                     test_loss_avg = sum(test_loss) / len(test_loss)
@@ -91,7 +93,8 @@ class DanTrainer:
                             epoch, step, loss_avg, test_loss_avg, accuracy_avg, test_accuracy_avg))
                     acc.clear()
                     loss.clear()
-
-                    if last_test_accuracy < test_accuracy_avg:
+                    if last_test_accuracy == 1:
+                        last_test_accuracy = 0
+                    if last_test_accuracy <= test_accuracy_avg:
                         self.save_mode()  # 保存较好的模型
                         last_test_accuracy = test_accuracy_avg
