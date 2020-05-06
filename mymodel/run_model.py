@@ -39,12 +39,17 @@ class DanTrainer:
 
     def log_write(self, result, path='../log/log.txt'):
         time_stamp = time.strftime("%Y-%m-%d %H:%M:%S", time.localtime())
-        if not os.path.exists(path):
-            os.makedirs(path)
-        with open(path, 'a') as f:
-            result += result + "\t" + time_stamp
-            print(result)
-            f.writelines(result)
+        dir_name = os.path.dirname(path)
+        if not os.path.exists(dir_name):
+            os.mkdir(dir_name)
+        if os.path.exists(path):
+            f = open(path, 'w')
+        else:
+            f = open(path,'a')
+        result_log = result + "\t" + time_stamp +'\n'
+        print(result_log)
+        f.write(result_log)
+        f.close()
         print("Generating log!")
 
 
@@ -132,8 +137,8 @@ class DanTrainer:
                 acc += [1 if pre_y[i] == y[i] else 0 for i in range(len(y))]
                 loss.append(loss_total.data.cpu())
         loss_avg  = sum(loss)/len(loss)
-        accuracy_avg = sum(acc)
-        result = "Data size:{}| Val loss:{}| Accuracy:{} ".format(len(acc), loss_avg, accuracy_avg)
+        accuracy_avg = sum(acc) / len(acc)
+        result = "Data size:{}| Val loss:{:.6f}| Accuracy:{:.5f} ".format(len(acc), loss_avg, accuracy_avg)
         self.log_write(result)
 
 
