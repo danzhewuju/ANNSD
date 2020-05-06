@@ -18,23 +18,38 @@ import torch.nn.functional as F
 from torch.utils.data import Dataset, DataLoader
 import torch.nn.utils.rnn as rnn_utils
 from util.util_tool import Data_info, MyDataset, collate_fn
+import torchvision.transforms as transforms
+from torchvision.utils import save_image
+
+from torch.utils.data import DataLoader
+from torchvision import datasets
+from torch.autograd import Variable
+
+import torch.nn as nn
+import torch.nn.functional as F
+import torch
+
+def test_1():
+    Tensor =  torch.FloatTensor
+    valid = Variable(Tensor(64, 1).fill_(1.0), requires_grad=False)
+    print(valid)
 
 if __name__ == '__main__':
-    TRAIN_PATH = "/home/cbd109-3/Users/data/yh/Program/Python/SEEG_Timing/preprocess/train_BDP.csv"
-    datainfo = Data_info(TRAIN_PATH)
-    p = datainfo.next_batch_data(16)
-    print(p)
-    mydataset = MyDataset(next(p))
-    dataLoader = DataLoader(mydataset, shuffle=True, batch_size=8, collate_fn=collate_fn)
-    for ima, l , _ in dataLoader:
-        print(ima, l)
-    # a = np.random.randint(0, 5, 1)
-    # print(a)
-    d = datainfo.next_batch_data(16)
-    data = MyDataset(next(d))
-    dataLoader = DataLoader(data, shuffle=True, batch_size=16, collate_fn = collate_fn)
-    ima, l, _ =  dataLoader
-    print("IMA, l")
+    # TRAIN_PATH = "/home/cbd109-3/Users/data/yh/Program/Python/SEEG_Timing/preprocess/train_BDP.csv"
+    # datainfo = Data_info(TRAIN_PATH)
+    # p = datainfo.next_batch_data(16)
+    # print(p)
+    # mydataset = MyDataset(next(p))
+    # dataLoader = DataLoader(mydataset, shuffle=True, batch_size=8, collate_fn=collate_fn)
+    # for ima, l , _ in dataLoader:
+    #     print(ima, l)
+    # # a = np.random.randint(0, 5, 1)
+    # # print(a)
+    # d = datainfo.next_batch_data(16)
+    # data = MyDataset(next(d))
+    # dataLoader = DataLoader(data, shuffle=True, batch_size=16, collate_fn = collate_fn)
+    # ima, l, _ =  dataLoader
+    # print("IMA, l")
 
     # a = np.random.randint(0, 5, 1)
     # # print(a)
@@ -46,4 +61,5 @@ if __name__ == '__main__':
     # a = torch.randn((5, 2))
     # b = torch.max(a, 1).values
     # print(b)
+    test_1()
 

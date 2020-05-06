@@ -42,7 +42,7 @@ class DanTrainer:
         dir_name = os.path.dirname(path)
         if not os.path.exists(dir_name):
             os.mkdir(dir_name)
-        if os.path.exists(path):
+        if not os.path.exists(path):
             f = open(path, 'w')
         else:
             f = open(path,'a')

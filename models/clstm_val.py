@@ -12,6 +12,8 @@ from torch import nn
 import torchvision.datasets as dsets
 import torchvision.transforms as transforms
 import matplotlib.pyplot as plt
+import sys
+sys.path.append('../')
 from util.util_tool import *
 from torch.utils.data import Dataset, DataLoader
 import torch.nn.functional as F
@@ -136,7 +138,7 @@ print("loading model...")
 loss_func = nn.CrossEntropyLoss()
 
 acc = []
-for step, (b_x, b_y, length) in enumerate(val_loader):  # gives batch data
+for step, (b_x, b_y, length) in enumerate(test_loader):  # gives batch data
     if step < 10000:
         b_x_g = b_x.cuda(GPU)
         b_y_g = b_y.cuda(GPU)
