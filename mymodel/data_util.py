@@ -93,7 +93,7 @@ class MyData():
 
         return torch.from_numpy(np.array(data)), torch.tensor(labels), torch.tensor(domains), torch.tensor(length)
 
-    def data_loader(self, mode='train'):
+    def data_loader(self, mode='train'): # 这里只有两个模式，一个是train/一个是val
         if mode == 'train':
             data_info = DataInfo(self.path_train)
         else:

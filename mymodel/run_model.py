@@ -4,10 +4,11 @@ from model_util import DAN
 import torch.nn as nn
 from tqdm import tqdm
 import os
+import time
 
 
 class DanTrainer:
-    def __init__(self, epoch=10, bath_size=16, lr=0.001, GPU=0, train_path=None, test_path=None, val_path=None):
+    def __init__(self, epoch=10, bath_size=16, lr=0.001, GPU=0, train_path=None, test_path=None, val_path=None, model = 'train'):
         self.epoch = epoch
         self.batch_size = bath_size
         self.lr = lr
@@ -16,9 +17,9 @@ class DanTrainer:
         self.val_path = val_path
         self.gpu = GPU
         if GPU is not None:
-            self.model = DAN(gpu=GPU, model='train').cuda(GPU)  # 放入显存中
+            self.model = DAN(gpu=GPU, model=model).cuda(GPU)  # 放入显存中
         else:
-            self.model = DAN(gpu=GPU, model='train')  # 放入内存中
+            self.model = DAN(gpu=GPU, model=model)  # 放入内存中
 
     def save_mode(self, save_path='../save_model'):
         if not os.path.exists(save_path):
@@ -31,10 +32,21 @@ class DanTrainer:
     def load_model(self, model_path='../save_model/DAN.pkl'):
         if os.path.exists(model_path):
             self.model.load_state_dict(torch.load(model_path))
-            print("Loading Mode DAN from {}......".format(model_path))
+            print("Loading Mode DAN from {}".format(model_path))
         else:
-            print("Model is not exist in {}......".format(model_path))
+            print("Model is not exist in {}".format(model_path))
         return
+
+    def log_write(self, result, path='../log/log.txt'):
+        time_stamp = time.strftime("%Y-%m-%d %H:%M:%S", time.localtime())
+        if not os.path.exists(path):
+            os.makedirs(path)
+        with open(path, 'a') as f:
+            result += result + "\t" + time_stamp
+            print(result)
+            f.writelines(result)
+        print("Generating log!")
+
 
     def train(self):  # 用于模型的训练
         mydata = MyData(self.train_path, self.test_path, self.val_path, self.batch_size)
@@ -98,3 +110,32 @@ class DanTrainer:
                     if last_test_accuracy <= test_accuracy_avg:
                         self.save_mode()  # 保存较好的模型
                         last_test_accuracy = test_accuracy_avg
+
+    def val(self):
+        self.load_model() # 加载模型
+        mydata = MyData(self.train_path, self.test_path, self.val_path, self.batch_size)
+        val_data_loader = mydata.data_loader(mode='val')
+        acc = []
+        loss = []
+        loss_func = nn.CrossEntropyLoss()
+        for step, (x, label, domain, length) in tqdm(enumerate(val_data_loader)):
+            if self.gpu is not None:
+                x, label, domain, length = x.cuda(self.gpu), label.cuda(self.gpu), domain.cuda(
+                    self.gpu), length.cuda(
+                    self.gpu)
+            with torch.no_grad():
+                label_output = self.model(x, label, domain, length)
+                loss_label = loss_func(label_output, label)
+                loss_total = loss_label
+                pre_y = torch.max(label_output, 1)[1].data.cpu()
+                y = label.cpu()
+                acc += [1 if pre_y[i] == y[i] else 0 for i in range(len(y))]
+                loss.append(loss_total.data.cpu())
+        loss_avg  = sum(loss)/len(loss)
+        accuracy_avg = sum(acc)
+        result = "Data size:{}| Val loss:{}| Accuracy:{} ".format(len(acc), loss_avg, accuracy_avg)
+        self.log_write(result)
+
+
+
+
