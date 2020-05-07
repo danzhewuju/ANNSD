@@ -66,7 +66,7 @@ class DAN(nn.Module):
         '''
         max_length = length[0] // self.resampling
         bat = x.shape[0]
-        if self.gpu is not None:
+        if self.gpu >=0 :
             res = torch.zeros((bat, max_length, self.dim)).cuda(self.gpu)
         else:
             res = torch.zeros((bat, max_length, self.dim))

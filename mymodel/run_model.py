@@ -18,7 +18,7 @@ class DanTrainer:
         self.test_path = test_path
         self.val_path = val_path
         self.gpu = GPU
-        if GPU is not None:
+        if GPU >= 0:
             self.model = DAN(gpu=GPU, model=model).cuda(GPU)  # 放入显存中
         else:
             self.model = DAN(gpu=GPU, model=model)  # 放入内存中
@@ -104,7 +104,7 @@ class DanTrainer:
         for epoch in tqdm(range(self.epoch)):
 
             for step, (x, label, domain, length) in tqdm(enumerate(train_data_loader)):
-                if self.gpu is not None:
+                if self.gpu >= 0:
                     x, label, domain, length = x.cuda(self.gpu), label.cuda(self.gpu), domain.cuda(
                         self.gpu), length.cuda(
                         self.gpu)
@@ -130,7 +130,7 @@ class DanTrainer:
 
                     acc_test, test_loss = [], []
                     for x_test, label_test, domain_test, length_test in next(mydata.next_batch_test_data()):
-                        if self.gpu is not None:
+                        if self.gpu >= 0:
                             x_test, label_test, domain_test, length_test = x_test.cuda(self.gpu), label_test.cuda(
                                 self.gpu), domain_test.cuda(
                                 self.gpu), length_test.cuda(self.gpu)
@@ -187,7 +187,7 @@ class DanTrainer:
         loss = []
         loss_func = nn.CrossEntropyLoss()
         for step, (x, label, domain, length) in tqdm(enumerate(val_data_loader)):
-            if self.gpu is not None:
+            if self.gpu >= 0:
                 x, label, domain, length = x.cuda(self.gpu), label.cuda(self.gpu), domain.cuda(
                     self.gpu), length.cuda(
                     self.gpu)
