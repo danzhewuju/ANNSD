@@ -8,6 +8,8 @@
 # from data.generatedata import generate_data
 
 from torch.autograd import Variable
+from tqdm import tqdm
+import time
 import os
 
 import torch
@@ -56,5 +58,19 @@ def test_2():
     draw_loss_plt(**info)
 
 
+def test_3():
+    n = 5
+    m = 300
+    with tqdm(total=n * m) as pbar:
+        for i1 in tqdm(range(n)):
+            for i2 in tqdm(range(m)):
+                # do something, e.g. sleep
+                time.sleep(0.01)
+                pbar.update(1)
+
+
+
+
+
 if __name__ == '__main__':
-    test_2()
+    test_3()

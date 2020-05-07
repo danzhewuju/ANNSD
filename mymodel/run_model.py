@@ -59,6 +59,7 @@ class DanTrainer:
         loss_l, loss_d, loss_t, acc = kwargs['loss_l'], kwargs['loss_d'], kwargs['loss_t'], kwargs['acc']
         plot_save_path = kwargs['save_path']
         model_info = kwargs['model_info']
+        show = kwargs['show']
         dir_name = os.path.dirname(plot_save_path)
         if not os.path.exists(dir_name):
             os.mkdir(dir_name)
@@ -74,7 +75,9 @@ class DanTrainer:
         plt.plot(x, acc, label='Accuracy')
         plt.legend(loc='upper right')
         plt.savefig(plot_save_path)
-        plt.show()
+        if show:
+            plt.show()
+        plt.close()
         print("The Picture has been saved.")
 
     def train(self):  # 用于模型的训练
@@ -100,83 +103,85 @@ class DanTrainer:
         test_loss_domain_discriminator_vi = []
 
         last_test_accuracy = 0
+        with tqdm(total=self.epoch * len(train_data_loader)) as pbar:
+            for epoch in tqdm(range(self.epoch)):
 
-        for epoch in tqdm(range(self.epoch)):
+                for step, (x, label, domain, length) in enumerate(tqdm(train_data_loader)):
+                    if self.gpu >= 0:
+                        x, label, domain, length = x.cuda(self.gpu), label.cuda(self.gpu), domain.cuda(
+                            self.gpu), length.cuda(
+                            self.gpu)
+                    label_output, domain_output = self.model(x, label, domain, length)
+                    loss_label = loss_func(label_output, label)
+                    loss_domain = loss_func(domain_output, domain)
+                    loss_total = (loss_label + loss_domain) * 0.5
+                    optimizer.zero_grad()
+                    loss_total.backward()
+                    optimizer.step()
 
-            for step, (x, label, domain, length) in tqdm(enumerate(train_data_loader)):
-                if self.gpu >= 0:
-                    x, label, domain, length = x.cuda(self.gpu), label.cuda(self.gpu), domain.cuda(
-                        self.gpu), length.cuda(
-                        self.gpu)
-                label_output, domain_output = self.model(x, label, domain, length)
-                loss_label = loss_func(label_output, label)
-                loss_domain = loss_func(domain_output, domain)
-                loss_total = (loss_label + loss_domain) * 0.5
-                optimizer.zero_grad()
-                loss_total.backward()
-                optimizer.step()
+                    pre_y = torch.max(label_output, 1)[1].data.cpu()
+                    y = label.cpu()
+                    acc += [1 if pre_y[i] == y[i] else 0 for i in range(len(y))]
+                    loss.append(loss_total.data.cpu())
+                    if step % 50 == 0:
+                        # 数据可视化的整理
+                        # 训练集的数据整理
+                        loss_vi.append(loss_total.data.cpu())
+                        loss_prediction_vi.append(loss_label.data.cpu())
+                        loss_domain_discrimination_vi.append(loss_domain.data.cpu())
 
-                pre_y = torch.max(label_output, 1)[1].data.cpu()
-                y = label.cpu()
-                acc += [1 if pre_y[i] == y[i] else 0 for i in range(len(y))]
-                loss.append(loss_total.data.cpu())
-                loss_vi.append(loss_total.data.cpu())
-                if step % 50 == 0:
-                    # 数据可视化的整理
-                    # 训练集的数据整理
-                    loss_vi.append(loss_total.data.cpu())
-                    loss_prediction_vi.append(loss_label.data.cpu())
-                    loss_domain_discrimination_vi.append(loss_domain.data.cpu())
+                        acc_test, test_loss = [], []
+                        for x_test, label_test, domain_test, length_test in next(mydata.next_batch_test_data()):
+                            if self.gpu >= 0:
+                                x_test, label_test, domain_test, length_test = x_test.cuda(self.gpu), label_test.cuda(
+                                    self.gpu), domain_test.cuda(
+                                    self.gpu), length_test.cuda(self.gpu)
+                            with torch.no_grad():
+                                label_output_test, domain_output_test = self.model(x_test, label_test, domain_test,
+                                                                                   length_test)
+                                loss_label = loss_func(label_output_test, label_test)
+                                loss_domain = loss_func(domain_output_test, domain_test)
+                                loss_total = (loss_label + loss_domain) * 0.5
 
-                    acc_test, test_loss = [], []
-                    for x_test, label_test, domain_test, length_test in next(mydata.next_batch_test_data()):
-                        if self.gpu >= 0:
-                            x_test, label_test, domain_test, length_test = x_test.cuda(self.gpu), label_test.cuda(
-                                self.gpu), domain_test.cuda(
-                                self.gpu), length_test.cuda(self.gpu)
-                        with torch.no_grad():
-                            label_output_test, domain_output_test = self.model(x_test, label_test, domain_test,
-                                                                               length_test)
-                            loss_label = loss_func(label_output_test, label_test)
-                            loss_domain = loss_func(domain_output_test, domain_test)
-                            loss_total = (loss_label + loss_domain) * 0.5
+                                y_test = label_test.cpu()
+                                pre_y_test = torch.max(label_output_test, 1)[1].data
+                                acc_test += [1 if pre_y_test[i] == y_test[i] else 0 for i in range(len(y_test))]
+                                test_loss.append(loss_total.data.cpu())
+                        # 测试集的数据可视化的整理
 
-                            y_test = label_test.cpu()
-                            pre_y_test = torch.max(label_output_test, 1)[1].data
-                            acc_test += [1 if pre_y_test[i] == y_test[i] else 0 for i in range(len(y_test))]
-                            test_loss.append(loss_total.data.cpu())
-                    # 测试集的数据可视化的整理
+                        test_loss_vi.append(loss_total.data.cpu())
+                        test_loss_prediction_vi.append(loss_label.data.cpu())
+                        test_loss_domain_discriminator_vi.append(loss_domain.data.cpu())
 
-                    test_loss_vi.append(loss_total.data.cpu())
-                    test_loss_prediction_vi.append(loss_label.data.cpu())
-                    test_loss_domain_discriminator_vi.append(loss_domain.data.cpu())
+                        test_accuracy_avg = sum(acc_test) / len(acc_test)
+                        test_loss_avg = sum(test_loss) / len(test_loss)
+                        loss_avg = sum(loss) / len(loss)
+                        accuracy_avg = sum(acc) / len(acc)
 
-                    test_accuracy_avg = sum(acc_test) / len(acc_test)
-                    test_loss_avg = sum(test_loss) / len(test_loss)
-                    loss_avg = sum(loss) / len(loss)
-                    accuracy_avg = sum(acc) / len(acc)
+                        # 准确率的可视化
+                        acc_vi.append(accuracy_avg)
+                        test_acc_vi.append(test_accuracy_avg)
 
-                    # 准确率的可视化
-                    acc_vi.append(accuracy_avg)
-                    test_acc_vi.append(test_accuracy_avg)
+                        print(
+                            'Epoch:{} | Step:{} | train loss:{:.6f} | test loss:{:.6f} | train accuracy:{:.5f} | test accuracy:{:.5f}'.format(
+                                epoch, step, loss_avg, test_loss_avg, accuracy_avg, test_accuracy_avg))
+                        acc.clear()
+                        loss.clear()
+                        if last_test_accuracy == 1:
+                            last_test_accuracy = 0
+                        if last_test_accuracy <= test_accuracy_avg:
+                            self.save_mode()  # 保存较好的模型
+                            last_test_accuracy = test_accuracy_avg
+                    pbar.update(1)
 
-                    print(
-                        'Epoch:{} | Step:{} | train loss:{:.6f} | test loss:{:.6f} | train accuracy:{:.5f} | test accuracy:{:.5f} |'.format(
-                            epoch, step, loss_avg, test_loss_avg, accuracy_avg, test_accuracy_avg))
-                    acc.clear()
-                    loss.clear()
-                    if last_test_accuracy == 1:
-                        last_test_accuracy = 0
-                    if last_test_accuracy <= test_accuracy_avg:
-                        self.save_mode()  # 保存较好的模型
-                        last_test_accuracy = test_accuracy_avg
         info = {'loss_l': loss_prediction_vi, 'loss_d': loss_domain_discrimination_vi, 'loss_t': loss_vi, 'acc': acc_vi,
                 'save_path': './draw/train_loss.png',
-                'model_info': "training information"}
+                'model_info': "training information", 'show':False}
         self.draw_loss_plt(**info)
-        info = {'loss_l': test_loss_vi, 'loss_d': test_loss_domain_discriminator_vi, 'loss_t': test_loss_vi, 'acc': test_acc_vi,
+        info = {'loss_l': test_loss_prediction_vi, 'loss_d': test_loss_domain_discriminator_vi, 'loss_t': test_loss_vi,
+                'acc': test_acc_vi,
                 'save_path': './draw/test_loss.png',
-                'model_info': "test information"}
+                'model_info': "test information", 'show':False}
         self.draw_loss_plt(**info)
 
     def val(self):
@@ -186,7 +191,7 @@ class DanTrainer:
         acc = []
         loss = []
         loss_func = nn.CrossEntropyLoss()
-        for step, (x, label, domain, length) in tqdm(enumerate(val_data_loader)):
+        for step, (x, label, domain, length) in enumerate(tqdm(val_data_loader)):
             if self.gpu >= 0:
                 x, label, domain, length = x.cuda(self.gpu), label.cuda(self.gpu), domain.cuda(
                     self.gpu), length.cuda(
