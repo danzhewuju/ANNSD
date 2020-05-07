@@ -6,60 +6,55 @@
 # @File    : test.py
 # @Software: PyCharm
 # from data.generatedata import generate_data
-import numpy as np
-from collections import Counter
-import pandas as pd
-import uuid
-import re
-import random
-import torch
-from torch import nn
-import torch.nn.functional as F
-from torch.utils.data import Dataset, DataLoader
-import torch.nn.utils.rnn as rnn_utils
-from util.util_tool import Data_info, MyDataset, collate_fn
-import torchvision.transforms as transforms
-from torchvision.utils import save_image
 
-from torch.utils.data import DataLoader
-from torchvision import datasets
 from torch.autograd import Variable
+import os
 
-import torch.nn as nn
-import torch.nn.functional as F
 import torch
+import matplotlib.pyplot as plt
+
 
 def test_1():
-    Tensor =  torch.FloatTensor
+    Tensor = torch.FloatTensor
     valid = Variable(Tensor(64, 1).fill_(1.0), requires_grad=False)
     print(valid)
 
+
+def test_2():
+    def draw_loss_plt(*args, **kwargs):
+        # 画出train或者test过程中的loss曲线
+        loss_l, loss_d, loss_t, acc = kwargs['loss_l'], kwargs['loss_d'], kwargs['loss_t'], kwargs['acc']
+        plot_save_path = kwargs['save_path']
+        model_info = kwargs['model_info']
+        dir_name = os.path.dirname(plot_save_path)
+        if not os.path.exists(dir_name):
+            os.mkdir(dir_name)
+            print("Create dir {}".format(dir_name))
+        plt.plot()
+        plt.xlabel('Step')
+        plt.ylabel('Loss/Accuracy')
+        plt.title(model_info)
+        x = range(len(acc))
+        plt.plot(x, loss_l, label="Loss of label classifier")
+        plt.plot(x, loss_d, label="Loss of domain discriminator")
+        plt.plot(x, loss_t, label='Total loss')
+        plt.plot(x, acc, label='Accuracy')
+        plt.legend(loc='upper right')
+        plt.savefig(plot_save_path)
+        plt.show()
+        print("The Picture has been saved.")
+
+    loss_l = torch.randn(100)
+    loss_d = torch.randn(100)
+    loss_t = (loss_l + loss_d) / 2
+    acc = torch.randn(100)
+    info = {'loss_l': loss_l, 'loss_d': loss_d, 'loss_t': loss_t, 'acc': acc, 'save_path': './draw/train_loss.png',
+            'model_info': "training information"}
+    draw_loss_plt(**info)
+    info = {'loss_l': loss_l, 'loss_d': loss_d, 'loss_t': loss_t, 'acc': acc, 'save_path': './draw/test_loss.png',
+            'model_info': "test information"}
+    draw_loss_plt(**info)
+
+
 if __name__ == '__main__':
-    # TRAIN_PATH = "/home/cbd109-3/Users/data/yh/Program/Python/SEEG_Timing/preprocess/train_BDP.csv"
-    # datainfo = Data_info(TRAIN_PATH)
-    # p = datainfo.next_batch_data(16)
-    # print(p)
-    # mydataset = MyDataset(next(p))
-    # dataLoader = DataLoader(mydataset, shuffle=True, batch_size=8, collate_fn=collate_fn)
-    # for ima, l , _ in dataLoader:
-    #     print(ima, l)
-    # # a = np.random.randint(0, 5, 1)
-    # # print(a)
-    # d = datainfo.next_batch_data(16)
-    # data = MyDataset(next(d))
-    # dataLoader = DataLoader(data, shuffle=True, batch_size=16, collate_fn = collate_fn)
-    # ima, l, _ =  dataLoader
-    # print("IMA, l")
-
-    # a = np.random.randint(0, 5, 1)
-    # # print(a)
-    # a = 0
-    # if a :
-    #     print("True")
-    # else:
-    #     print("False")
-    # a = torch.randn((5, 2))
-    # b = torch.max(a, 1).values
-    # print(b)
-    test_1()
-
+    test_2()
