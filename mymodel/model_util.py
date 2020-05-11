@@ -1,6 +1,8 @@
 import torch.nn as nn
 from torch.autograd import Function
 import torch
+import torch.nn.functional as F
+import random
 
 
 class DAN(nn.Module):
@@ -82,14 +84,32 @@ class DAN(nn.Module):
         return res
 
     def forward(self, x, label, domain, length, alpha=1):
-        code = self.trans_data(x, length)
-        label_tmp, (_, _) = self.label_classifier(code)
+        code_x1 = self.trans_data(x, length)
+        label_tmp, (_, _) = self.label_classifier(code_x1)
         y_label = self.label_fc(label_tmp[:, -1, :])
-        if self.model == 'train':
-            reverse_feature = ReverseLayerF.apply(code, alpha)  # 对抗样本需要经过GRL模块
-            domain_tmp,(_, _) = self.domain_classifier(reverse_feature)
-            y_domain = self.domain_fc(domain_tmp[:, -1, :])
-            return y_label, y_domain
+        if self.model == 'train': # 模型的成对训练
+            if self.gpu >= 0 :
+                code_x2 = torch.zeros(code_x1.shape).cuda(self.gpu)
+                domain_label = torch.zeros(code_x1.shape[0]).cuda(self.gpu)
+            else:
+                code_x2 = torch.zeros(code_x1.shape)
+                domain_label = torch.zeros(code_x1.shape[0])
+            code_x2_order = list(range(domain.shape[0]))
+            random.shuffle(code_x2_order[len(code_x2_order)//2:])  # 只打乱一半的数据
+            for i, p in enumerate(code_x2_order):
+                code_x2[i] = code_x1[p]
+                if domain[i] == domain[p]:
+                    domain_label[i] = 1
+                else:
+                    domain_label[i] = 0
+
+            reverse_feature_x1 = ReverseLayerF.apply(code_x1, alpha)  # 对抗样本需要经过GRL模块
+            reverse_feature_x2 = ReverseLayerF.apply(code_x2, alpha)  # 对抗样本需要经过GRL模块
+            domain_tmp_x1,(_, _) = self.domain_classifier(reverse_feature_x1)
+            domain_tmp_x2, (_, _) = self.domain_classifier(reverse_feature_x2)
+            y_domain_1 = self.domain_fc(domain_tmp_x1[:, -1, :])
+            y_domain_2 = self.domain_fc(domain_tmp_x2[:, -1, :])
+            return y_label, y_domain_1, y_domain_2, domain_label
         else:
             return y_label
 
@@ -104,3 +124,21 @@ class ReverseLayerF(Function):  # GRL模块，GRL模块在反向传播的过程�
     def backward(ctx, grad_output):
         output = grad_output.neg() * ctx.alpha
         return output, None
+
+
+# 定义对抗的损失函数
+class ContrastiveLoss(nn.Module):
+    """
+    Contrastive loss
+    Takes embeddings of two samples and a target label == 1 if samples are from the same class and label == 0 otherwise
+    """
+    def __init__(self, margin=1.0):
+        super(ContrastiveLoss, self).__init__()
+        self.margin = margin
+
+    def forward(self, output1, output2, target, use_domain=1.0, size_average=True):
+        distances = (output2 - output1).pow(2).sum(1)+0.001  # squared distances
+        losses = 0.5 * (target.float() * distances +
+                        (1 + -1 * target).float() * F.relu(self.margin - distances.sqrt()).pow(2))
+        losses = losses*use_domain
+        return losses.mean() if size_average else losses.sum()

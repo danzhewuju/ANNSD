@@ -6,6 +6,7 @@
 # @File    : test.py
 # @Software: PyCharm
 # from data.generatedata import generate_data
+import random
 
 from torch.autograd import Variable
 from tqdm import tqdm
@@ -69,8 +70,15 @@ def test_3():
                 pbar.update(1)
 
 
+def test_4():
+    b = list(range(10))
+    a = b[:len(b)//2]
+    c = b[len(b)//2:]
+    random.shuffle(c)
+    b = a + c
 
+    print(b)
 
 
 if __name__ == '__main__':
-    test_3()
+    test_4()

@@ -1,11 +1,12 @@
 import torch
 from data_util import MyData
-from model_util import DAN
+from model_util import DAN, ContrastiveLoss
 import torch.nn as nn
 from tqdm import tqdm
 import os
 import time
 import matplotlib.pyplot as plt
+
 
 
 class DanTrainer:
@@ -86,6 +87,7 @@ class DanTrainer:
         train_data_loader = mydata.data_loader(mode='train')
         optimizer = torch.optim.Adam(self.model.parameters(), lr=self.lr)
         loss_func = nn.CrossEntropyLoss()
+        loss_func_domain = ContrastiveLoss()
 
         acc = []
         loss = []
@@ -111,9 +113,9 @@ class DanTrainer:
                         x, label, domain, length = x.cuda(self.gpu), label.cuda(self.gpu), domain.cuda(
                             self.gpu), length.cuda(
                             self.gpu)
-                    label_output, domain_output = self.model(x, label, domain, length)
+                    label_output, domain_output_1, domain_output_2, domain_label = self.model(x, label, domain, length)
                     loss_label = loss_func(label_output, label)
-                    loss_domain = loss_func(domain_output, domain)
+                    loss_domain = loss_func_domain(domain_output_1, domain_output_2, domain_label)
                     loss_total = (loss_label + loss_domain) * 0.5
                     optimizer.zero_grad()
                     loss_total.backward()
@@ -137,10 +139,10 @@ class DanTrainer:
                                     self.gpu), domain_test.cuda(
                                     self.gpu), length_test.cuda(self.gpu)
                             with torch.no_grad():
-                                label_output_test, domain_output_test = self.model(x_test, label_test, domain_test,
+                                label_output_test, domain_output_1, domain_output_2, domain_label = self.model(x_test, label_test, domain_test,
                                                                                    length_test)
                                 loss_label = loss_func(label_output_test, label_test)
-                                loss_domain = loss_func(domain_output_test, domain_test)
+                                loss_domain = loss_func_domain(domain_output_1, domain_output_2, domain_label)
                                 loss_total = (loss_label + loss_domain) * 0.5
 
                                 y_test = label_test.cpu()
@@ -176,12 +178,12 @@ class DanTrainer:
 
         info = {'loss_l': loss_prediction_vi, 'loss_d': loss_domain_discrimination_vi, 'loss_t': loss_vi, 'acc': acc_vi,
                 'save_path': './draw/train_loss.png',
-                'model_info': "training information", 'show':False}
+                'model_info': "training information", 'show': False}
         self.draw_loss_plt(**info)
         info = {'loss_l': test_loss_prediction_vi, 'loss_d': test_loss_domain_discriminator_vi, 'loss_t': test_loss_vi,
                 'acc': test_acc_vi,
                 'save_path': './draw/test_loss.png',
-                'model_info': "test information", 'show':False}
+                'model_info': "test information", 'show': False}
         self.draw_loss_plt(**info)
 
     def val(self):
