@@ -71,14 +71,14 @@ def test_3():
 
 
 def test_4():
-    b = list(range(10))
-    a = b[:len(b)//2]
-    c = b[len(b)//2:]
-    random.shuffle(c)
-    b = a + c
+    code_x2_order = list(range(16))
+    pre_half, behind_half = code_x2_order[:len(code_x2_order) // 2], code_x2_order[len(code_x2_order) // 2:]
+    random.shuffle(behind_half)  # 只打乱一半的数据
+    code_x2_order = pre_half + behind_half
 
-    print(b)
+    print(code_x2_order)
 
 
 if __name__ == '__main__':
-    test_4()
+    for i in range(10):
+        test_4()

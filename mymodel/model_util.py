@@ -95,7 +95,9 @@ class DAN(nn.Module):
                 code_x2 = torch.zeros(code_x1.shape)
                 domain_label = torch.zeros(code_x1.shape[0])
             code_x2_order = list(range(domain.shape[0]))
-            random.shuffle(code_x2_order[len(code_x2_order)//2:])  # 只打乱一半的数据
+            pre_half, behind_half = code_x2_order[:len(code_x2_order)//2], code_x2_order[len(code_x2_order)//2:]
+            random.shuffle(behind_half)  # 只打乱一半的数据, 否则的数据均衡会严重失调
+            code_x2_order = pre_half + behind_half
             for i, p in enumerate(code_x2_order):
                 code_x2[i] = code_x1[p]
                 if domain[i] == domain[p]:
