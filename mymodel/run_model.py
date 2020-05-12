@@ -8,21 +8,21 @@ import time
 import matplotlib.pyplot as plt
 
 
-
 class DanTrainer:
-    def __init__(self, epoch=10, bath_size=16, lr=0.001, GPU=0, train_path=None, test_path=None, val_path=None,
-                 model='train'):
+    def __init__(self, epoch=10, bath_size=16, lr=0.001, gpu=0, train_path=None, test_path=None, val_path=None,
+                 model='train', encoder_name='vae'):
         self.epoch = epoch
         self.batch_size = bath_size
         self.lr = lr
         self.train_path = train_path
         self.test_path = test_path
         self.val_path = val_path
-        self.gpu = GPU
-        if GPU >= 0:
-            self.model = DAN(gpu=GPU, model=model).cuda(GPU)  # 放入显存中
+        self.encoder_name = encoder_name
+        self.gpu = gpu
+        if gpu >= 0:
+            self.model = DAN(gpu=gpu, model=model, encoder_name=encoder_name).cuda(gpu)  # 放入显存中
         else:
-            self.model = DAN(gpu=GPU, model=model)  # 放入内存中
+            self.model = DAN(gpu=gpu, model=model, encoder_name=encoder_name)  # 放入内存中
 
     def save_mode(self, save_path='../save_model'):
         if not os.path.exists(save_path):
@@ -55,9 +55,11 @@ class DanTrainer:
         f.close()
         print("Generating log!")
 
-    def draw_loss_plt(*args, **kwargs):
+    def draw_loss_plt(self, *args, **kwargs):
         # 画出train或者test过程中的loss曲线
         loss_l, loss_d, loss_t, acc = kwargs['loss_l'], kwargs['loss_d'], kwargs['loss_t'], kwargs['acc']
+        if 'loss_vae' in kwargs.keys():
+            loss_vae = kwargs['loss_vae']
         plot_save_path = kwargs['save_path']
         model_info = kwargs['model_info']
         show = kwargs['show']
@@ -72,6 +74,8 @@ class DanTrainer:
         x = range(len(acc))
         plt.plot(x, loss_l, label="Loss of label classifier")
         plt.plot(x, loss_d, label="Loss of domain discriminator")
+        if 'loss_vae' in kwargs.keys():
+            plt.plot(x, loss_vae, label='Loss of VAEs')
         plt.plot(x, loss_t, label='Total loss')
         plt.plot(x, acc, label='Accuracy')
         plt.legend(loc='upper right')
@@ -97,12 +101,14 @@ class DanTrainer:
         loss_vi = []
         loss_prediction_vi = []
         loss_domain_discrimination_vi = []
+        loss_vae_vi = []
 
         # 测试集中的数据
         test_acc_vi = []
         test_loss_vi = []
         test_loss_prediction_vi = []
         test_loss_domain_discriminator_vi = []
+        test_loss_vae_vi = []
 
         last_test_accuracy = 0
         with tqdm(total=self.epoch * len(train_data_loader)) as pbar:
@@ -113,10 +119,17 @@ class DanTrainer:
                         x, label, domain, length = x.cuda(self.gpu), label.cuda(self.gpu), domain.cuda(
                             self.gpu), length.cuda(
                             self.gpu)
-                    label_output, domain_output_1, domain_output_2, domain_label = self.model(x, label, domain, length)
+                    if self.encoder_name == 'vae':
+                        label_output, domain_output_1, domain_output_2, domain_label, loss_vae = self.model(x, label,
+                                                                                                            domain,
+                                                                                                            length)
+                    else:
+                        label_output, domain_output_1, domain_output_2, domain_label = self.model(x, label, domain,
+                                                                                                  length)
+                        loss_vae = 0
                     loss_label = loss_func(label_output, label)
                     loss_domain = loss_func_domain(domain_output_1, domain_output_2, domain_label)
-                    loss_total = (loss_label + loss_domain) * 0.5
+                    loss_total = (loss_label + loss_domain + loss_vae) / 3
                     optimizer.zero_grad()
                     loss_total.backward()
                     optimizer.step()
@@ -131,6 +144,7 @@ class DanTrainer:
                         loss_vi.append(loss_total.data.cpu())
                         loss_prediction_vi.append(loss_label.data.cpu())
                         loss_domain_discrimination_vi.append(loss_domain.data.cpu())
+                        if self.encoder_name == 'vae': loss_vae_vi.append(loss_vae.data.cpu())
 
                         acc_test, test_loss = [], []
                         for x_test, label_test, domain_test, length_test in next(mydata.next_batch_test_data()):
@@ -139,11 +153,16 @@ class DanTrainer:
                                     self.gpu), domain_test.cuda(
                                     self.gpu), length_test.cuda(self.gpu)
                             with torch.no_grad():
-                                label_output_test, domain_output_1, domain_output_2, domain_label = self.model(x_test, label_test, domain_test,
-                                                                                   length_test)
+                                if self.encoder_name == 'vae':
+                                    label_output, domain_output_1, domain_output_2, domain_label, loss_vae = self.model(
+                                        x, label, domain, length)
+                                else:
+                                    label_output_test, domain_output_1, domain_output_2, domain_label = self.model(
+                                        x_test, label_test, domain_test, length_test)
+                                    loss_vae = 0
                                 loss_label = loss_func(label_output_test, label_test)
                                 loss_domain = loss_func_domain(domain_output_1, domain_output_2, domain_label)
-                                loss_total = (loss_label + loss_domain) * 0.5
+                                loss_total = (loss_label + loss_domain + loss_vae) / 3
 
                                 y_test = label_test.cpu()
                                 pre_y_test = torch.max(label_output_test, 1)[1].data
@@ -154,6 +173,7 @@ class DanTrainer:
                         test_loss_vi.append(loss_total.data.cpu())
                         test_loss_prediction_vi.append(loss_label.data.cpu())
                         test_loss_domain_discriminator_vi.append(loss_domain.data.cpu())
+                        if self.encoder_name == 'vae': test_loss_vae_vi.append(loss_vae.data.cpu())
 
                         test_accuracy_avg = sum(acc_test) / len(acc_test)
                         test_loss_avg = sum(test_loss) / len(test_loss)
@@ -177,11 +197,12 @@ class DanTrainer:
                     pbar.update(1)
 
         info = {'loss_l': loss_prediction_vi, 'loss_d': loss_domain_discrimination_vi, 'loss_t': loss_vi, 'acc': acc_vi,
+                'loss_vae': loss_vae_vi,
                 'save_path': './draw/train_loss.png',
                 'model_info': "training information", 'show': False}
         self.draw_loss_plt(**info)
         info = {'loss_l': test_loss_prediction_vi, 'loss_d': test_loss_domain_discriminator_vi, 'loss_t': test_loss_vi,
-                'acc': test_acc_vi,
+                'acc': test_acc_vi, 'loss_vae': test_loss_vae_vi,
                 'save_path': './draw/test_loss.png',
                 'model_info': "test information", 'show': False}
         self.draw_loss_plt(**info)

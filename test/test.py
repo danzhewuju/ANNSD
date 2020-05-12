@@ -15,6 +15,7 @@ import os
 
 import torch
 import matplotlib.pyplot as plt
+import argparse
 
 
 def test_1():
@@ -80,5 +81,8 @@ def test_4():
 
 
 if __name__ == '__main__':
-    for i in range(10):
-        test_4()
+    parser = argparse.ArgumentParser()
+    parser.add_argument('-t', '--test', type=int, default=1, help="this is test file ")
+    args = parser.parse_args()
+
+    print(a)
