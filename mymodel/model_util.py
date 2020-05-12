@@ -23,10 +23,13 @@ class VAE(nn.Module):
             nn.Linear(512, input_shape[0] * input_shape[1]),
             nn.Sigmoid(),  # compress to a range (0, 1)
         )
+        self.input_shape = input_shape
 
     def forward(self, x):
+        x = torch.reshape(x, (-1, self.input_shape[0] * self.input_shape[1]))
         encoded = self.encoder(x)
         decoded = self.decoder(encoded)
+        decoded = torch.reshape(decoded, (self.input_shape[0], self.input_shape[1]))
         return encoded, decoded
 
 
@@ -79,7 +82,6 @@ class DAN(nn.Module):
 
         else:
             self.encoder = CNNEncoder(input_shape, c_dim=c_dim)
-        self.fc1 = self
 
         self.label_classifier = nn.LSTM(
             input_size=c_dim,
@@ -108,30 +110,30 @@ class DAN(nn.Module):
         '''
         max_length = length[0] // self.resampling
         bat = x.shape[0]
-        if self.encoder == 'vae':
+        if self.encoder_name == 'vae':
             loss_vae = []
             loss_func = nn.MSELoss()
         if self.gpu >= 0:
             res = torch.zeros((bat, max_length, self.dim)).cuda(self.gpu)
         else:
             res = torch.zeros((bat, max_length, self.dim))
+        loss_vae = []
         for i in range(bat):
             tmp_x = x[i][0]
             l = length[i] // self.resampling
             for j in range(l):
                 tmp_split = tmp_x[:, self.resampling * j:(j + 1) * self.resampling]
                 tmp_split = torch.reshape(tmp_split, (1, 1, self.input_shape[0], self.input_shape[1]))
-                if self.encoder == 'vae':
+                if self.encoder_name == 'vae':
                     tmx, decode = self.encoder(tmp_split)
-                    if i < l - 1:
+                    if j < l - 1:
                         next_x = tmp_x[:, self.resampling * (j + 1):(j + 2) * self.resampling]
-                        loss_vae = loss_func(decode, next_x)
+                        loss_vae.append(loss_func(decode, next_x))
                 else:
                     tmx = self.encoder(tmp_split)
-                tmx = self.fc1(tmx.reshape(1, -1))
                 res[i][j] = tmx
         if self.encoder_name == 'vae':
-            return res, loss_vae.mean()
+            return res, torch.mean(torch.tensor(loss_vae))
         else:
             return res
 
@@ -168,7 +170,7 @@ class DAN(nn.Module):
             y_domain_1 = self.domain_fc(domain_tmp_x1[:, -1, :])
             y_domain_2 = self.domain_fc(domain_tmp_x2[:, -1, :])
             if self.encoder_name == 'vae':
-                return y_label, y_domain_1, y_domain_2, domain_label, loss_vae # 如果使用的是vae的编码，需要将vae的损失函数传递出去
+                return y_label, y_domain_1, y_domain_2, domain_label, loss_vae  # 如果使用的是vae的编码，需要将vae的损失函数传递出去
             else:
                 return y_label, y_domain_1, y_domain_2, domain_label
 

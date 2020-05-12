@@ -52,7 +52,7 @@ def test_2():
     loss_d = torch.randn(100)
     loss_t = (loss_l + loss_d) / 2
     acc = torch.randn(100)
-    info = {'loss_l': loss_l, 'loss_d': loss_d, 'loss_t': loss_t, 'acc': acc, 'save_path': './draw/train_loss.png',
+    info = {'loss_l': loss_l, 'loss_d': loss_d, 'loss_t': loss_t, 'acc': acc, 'save_path': './draw/train_loss_pair.png',
             'model_info': "training information"}
     draw_loss_plt(**info)
     info = {'loss_l': loss_l, 'loss_d': loss_d, 'loss_t': loss_t, 'acc': acc, 'save_path': './draw/test_loss.png',
@@ -81,8 +81,7 @@ def test_4():
 
 
 if __name__ == '__main__':
-    parser = argparse.ArgumentParser()
-    parser.add_argument('-t', '--test', type=int, default=1, help="this is test file ")
-    args = parser.parse_args()
-
-    print(a)
+    a = torch.tensor(1.0)
+    b = torch.tensor(2.0)
+    c = [a, b]
+    print(torch.mean(torch.tensor(c)))

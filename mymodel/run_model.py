@@ -27,12 +27,13 @@ class DanTrainer:
     def save_mode(self, save_path='../save_model'):
         if not os.path.exists(save_path):
             os.mkdir(save_path)
-        save_full_path = os.path.join(save_path, 'DAN.pkl')
+        save_full_path = os.path.join(save_path, 'DAN_encoder_{}.pkl'.format(self.encoder_name))
         torch.save(self.model.state_dict(), save_full_path)
         print("Saving Model DAN in {}......".format(save_full_path))
         return
 
-    def load_model(self, model_path='../save_model/DAN.pkl'):
+    def load_model(self, model_path='../save_model/DAN_encoder_{}.pkl'):
+        model_path = model_path.format(self.encoder_name)
         if os.path.exists(model_path):
             self.model.load_state_dict(torch.load(model_path))
             print("Loading Mode DAN from {}".format(model_path))
@@ -154,8 +155,8 @@ class DanTrainer:
                                     self.gpu), length_test.cuda(self.gpu)
                             with torch.no_grad():
                                 if self.encoder_name == 'vae':
-                                    label_output, domain_output_1, domain_output_2, domain_label, loss_vae = self.model(
-                                        x, label, domain, length)
+                                    label_output_test, domain_output_1, domain_output_2, domain_label, loss_vae = self.model(
+                                        x_test, label_test, domain_test, length_test)
                                 else:
                                     label_output_test, domain_output_1, domain_output_2, domain_label = self.model(
                                         x_test, label_test, domain_test, length_test)
@@ -198,7 +199,7 @@ class DanTrainer:
 
         info = {'loss_l': loss_prediction_vi, 'loss_d': loss_domain_discrimination_vi, 'loss_t': loss_vi, 'acc': acc_vi,
                 'loss_vae': loss_vae_vi,
-                'save_path': './draw/train_loss.png',
+                'save_path': './draw/train_loss_pair.png',
                 'model_info': "training information", 'show': False}
         self.draw_loss_plt(**info)
         info = {'loss_l': test_loss_prediction_vi, 'loss_d': test_loss_domain_discriminator_vi, 'loss_t': test_loss_vi,
@@ -229,5 +230,5 @@ class DanTrainer:
                 loss.append(loss_total.data.cpu())
         loss_avg = sum(loss) / len(loss)
         accuracy_avg = sum(acc) / len(acc)
-        result = "Data size:{}| Val loss:{:.6f}| Accuracy:{:.5f} ".format(len(acc), loss_avg, accuracy_avg)
+        result = "Encoder:{}|Data size:{}| Val loss:{:.6f}| Accuracy:{:.5f} ".format(self.encoder_name,len(acc), loss_avg, accuracy_avg)
         self.log_write(result)

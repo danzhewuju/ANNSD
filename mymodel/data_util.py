@@ -2,6 +2,7 @@ import pandas as pd
 from torch.utils.data import Dataset, DataLoader
 import numpy as np
 import sys
+
 sys.path.append('../')
 from util.util_tool import matrix_normalization, collate_fn
 import torch
@@ -25,7 +26,7 @@ class DataInfo():
         start = 0
         end = batch_size
         while end < N:
-            yield self.data[start:batch_size]
+            yield self.data[start:end]
             start = end
             end += batch_size
             if end >= N:
@@ -93,7 +94,7 @@ class MyData():
 
         return torch.from_numpy(np.array(data)), torch.tensor(labels), torch.tensor(domains), torch.tensor(length)
 
-    def data_loader(self, mode='train'): # 这里只有两个模式，一个是train/一个是val
+    def data_loader(self, mode='train'):  # 这里只有两个模式，一个是train/一个是val
         if mode == 'train':
             data_info = DataInfo(self.path_train)
         else:
@@ -105,5 +106,6 @@ class MyData():
     def next_batch_test_data(self):
         data_info = DataInfo(self.path_test)
         dataset = MyDataset(next(data_info.next_batch_data(self.batch_size)))
-        next_batch_data_loader = DataLoader(dataset, shuffle=True, collate_fn=self.collate_fn)
+        next_batch_data_loader = DataLoader(dataset, batch_size=self.batch_size, shuffle=True,
+                                            collate_fn=self.collate_fn, )
         yield next_batch_data_loader

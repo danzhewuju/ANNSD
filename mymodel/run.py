@@ -32,7 +32,7 @@ if __name__ == '__main__':
     model = args.model
     embedding = args.embedding
     train_path, test_path, val_path = train_path.format(patient), test_path.format(patient), val_path.format(patient)
-    dan_train = DanTrainer(epoch, bath_size=batch_size, lr=lr, GPU=gpu, train_path=train_path, test_path=test_path,
+    dan_train = DanTrainer(epoch, bath_size=batch_size, lr=lr, gpu=gpu, train_path=train_path, test_path=test_path,
                            val_path=val_path, model=model, )
     if model == 'train':
         dan_train.train()
