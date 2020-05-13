@@ -2,13 +2,14 @@ import pandas as pd
 from torch.utils.data import Dataset, DataLoader
 import numpy as np
 import sys
+import random
 
 sys.path.append('../')
 from util.util_tool import matrix_normalization, collate_fn
 import torch
 
 
-class DataInfo():
+class DataInfo:
     def __init__(self, path_data):
         self.dict_label = {"pre_seizure": 1, "non_seizure": 0}
         self.dict_domain = {'BDP': 0, 'LK': 1, 'SYF': 2, 'WSH': 3, 'ZK': 4}
@@ -20,6 +21,17 @@ class DataInfo():
         for i in range(len(data_path)):
             self.data.append((data_path[i], self.dict_label[label[i]], self.dict_domain[domain[i]]))
         self.data_length = len(self.data)
+
+    def few_shot_learning_sampling(self, ratio=0.2):
+        '''
+
+        :param ratio:  所占的整体数据的比例
+        :return:
+        '''
+        sampling_k = int(ratio * self.data_length)  # 采样的个数
+        random_index = random.sample(range(self.data_length), sampling_k)
+        few_shot_sampling_list = [self.data[p] for p in random_index]
+        return few_shot_sampling_list
 
     def next_batch_data(self, batch_size):  # 用于返回一个batch的数据
         N = self.data_length
@@ -54,8 +66,8 @@ class MyDataset(Dataset):  # 重写dateset的相关类
         return len(self.data)
 
 
-class MyData():
-    def __init__(self, path_train, path_test, path_val, batch_size):
+class MyData:
+    def __init__(self, path_train, path_test, path_val, batch_size, few_shot=True, few_shot_ratio=0.2):
         '''
 
         :param path_train: 训练集数据的路径
@@ -68,6 +80,8 @@ class MyData():
         self.path_test = path_test
         self.path_val = path_val
         self.batch_size = batch_size
+        self.few_shot = few_shot
+        self.few_shot_ratio = few_shot_ratio
 
     def collate_fn(self, data):  #
         '''
@@ -96,7 +110,13 @@ class MyData():
 
     def data_loader(self, mode='train'):  # 这里只有两个模式，一个是train/一个是val
         if mode == 'train':
+            # 如果加入了少样本学习的方法，需要额外的处理
             data_info = DataInfo(self.path_train)
+            if self.few_shot:
+                data_info_val = DataInfo(self.path_val)  # 将少样本学习的样本加入到训练集中
+                few_shot_learning_list = data_info_val.few_shot_learning_sampling(ratio=self.few_shot_ratio)
+                data_info.data += few_shot_learning_list  # 将数据加载到模型进行训练
+
         else:
             data_info = DataInfo(self.path_val)
         dataset = MyDataset(data_info.data)

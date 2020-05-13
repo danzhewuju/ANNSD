@@ -15,8 +15,9 @@ if __name__ == '__main__':
     parser.add_argument('-vap', '--val_path', type=str, default="../preprocess/val_{}.csv", help='val data path')
     parser.add_argument('-p', '--patient', type=str, default="BDP", help='patient name')
     parser.add_argument('-m', '--model', type=str, default="train", help='style of train')
-    parser.add_argument('-em', '--embedding', type=str, default="vae", help='method of embedding')
-
+    parser.add_argument('-few', '--few_show_learning', type=bool, default=True, help='keep few shot learning open')
+    parser.add_argument('-f_ratio', '--few_show_learning_ratio', type=float, default=0.2, help='few shot learning ratio')
+    parser.add_argument('-em', '--embedding', type=str, default="cnn", help='method of embedding')
 
     args = parser.parse_args()
 
@@ -31,9 +32,12 @@ if __name__ == '__main__':
     patient = args.patient
     model = args.model
     embedding = args.embedding
+    few_shot_ratio = args.few_show_learning_ratio
+    few_show_learning = args.few_show_learning
     train_path, test_path, val_path = train_path.format(patient), test_path.format(patient), val_path.format(patient)
     dan_train = DanTrainer(epoch, bath_size=batch_size, lr=lr, gpu=gpu, train_path=train_path, test_path=test_path,
-                           val_path=val_path, model=model, )
+                           val_path=val_path, model=model, encoder_name=embedding, few_shot=few_show_learning,
+                           few_show_ratio=few_shot_ratio)
     if model == 'train':
         dan_train.train()
     elif model == 'val':

@@ -81,7 +81,11 @@ def test_4():
 
 
 if __name__ == '__main__':
-    a = torch.tensor(1.0)
-    b = torch.tensor(2.0)
-    c = [a, b]
-    print(torch.mean(torch.tensor(c)))
+    class A:
+        def __init__(self):
+            self.a = 12
+    a = A()
+    print(a.a)
+    a.a = 100
+    print(a.a)
+

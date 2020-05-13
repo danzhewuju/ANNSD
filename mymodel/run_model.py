@@ -10,7 +10,7 @@ import matplotlib.pyplot as plt
 
 class DanTrainer:
     def __init__(self, epoch=10, bath_size=16, lr=0.001, gpu=0, train_path=None, test_path=None, val_path=None,
-                 model='train', encoder_name='vae'):
+                 model='train', encoder_name='vae', few_shot=True, few_show_ratio=0.2):
         self.epoch = epoch
         self.batch_size = bath_size
         self.lr = lr
@@ -19,6 +19,8 @@ class DanTrainer:
         self.val_path = val_path
         self.encoder_name = encoder_name
         self.gpu = gpu
+        self.few_shot = few_shot
+        self.few_shot_ratio = few_show_ratio
         if gpu >= 0:
             self.model = DAN(gpu=gpu, model=model, encoder_name=encoder_name).cuda(gpu)  # 放入显存中
         else:
@@ -87,7 +89,8 @@ class DanTrainer:
         print("The Picture has been saved.")
 
     def train(self):  # 用于模型的训练
-        mydata = MyData(self.train_path, self.test_path, self.val_path, self.batch_size)
+        mydata = MyData(self.train_path, self.test_path, self.val_path, self.batch_size, few_shot=self.few_shot,
+                        few_shot_ratio=self.few_shot_ratio)
 
         train_data_loader = mydata.data_loader(mode='train')
         optimizer = torch.optim.Adam(self.model.parameters(), lr=self.lr)
@@ -230,5 +233,6 @@ class DanTrainer:
                 loss.append(loss_total.data.cpu())
         loss_avg = sum(loss) / len(loss)
         accuracy_avg = sum(acc) / len(acc)
-        result = "Encoder:{}|Data size:{}| Val loss:{:.6f}| Accuracy:{:.5f} ".format(self.encoder_name,len(acc), loss_avg, accuracy_avg)
+        result = "Encoder:{}|Data size:{}| Val loss:{:.6f}| Accuracy:{:.5f} ".format(self.encoder_name, len(acc),
+                                                                                     loss_avg, accuracy_avg)
         self.log_write(result)

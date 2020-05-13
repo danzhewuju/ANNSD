@@ -59,6 +59,7 @@ class CNNEncoder(nn.Module):
 
     def forward(self, x):
         x = self.encoder(x)
+        x = torch.reshape(x, (1, -1))
         x = self.fc1(x)
         return x
 
@@ -111,7 +112,6 @@ class DAN(nn.Module):
         max_length = length[0] // self.resampling
         bat = x.shape[0]
         if self.encoder_name == 'vae':
-            loss_vae = []
             loss_func = nn.MSELoss()
         if self.gpu >= 0:
             res = torch.zeros((bat, max_length, self.dim)).cuda(self.gpu)
