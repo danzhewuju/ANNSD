@@ -200,16 +200,31 @@ class DanTrainer:
                             last_test_accuracy = test_accuracy_avg
                     pbar.update(1)
 
-        info = {'loss_l': loss_prediction_vi, 'loss_d': loss_domain_discrimination_vi, 'loss_t': loss_vi, 'acc': acc_vi,
-                'loss_vae': loss_vae_vi,
-                'save_path': './draw/train_loss_pair.png',
-                'model_info': "training information", 'show': False}
-        self.draw_loss_plt(**info)
-        info = {'loss_l': test_loss_prediction_vi, 'loss_d': test_loss_domain_discriminator_vi, 'loss_t': test_loss_vi,
-                'acc': test_acc_vi, 'loss_vae': test_loss_vae_vi,
-                'save_path': './draw/test_loss.png',
-                'model_info': "test information", 'show': False}
-        self.draw_loss_plt(**info)
+        if self.encoder_name == 'vae':
+            info = {'loss_l': loss_prediction_vi, 'loss_d': loss_domain_discrimination_vi, 'loss_t': loss_vi,
+                    'acc': acc_vi,
+                    'loss_vae': loss_vae_vi,
+                    'save_path': './draw/train_loss_pair.png',
+                    'model_info': "training information", 'show': False}
+            self.draw_loss_plt(**info)
+            info = {'loss_l': test_loss_prediction_vi, 'loss_d': test_loss_domain_discriminator_vi,
+                    'loss_t': test_loss_vi,
+                    'acc': test_acc_vi, 'loss_vae': test_loss_vae_vi,
+                    'save_path': './draw/test_loss.png',
+                    'model_info': "test information", 'show': False}
+            self.draw_loss_plt(**info)
+        else:
+            info = {'loss_l': loss_prediction_vi, 'loss_d': loss_domain_discrimination_vi, 'loss_t': loss_vi,
+                    'acc': acc_vi,
+                    'save_path': './draw/train_loss_pair_{}.png'.format(self.encoder_name),
+                    'model_info': "training information", 'show': False}
+            self.draw_loss_plt(**info)
+            info = {'loss_l': test_loss_prediction_vi, 'loss_d': test_loss_domain_discriminator_vi,
+                    'loss_t': test_loss_vi,
+                    'acc': test_acc_vi,
+                    'save_path': './draw/test_loss_pair_{}.png'.format(self.encoder_name),
+                    'model_info': "test information", 'show': False}
+            self.draw_loss_plt(**info)
 
     def val(self):
         self.load_model()  # 加载模型
