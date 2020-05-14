@@ -189,7 +189,7 @@ class DanTrainer:
                         test_acc_vi.append(test_accuracy_avg)
 
                         print(
-                            'Epoch:{} | Step:{} | train loss:{:.6f} | test loss:{:.6f} | train accuracy:{:.5f} | test accuracy:{:.5f}'.format(
+                            'Epoch:{} | Step:{} | train loss:{:.6f} | val loss:{:.6f} | train accuracy:{:.5f} | test accuracy:{:.5f}'.format(
                                 epoch, step, loss_avg, test_loss_avg, accuracy_avg, test_accuracy_avg))
                         acc.clear()
                         loss.clear()
@@ -211,7 +211,7 @@ class DanTrainer:
                     'loss_t': test_loss_vi,
                     'acc': test_acc_vi, 'loss_vae': test_loss_vae_vi,
                     'save_path': './draw/test_loss_{}.png'.format(self.encoder_name),
-                    'model_info': "test information", 'show': False}
+                    'model_info': "validation information", 'show': False}
             self.draw_loss_plt(**info)
         else:
             info = {'loss_l': loss_prediction_vi, 'loss_d': loss_domain_discrimination_vi, 'loss_t': loss_vi,
@@ -223,17 +223,17 @@ class DanTrainer:
                     'loss_t': test_loss_vi,
                     'acc': test_acc_vi,
                     'save_path': './draw/test_loss_{}.png'.format(self.encoder_name),
-                    'model_info': "test information", 'show': False}
+                    'model_info': "validation information", 'show': False}
             self.draw_loss_plt(**info)
 
-    def val(self):
+    def test(self):
         self.load_model()  # 加载模型
         mydata = MyData(self.train_path, self.test_path, self.val_path, self.batch_size)
-        val_data_loader = mydata.data_loader(mode='val')
+        test_data_loader = mydata.data_loader(mode='test')
         acc = []
         loss = []
         loss_func = nn.CrossEntropyLoss()
-        for step, (x, label, domain, length) in enumerate(tqdm(val_data_loader)):
+        for step, (x, label, domain, length) in enumerate(tqdm(test_data_loader)):
             if self.gpu >= 0:
                 x, label, domain, length = x.cuda(self.gpu), label.cuda(self.gpu), domain.cuda(
                     self.gpu), length.cuda(
@@ -248,6 +248,6 @@ class DanTrainer:
                 loss.append(loss_total.data.cpu())
         loss_avg = sum(loss) / len(loss)
         accuracy_avg = sum(acc) / len(acc)
-        result = "Encoder:{}|Data size:{}| Val loss:{:.6f}| Accuracy:{:.5f} ".format(self.encoder_name, len(acc),
+        result = "Encoder:{}|Data size:{}| test loss:{:.6f}| Accuracy:{:.5f} ".format(self.encoder_name, len(acc),
                                                                                      loss_avg, accuracy_avg)
         self.log_write(result)

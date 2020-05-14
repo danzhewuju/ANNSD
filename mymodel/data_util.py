@@ -113,18 +113,18 @@ class MyData:
             # 如果加入了少样本学习的方法，需要额外的处理
             data_info = DataInfo(self.path_train)
             if self.few_shot:
-                data_info_val = DataInfo(self.path_val)  # 将少样本学习的样本加入到训练集中
+                data_info_val = DataInfo(self.path_test)  # 将少样本学习的样本加入到训练集中
                 few_shot_learning_list = data_info_val.few_shot_learning_sampling(ratio=self.few_shot_ratio)
                 data_info.data += few_shot_learning_list  # 将数据加载到模型进行训练
 
         else:
-            data_info = DataInfo(self.path_val)
+            data_info = DataInfo(self.path_test)
         dataset = MyDataset(data_info.data)
         dataloader = DataLoader(dataset, batch_size=self.batch_size, shuffle=True, collate_fn=self.collate_fn)
         return dataloader
 
     def next_batch_test_data(self):
-        data_info = DataInfo(self.path_test)
+        data_info = DataInfo(self.path_val)
         dataset = MyDataset(next(data_info.next_batch_data(self.batch_size)))
         next_batch_data_loader = DataLoader(dataset, batch_size=self.batch_size, shuffle=True,
                                             collate_fn=self.collate_fn, )
