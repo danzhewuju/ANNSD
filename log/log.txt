@@ -1,0 +1,15 @@
+Data size:6000| Val loss:1.105235| Accuracy:0.46883 	2020-05-06 20:05:16
+Data size:6000| Val loss:1.673726| Accuracy:0.49833 	2020-05-06 23:14:09
+Data size:6000| Val loss:1.661124| Accuracy:0.50167 	2020-05-07 10:08:38
+Data size:7200| Val loss:0.184506| Accuracy:0.93333 	2020-05-07 10:20:49
+Data size:6000| Val loss:1.229265| Accuracy:0.47283 	2020-05-12 09:52:20
+Data size:6000| Val loss:0.693179| Accuracy:0.50133 	2020-05-12 14:54:56
+Encoder:vae|Data size:6000| Val loss:1.167587| Accuracy:0.49383 	2020-05-12 23:04:29
+Encoder:cnn|Data size:6000| Val loss:0.921267| Accuracy:0.53133 	2020-05-13 20:00:38
+Encoder:vae|Data size:6000| Val loss:0.620116| Accuracy:0.68700 	2020-05-13 23:31:17
+Encoder:cnn|Data size:6000| Val loss:0.555993| Accuracy:0.70217 	2020-05-14 00:03:32
+Encoder:cnn|Data size:6000| Val loss:0.693943| Accuracy:0.50217 	2020-05-14 10:16:34
+Encoder:cnn|Data size:6000| Val loss:0.694206| Accuracy:0.50150 	2020-05-14 10:19:57
+Encoder:cnn|Data size:6000| test loss:0.693135| Accuracy:0.50233 	2020-05-14 19:40:28
+Encoder:cnn|Data size:6000| test loss:0.357515| Accuracy:0.84133 	2020-05-14 23:30:36
+Encoder:cnn|Data size:6000| test loss:0.489322| Accuracy:0.75367 	2020-05-15 22:37:05

@@ -16,6 +16,7 @@ import os
 import torch
 import matplotlib.pyplot as plt
 import argparse
+from util.run_util import get_gpu_used
 
 
 def test_1():
@@ -81,11 +82,5 @@ def test_4():
 
 
 if __name__ == '__main__':
-    class A:
-        def __init__(self):
-            self.a = 12
-    a = A()
-    print(a.a)
-    a.a = 100
-    print(a.a)
+    print(get_gpu_used(0)/1024**2)
 
