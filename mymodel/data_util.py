@@ -49,14 +49,14 @@ class DataInfo:
 class MyDataset(Dataset):  # 重写dateset的相关类
     def __init__(self, data, transform=None, target_transform=None):
         self.data = data
-        self.transform = transform
+        self.transform_data = transform
         self.target_transform = target_transform
 
     def __getitem__(self, index):
         fn, label, domain = self.data[index]
         data = np.load(fn)
-        # data = self.transform(data)
-        result = matrix_normalization(data, (100, 1000))
+        result = self.transform_data(data)
+        result = matrix_normalization(result, (100, 1000))
         result = result.astype('float32')
         result = result[np.newaxis, :]
         # result = trans_data(vae_model, result)
@@ -108,7 +108,7 @@ class MyData:
 
         return torch.from_numpy(np.array(data)), torch.tensor(labels), torch.tensor(domains), torch.tensor(length)
 
-    def data_loader(self, mode='train'):  # 这里只有两个模式，一个是train/一个是val
+    def data_loader(self, transform, mode='train'):  # 这里只有两个模式，一个是train/一个是test
         if mode == 'train':
             # 如果加入了少样本学习的方法，需要额外的处理
             data_info = DataInfo(self.path_train)
@@ -119,13 +119,13 @@ class MyData:
 
         else:
             data_info = DataInfo(self.path_test)
-        dataset = MyDataset(data_info.data)
+        dataset = MyDataset(data_info.data, transform=transform)
         dataloader = DataLoader(dataset, batch_size=self.batch_size, shuffle=True, collate_fn=self.collate_fn)
         return dataloader
 
-    def next_batch_test_data(self):
+    def next_batch_test_data(self, transform):
         data_info = DataInfo(self.path_val)
-        dataset = MyDataset(next(data_info.next_batch_data(self.batch_size)))
+        dataset = MyDataset(next(data_info.next_batch_data(self.batch_size)), transform=transform)
         next_batch_data_loader = DataLoader(dataset, batch_size=self.batch_size, shuffle=True,
                                             collate_fn=self.collate_fn, )
         yield next_batch_data_loader

@@ -6,6 +6,10 @@ from tqdm import tqdm
 import os
 import time
 import matplotlib.pyplot as plt
+from torchvision import transforms
+from PIL import Image
+import numpy as np
+from util.util_file import trans_numpy_cv2
 
 
 class DanTrainer:
@@ -89,10 +93,31 @@ class DanTrainer:
         print("The Picture has been saved.")
 
     def train(self):  # 用于模型的训练
+        def transform_data(x):
+            '''
+            模型数据的转化，需要添加高斯噪音
+            :return:
+            '''
+            trans_data = transforms.Compose([
+                transforms.RandomHorizontalFlip(),
+                # transforms.RandomCrop(96),
+                transforms.ColorJitter(brightness=0.5, contrast=0.5, hue=0.5),
+                transforms.ToTensor(),
+                transforms.Normalize([0.5], [0.5])
+            ])
+            x = trans_numpy_cv2(x)
+            x = Image.fromarray(x)
+            x = trans_data(x)
+            result = np.array(x)
+            result = result.reshape((result.shape[1:]))
+            noise = np.random.rand(result.shape[0], result.shape[1])
+            result += noise
+            return result
+
         mydata = MyData(self.train_path, self.test_path, self.val_path, self.batch_size, few_shot=self.few_shot,
                         few_shot_ratio=self.few_shot_ratio)
 
-        train_data_loader = mydata.data_loader(mode='train')
+        train_data_loader = mydata.data_loader(transform_data, mode='train')
         optimizer = torch.optim.Adam(self.model.parameters(), lr=self.lr)
         loss_func = nn.CrossEntropyLoss()
         loss_func_domain = ContrastiveLoss()
@@ -133,7 +158,7 @@ class DanTrainer:
                         loss_vae = 0
                     loss_label = loss_func(label_output, label)
                     loss_domain = loss_func_domain(domain_output_1, domain_output_2, domain_label)
-                    loss_total = (loss_label + loss_domain + loss_vae) / 3
+                    loss_total = (loss_label + loss_domain + 0.001*loss_vae) / 3
                     optimizer.zero_grad()
                     loss_total.backward()
                     optimizer.step()
@@ -151,7 +176,8 @@ class DanTrainer:
                         if self.encoder_name == 'vae': loss_vae_vi.append(loss_vae.data.cpu())
 
                         acc_test, test_loss = [], []
-                        for x_test, label_test, domain_test, length_test in next(mydata.next_batch_test_data()):
+                        for x_test, label_test, domain_test, length_test in next(
+                                mydata.next_batch_test_data(transform=transform_data)):
                             if self.gpu >= 0:
                                 x_test, label_test, domain_test, length_test = x_test.cuda(self.gpu), label_test.cuda(
                                     self.gpu), domain_test.cuda(
@@ -166,7 +192,7 @@ class DanTrainer:
                                     loss_vae = 0
                                 loss_label = loss_func(label_output_test, label_test)
                                 loss_domain = loss_func_domain(domain_output_1, domain_output_2, domain_label)
-                                loss_total = (loss_label + loss_domain + loss_vae) / 3
+                                loss_total = (loss_label + loss_domain + 0.001*loss_vae) / 3
 
                                 y_test = label_test.cpu()
                                 pre_y_test = torch.max(label_output_test, 1)[1].data
@@ -249,5 +275,5 @@ class DanTrainer:
         loss_avg = sum(loss) / len(loss)
         accuracy_avg = sum(acc) / len(acc)
         result = "Encoder:{}|Data size:{}| test loss:{:.6f}| Accuracy:{:.5f} ".format(self.encoder_name, len(acc),
-                                                                                     loss_avg, accuracy_avg)
+                                                                                      loss_avg, accuracy_avg)
         self.log_write(result)

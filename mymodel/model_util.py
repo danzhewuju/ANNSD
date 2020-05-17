@@ -113,12 +113,11 @@ class DAN(nn.Module):
         max_length = length[0] // self.resampling
         bat = x.shape[0]
         if self.encoder_name == 'vae':
-            loss_func = VaeLoss()
+            loss_func = nn.MSELoss()
         if self.gpu >= 0:
             res = torch.zeros((bat, max_length, self.dim)).cuda(self.gpu)
         else:
             res = torch.zeros((bat, max_length, self.dim))
-        loss_vae = []
         for i in range(bat):
             tmp_x = x[i][0]
             l = length[i] // self.resampling
@@ -129,13 +128,12 @@ class DAN(nn.Module):
                     tmx, decode = self.encoder(tmp_split)
                     if j < l - 1:
                         next_x = tmp_x[:, self.resampling * (j + 1):(j + 2) * self.resampling]
-
-                        loss_vae.append(loss_func(linear_matrix_normalization(decode), linear_matrix_normalization(next_x)))
+                        loss_vae = loss_func(linear_matrix_normalization(decode), linear_matrix_normalization(next_x))
                 else:
                     tmx = self.encoder(tmp_split)
                 res[i][j] = tmx
         if self.encoder_name == 'vae':
-            return res, torch.mean(torch.tensor(loss_vae))
+            return res, loss_vae.mean()
         else:
             return res
 
@@ -210,23 +208,3 @@ class ContrastiveLoss(nn.Module):
                         (1 + -1 * target).float() * F.relu(self.margin - distances.sqrt()).pow(2))
         losses = losses * use_domain
         return losses.mean() if size_average else losses.sum()
-
-
-class VaeLoss(nn.Module):
-    '''
-    VAE 的损失函数
-    '''
-
-    def __init__(self):
-        super(VaeLoss, self).__init__()
-        self.loss_fuc = nn.MSELoss()
-
-    def forward(self, x, next_x):
-        '''
-
-        :param x:  当前帧的数据
-        :param next_x:  下一帧的数据
-        :return:
-        '''
-        loss = self.loss_fuc(x, next_x)
-        return loss

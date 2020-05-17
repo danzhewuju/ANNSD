@@ -84,17 +84,6 @@ def test_4():
 
 
 if __name__ == '__main__':
-    a = torch.randn((4, 5), requires_grad=True)
-    print(a, a.min(), a.max())
-    b = (a - a.min()) / (a.max() - a.min())
+    now02 = time.strftime('%Y-%m-%d_%H:%M:%S', time.localtime(time.time()))
+    print(now02)
 
-    print(b)
-    c = torch.randn((4, 5), requires_grad=True)
-    print(c, c.min(), c.max())
-    d = (c - c.min()) / (c.max() - c.min())
-
-    print(d)
-    loss_fun = nn.MSELoss()
-    loss_b = loss_fun(a, c)
-    loss_a = loss_fun(b, d)
-    print(loss_a, loss_b)
