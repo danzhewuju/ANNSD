@@ -15,8 +15,10 @@ import os
 
 import torch
 import matplotlib.pyplot as plt
+from model_util import VaeLoss
 import argparse
 from util.run_util import get_gpu_used
+import torch.nn as nn
 
 
 def test_1():
@@ -82,5 +84,17 @@ def test_4():
 
 
 if __name__ == '__main__':
-    print(get_gpu_used(0)/1024**2)
+    a = torch.randn((4, 5), requires_grad=True)
+    print(a, a.min(), a.max())
+    b = (a - a.min()) / (a.max() - a.min())
 
+    print(b)
+    c = torch.randn((4, 5), requires_grad=True)
+    print(c, c.min(), c.max())
+    d = (c - c.min()) / (c.max() - c.min())
+
+    print(d)
+    loss_fun = nn.MSELoss()
+    loss_b = loss_fun(a, c)
+    loss_a = loss_fun(b, d)
+    print(loss_a, loss_b)

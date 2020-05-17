@@ -3,6 +3,7 @@ from torch.autograd import Function
 import torch
 import torch.nn.functional as F
 import random
+from util.util_file import linear_matrix_normalization
 
 
 class VAE(nn.Module):
@@ -27,10 +28,10 @@ class VAE(nn.Module):
 
     def forward(self, x):
         x = torch.reshape(x, (-1, self.input_shape[0] * self.input_shape[1]))
-        encoded = self.encoder(x)
-        decoded = self.decoder(encoded)
+        coded = self.encoder(x)
+        decoded = self.decoder(coded)
         decoded = torch.reshape(decoded, (self.input_shape[0], self.input_shape[1]))
-        return encoded, decoded
+        return coded, decoded
 
 
 class CNNEncoder(nn.Module):
@@ -112,7 +113,7 @@ class DAN(nn.Module):
         max_length = length[0] // self.resampling
         bat = x.shape[0]
         if self.encoder_name == 'vae':
-            loss_func = nn.MSELoss()
+            loss_func = VaeLoss()
         if self.gpu >= 0:
             res = torch.zeros((bat, max_length, self.dim)).cuda(self.gpu)
         else:
@@ -128,7 +129,8 @@ class DAN(nn.Module):
                     tmx, decode = self.encoder(tmp_split)
                     if j < l - 1:
                         next_x = tmp_x[:, self.resampling * (j + 1):(j + 2) * self.resampling]
-                        loss_vae.append(loss_func(decode, next_x))
+
+                        loss_vae.append(loss_func(linear_matrix_normalization(decode), linear_matrix_normalization(next_x)))
                 else:
                     tmx = self.encoder(tmp_split)
                 res[i][j] = tmx
@@ -208,3 +210,23 @@ class ContrastiveLoss(nn.Module):
                         (1 + -1 * target).float() * F.relu(self.margin - distances.sqrt()).pow(2))
         losses = losses * use_domain
         return losses.mean() if size_average else losses.sum()
+
+
+class VaeLoss(nn.Module):
+    '''
+    VAE 的损失函数
+    '''
+
+    def __init__(self):
+        super(VaeLoss, self).__init__()
+        self.loss_fuc = nn.MSELoss()
+
+    def forward(self, x, next_x):
+        '''
+
+        :param x:  当前帧的数据
+        :param next_x:  下一帧的数据
+        :return:
+        '''
+        loss = self.loss_fuc(x, next_x)
+        return loss

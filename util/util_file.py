@@ -20,6 +20,7 @@ import matplotlib.pyplot as plt
 from collections import Counter
 from scipy.stats import wasserstein_distance
 import time
+import torch
 
 
 def sigmoid(x):
@@ -308,7 +309,7 @@ class IndicatorCalculation():  # 包含二分类中各种指标
         # if type(self.prediction) is not np.ndarray:
         #     self.prediction = np.asarray(self.prediction)
         #     self.ground_truth = np.asarray(self.ground_truth)
-        if y_real is  None and y_pre is  None:
+        if y_real is None and y_pre is None:
             y_predict = self.prediction.cpu()
             y_real = self.ground_truth.cpu()
         else:
@@ -440,11 +441,11 @@ class LogRecord:
         f.close()
 
 
-def test_list():
-    a = [1, 2, 3]
-    b = [4, 5, 6]
-    print(a + b)
+def linear_matrix_normalization(M):
+    '''
 
-
-if __name__ == '__main__':
-    test_list()
+    :param M: 输入的举证，矩阵的线性归一化， M 的格式是tensor, 讲其转化为图片的格式
+    :return:
+    '''
+    m = (M - M.min()) / (M.max() - M.min())
+    return m
