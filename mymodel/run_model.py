@@ -74,7 +74,7 @@ class DanTrainer:
         if not os.path.exists(dir_name):
             os.mkdir(dir_name)
             print("Create dir {}".format(dir_name))
-        plt.plot()
+        plt.figure()
         plt.xlabel('Step')
         plt.ylabel('Loss/Accuracy')
         plt.title(model_info)
@@ -92,32 +92,33 @@ class DanTrainer:
         plt.close()
         print("The Picture has been saved.")
 
+    def transform_data(self, x):
+        '''
+        模型数据的转化，需要添加高斯噪音
+        :return:
+        '''
+        trans_data = transforms.Compose([
+            transforms.RandomHorizontalFlip(),
+            # transforms.RandomCrop(96),
+            transforms.ColorJitter(brightness=0.5, contrast=0.5, hue=0.5),
+            transforms.ToTensor(),
+            transforms.Normalize([0.5], [0.5])
+        ])
+        x = trans_numpy_cv2(x)
+        x = Image.fromarray(x)
+        x = trans_data(x)
+        result = np.array(x)
+        result = result.reshape((result.shape[1:]))
+        noise = np.random.rand(result.shape[0], result.shape[1])
+        result += noise
+        return result
+
     def train(self):  # 用于模型的训练
-        def transform_data(x):
-            '''
-            模型数据的转化，需要添加高斯噪音
-            :return:
-            '''
-            trans_data = transforms.Compose([
-                transforms.RandomHorizontalFlip(),
-                # transforms.RandomCrop(96),
-                transforms.ColorJitter(brightness=0.5, contrast=0.5, hue=0.5),
-                transforms.ToTensor(),
-                transforms.Normalize([0.5], [0.5])
-            ])
-            x = trans_numpy_cv2(x)
-            x = Image.fromarray(x)
-            x = trans_data(x)
-            result = np.array(x)
-            result = result.reshape((result.shape[1:]))
-            noise = np.random.rand(result.shape[0], result.shape[1])
-            result += noise
-            return result
 
         mydata = MyData(self.train_path, self.test_path, self.val_path, self.batch_size, few_shot=self.few_shot,
                         few_shot_ratio=self.few_shot_ratio)
 
-        train_data_loader = mydata.data_loader(transform_data, mode='train')
+        train_data_loader = mydata.data_loader(self.transform_data, mode='train')
         optimizer = torch.optim.Adam(self.model.parameters(), lr=self.lr)
         loss_func = nn.CrossEntropyLoss()
         loss_func_domain = ContrastiveLoss()
@@ -158,7 +159,7 @@ class DanTrainer:
                         loss_vae = 0
                     loss_label = loss_func(label_output, label)
                     loss_domain = loss_func_domain(domain_output_1, domain_output_2, domain_label)
-                    loss_total = (loss_label + loss_domain + 0.001*loss_vae) / 3
+                    loss_total = (loss_label + loss_domain + loss_vae) / 3
                     optimizer.zero_grad()
                     loss_total.backward()
                     optimizer.step()
@@ -177,7 +178,7 @@ class DanTrainer:
 
                         acc_test, test_loss = [], []
                         for x_test, label_test, domain_test, length_test in next(
-                                mydata.next_batch_test_data(transform=transform_data)):
+                                mydata.next_batch_test_data(transform=self.transform_data)):
                             if self.gpu >= 0:
                                 x_test, label_test, domain_test, length_test = x_test.cuda(self.gpu), label_test.cuda(
                                     self.gpu), domain_test.cuda(
@@ -189,10 +190,13 @@ class DanTrainer:
                                 else:
                                     label_output_test, domain_output_1, domain_output_2, domain_label = self.model(
                                         x_test, label_test, domain_test, length_test)
-                                    loss_vae = 0
+
                                 loss_label = loss_func(label_output_test, label_test)
                                 loss_domain = loss_func_domain(domain_output_1, domain_output_2, domain_label)
-                                loss_total = (loss_label + loss_domain + 0.001*loss_vae) / 3
+                                if self.encoder_name == 'vae':
+                                    loss_total = (loss_label + loss_domain + loss_vae) / 3
+                                else:
+                                    loss_total = (loss_label + loss_domain) / 2
 
                                 y_test = label_test.cpu()
                                 pre_y_test = torch.max(label_output_test, 1)[1].data
@@ -255,7 +259,7 @@ class DanTrainer:
     def test(self):
         self.load_model()  # 加载模型
         mydata = MyData(self.train_path, self.test_path, self.val_path, self.batch_size)
-        test_data_loader = mydata.data_loader(mode='test')
+        test_data_loader = mydata.data_loader(mode='test', transform=None)
         acc = []
         loss = []
         loss_func = nn.CrossEntropyLoss()

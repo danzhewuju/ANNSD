@@ -114,6 +114,7 @@ class DAN(nn.Module):
         bat = x.shape[0]
         if self.encoder_name == 'vae':
             loss_func = nn.MSELoss()
+            loss_vae = torch.tensor(0.0, requires_grad=True).cuda(0)
         if self.gpu >= 0:
             res = torch.zeros((bat, max_length, self.dim)).cuda(self.gpu)
         else:
@@ -128,12 +129,12 @@ class DAN(nn.Module):
                     tmx, decode = self.encoder(tmp_split)
                     if j < l - 1:
                         next_x = tmp_x[:, self.resampling * (j + 1):(j + 2) * self.resampling]
-                        loss_vae = loss_func(linear_matrix_normalization(decode), linear_matrix_normalization(next_x))
+                        loss_vae += loss_func(linear_matrix_normalization(decode), linear_matrix_normalization(next_x))
                 else:
                     tmx = self.encoder(tmp_split)
                 res[i][j] = tmx
         if self.encoder_name == 'vae':
-            return res, loss_vae.mean()
+            return res, loss_vae
         else:
             return res
 
@@ -202,7 +203,7 @@ class ContrastiveLoss(nn.Module):
         super(ContrastiveLoss, self).__init__()
         self.margin = margin
 
-    def forward(self, output1, output2, target, use_domain=1.0, size_average=True):
+    def forward(self, output1, output2, target, use_domain=10, size_average=True):
         distances = (output2 - output1).pow(2).sum(1) + 0.001  # squared distances
         losses = 0.5 * (target.float() * distances +
                         (1 + -1 * target).float() * F.relu(self.margin - distances.sqrt()).pow(2))

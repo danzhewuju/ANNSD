@@ -13,3 +13,6 @@ Encoder:cnn|Data size:6000| Val loss:0.694206| Accuracy:0.50150 	2020-05-14 10:1
 Encoder:cnn|Data size:6000| test loss:0.693135| Accuracy:0.50233 	2020-05-14 19:40:28
 Encoder:cnn|Data size:6000| test loss:0.357515| Accuracy:0.84133 	2020-05-14 23:30:36
 Encoder:cnn|Data size:6000| test loss:0.489322| Accuracy:0.75367 	2020-05-15 22:37:05
+Encoder:vae|Data size:6000| test loss:0.693068| Accuracy:0.50117 	2020-05-17 17:21:09
+Encoder:vae|Data size:6000| test loss:0.693148| Accuracy:0.50000 	2020-05-17 21:12:30
+Encoder:vae|Data size:6000| test loss:0.693380| Accuracy:0.49983 	2020-05-18 08:13:03

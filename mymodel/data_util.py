@@ -55,8 +55,9 @@ class MyDataset(Dataset):  # 重写dateset的相关类
     def __getitem__(self, index):
         fn, label, domain = self.data[index]
         data = np.load(fn)
-        result = self.transform_data(data)
-        result = matrix_normalization(result, (100, 1000))
+        if self.transform_data:
+            data = self.transform_data(data)
+        result = matrix_normalization(data, (100, 1000))
         result = result.astype('float32')
         result = result[np.newaxis, :]
         # result = trans_data(vae_model, result)
@@ -116,10 +117,12 @@ class MyData:
                 data_info_val = DataInfo(self.path_test)  # 将少样本学习的样本加入到训练集中
                 few_shot_learning_list = data_info_val.few_shot_learning_sampling(ratio=self.few_shot_ratio)
                 data_info.data += few_shot_learning_list  # 将数据加载到模型进行训练
+            dataset = MyDataset(data_info.data, transform=transform)
 
         else:
             data_info = DataInfo(self.path_test)
-        dataset = MyDataset(data_info.data, transform=transform)
+            dataset = MyDataset(data_info.data, transform=transform)
+
         dataloader = DataLoader(dataset, batch_size=self.batch_size, shuffle=True, collate_fn=self.collate_fn)
         return dataloader
 

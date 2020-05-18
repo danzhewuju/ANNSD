@@ -15,7 +15,6 @@ import os
 
 import torch
 import matplotlib.pyplot as plt
-from model_util import VaeLoss
 import argparse
 from util.run_util import get_gpu_used
 import torch.nn as nn
@@ -37,7 +36,7 @@ def test_2():
         if not os.path.exists(dir_name):
             os.mkdir(dir_name)
             print("Create dir {}".format(dir_name))
-        plt.plot()
+        plt.figure()
         plt.xlabel('Step')
         plt.ylabel('Loss/Accuracy')
         plt.title(model_info)
@@ -84,6 +83,5 @@ def test_4():
 
 
 if __name__ == '__main__':
-    now02 = time.strftime('%Y-%m-%d_%H:%M:%S', time.localtime(time.time()))
-    print(now02)
+    test_2()
 

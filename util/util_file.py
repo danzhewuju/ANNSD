@@ -447,6 +447,6 @@ def linear_matrix_normalization(M):
     :param M: 输入的举证，矩阵的线性归一化， M 的格式是tensor, 讲其转化为图片的格式
     :return:
     '''
-    m = (M - M.min()) / (M.max() - M.min())*255
+    m = (M - M.min()) / (M.max() - M.min())
 
-    return m.floor()
+    return m
