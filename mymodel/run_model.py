@@ -118,7 +118,7 @@ class DanTrainer:
         mydata = MyData(self.train_path, self.test_path, self.val_path, self.batch_size, few_shot=self.few_shot,
                         few_shot_ratio=self.few_shot_ratio)
 
-        train_data_loader = mydata.data_loader(self.transform_data, mode='train')
+        train_data_loader = mydata.data_loader(None, mode='train')
         optimizer = torch.optim.Adam(self.model.parameters(), lr=self.lr)
         loss_func = nn.CrossEntropyLoss()
         loss_func_domain = ContrastiveLoss()
@@ -159,7 +159,11 @@ class DanTrainer:
                         loss_vae = 0
                     loss_label = loss_func(label_output, label)
                     loss_domain = loss_func_domain(domain_output_1, domain_output_2, domain_label)
-                    loss_total = (loss_label + loss_domain + loss_vae) / 3
+                    if self.encoder_name == 'vae':
+                        loss_total = (loss_label + loss_domain + loss_vae) / 3
+                    else:
+                        loss_total = (loss_label + loss_domain) / 2
+
                     optimizer.zero_grad()
                     loss_total.backward()
                     optimizer.step()
@@ -178,7 +182,7 @@ class DanTrainer:
 
                         acc_test, test_loss = [], []
                         for x_test, label_test, domain_test, length_test in next(
-                                mydata.next_batch_test_data(transform=self.transform_data)):
+                                mydata.next_batch_test_data(transform=None)):
                             if self.gpu >= 0:
                                 x_test, label_test, domain_test, length_test = x_test.cuda(self.gpu), label_test.cuda(
                                     self.gpu), domain_test.cuda(
