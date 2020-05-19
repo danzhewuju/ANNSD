@@ -114,8 +114,8 @@ class MyData:
             # 如果加入了少样本学习的方法，需要额外的处理
             data_info = DataInfo(self.path_train)
             if self.few_shot:
-                data_info_val = DataInfo(self.path_test)  # 将少样本学习的样本加入到训练集中
-                few_shot_learning_list = data_info_val.few_shot_learning_sampling(ratio=self.few_shot_ratio)
+                data_info_test = DataInfo(self.path_test)  # 将少样本学习的样本加入到训练集中
+                few_shot_learning_list = data_info_test.few_shot_learning_sampling(ratio=self.few_shot_ratio)
                 data_info.data += few_shot_learning_list  # 将数据加载到模型进行训练
             dataset = MyDataset(data_info.data, transform=transform)
 

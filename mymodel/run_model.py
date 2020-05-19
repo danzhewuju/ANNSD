@@ -219,7 +219,7 @@ class DanTrainer:
                         test_acc_vi.append(test_accuracy_avg)
 
                         print(
-                            'Epoch:{} | Step:{} | train loss:{:.6f} | val loss:{:.6f} | train accuracy:{:.5f} | test accuracy:{:.5f}'.format(
+                            'Epoch:{} | Step:{} | train loss:{:.6f} | val loss:{:.6f} | train accuracy:{:.5f} | val accuracy:{:.5f}'.format(
                                 epoch, step, loss_avg, test_loss_avg, accuracy_avg, test_accuracy_avg))
                         acc.clear()
                         loss.clear()

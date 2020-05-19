@@ -203,7 +203,7 @@ class ContrastiveLoss(nn.Module):
         super(ContrastiveLoss, self).__init__()
         self.margin = margin
 
-    def forward(self, output1, output2, target, use_domain=10, size_average=True):
+    def forward(self, output1, output2, target, use_domain=1, size_average=True):
         distances = (output2 - output1).pow(2).sum(1) + 0.001  # squared distances
         losses = 0.5 * (target.float() * distances +
                         (1 + -1 * target).float() * F.relu(self.margin - distances.sqrt()).pow(2))
