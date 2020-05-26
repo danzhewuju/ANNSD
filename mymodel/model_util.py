@@ -11,27 +11,51 @@ class VAE(nn.Module):
         super(VAE, self).__init__()
         self.encoder = nn.Sequential(
             nn.Linear(input_shape[0] * input_shape[1], 512),
-            nn.Tanh(),
+            nn.ReLU(),
             nn.Linear(512, 128),
-            nn.Tanh(),
-            nn.Linear(128, c_dim),
+            nn.ReLU(),
+            nn.Linear(128, c_dim)
         )
+
         self.decoder = nn.Sequential(
             nn.Linear(c_dim, 128),
-            nn.Tanh(),
+            nn.ReLU(),
             nn.Linear(128, 512),
-            nn.Tanh(),
+            nn.ReLU(),
             nn.Linear(512, input_shape[0] * input_shape[1]),
-            nn.Sigmoid(),  # compress to a range (0, 1)
+            nn.Sigmoid()  # compress to a range (0, 1)
         )
         self.input_shape = input_shape
 
+    def reparameterize(self, mu, logval):
+        std = torch.exp(0.5 * logval)
+        eps = torch.randn_like(std)
+        return mu + eps * std
+
+    # def loss_function(self, recon_x, x, mu, logvar):
+    #     # recon_x = linear_matrix_normalization(recon_x)
+    #     # x = linear_matrix_normalization(x)
+    #     # x = torch.sigmoid(x)
+    #     # x = torch.reshape(x, (-1, self.input_shape[0] * self.input_shape[1]))
+    #     BCE = F.binary_cross_entropy(recon_x, x, reduction='mean')
+    #
+    #     # see Appendix B from VAE paper:
+    #     # Kingma and Welling. Auto-Encoding Variational Bayes. ICLR, 2014
+    #     # https://arxiv.org/abs/1312.6114
+    #     # 0.5 * sum(1 + log(sigma^2) - mu^2 - sigma^2)
+    #     KLD = -0.5 * torch.sum(1 + logvar - mu.pow(2) - logvar.exp())
+    #
+    #     return abs(BCE + KLD)
+
     def forward(self, x):
         x = torch.reshape(x, (-1, self.input_shape[0] * self.input_shape[1]))
-        coded = self.encoder(x)
-        decoded = self.decoder(coded)
+        z = self.encoder(x)
+        # mu = self.fc1(coded)
+        # logvar = self.fc2(coded)
+        # z = self.reparameterize(mu, logvar)
+        decoded = self.decoder(z)
         decoded = torch.reshape(decoded, (self.input_shape[0], self.input_shape[1]))
-        return coded, decoded
+        return z, decoded
 
 
 class CNNEncoder(nn.Module):
@@ -113,8 +137,10 @@ class DAN(nn.Module):
         max_length = length[0] // self.resampling
         bat = x.shape[0]
         if self.encoder_name == 'vae':
-            loss_func = nn.MSELoss()
-            loss_vae = torch.tensor(0.0, requires_grad=True).cuda(0)
+            loss_func = nn.functional.mse_loss
+            loss_vae = torch.tensor(0.0, requires_grad=True).cuda(self.gpu)
+            count = 0
+
         if self.gpu >= 0:
             res = torch.zeros((bat, max_length, self.dim)).cuda(self.gpu)
         else:
@@ -126,15 +152,17 @@ class DAN(nn.Module):
                 tmp_split = tmp_x[:, self.resampling * j:(j + 1) * self.resampling]
                 tmp_split = torch.reshape(tmp_split, (1, 1, self.input_shape[0], self.input_shape[1]))
                 if self.encoder_name == 'vae':
-                    tmx, decode = self.encoder(tmp_split)
+                    z, decode = self.encoder(tmp_split)
                     if j < l - 1:
                         next_x = tmp_x[:, self.resampling * (j + 1):(j + 2) * self.resampling]
-                        loss_vae += loss_func(linear_matrix_normalization(decode), linear_matrix_normalization(next_x))
+
+                        loss_vae += loss_func(decode, next_x)
+                        count += 1
                 else:
-                    tmx = self.encoder(tmp_split)
-                res[i][j] = tmx
+                    z = self.encoder(tmp_split)
+                res[i][j] = z
         if self.encoder_name == 'vae':
-            return res, loss_vae
+            return res, loss_vae / count
         else:
             return res
 
@@ -204,8 +232,8 @@ class ContrastiveLoss(nn.Module):
         self.margin = margin
 
     def forward(self, output1, output2, target, use_domain=1, size_average=True):
-        distances = (output2 - output1).pow(2).sum(1) + 0.001  # squared distances
+        distances = 100 * (output2 - output1).pow(2).sum(1) + 0.01  # squared distances
         losses = 0.5 * (target.float() * distances +
-                        (2 + -1 * target).float() * F.relu(self.margin - distances.sqrt()).pow(2))
+                        (1 + -1 * target).float() * F.relu(self.margin - distances.sqrt()).pow(2))
         losses = losses * use_domain
         return losses.mean() if size_average else losses.sum()

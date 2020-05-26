@@ -9,7 +9,7 @@ import matplotlib.pyplot as plt
 from torchvision import transforms
 from PIL import Image
 import numpy as np
-from util.util_file import trans_numpy_cv2
+from util.util_file import trans_numpy_cv2, linear_matrix_normalization
 
 
 class DanTrainer:
@@ -145,6 +145,7 @@ class DanTrainer:
             for epoch in tqdm(range(self.epoch)):
 
                 for step, (x, label, domain, length) in enumerate(tqdm(train_data_loader)):
+                    # x = linear_matrix_normalization(x)
                     if self.gpu >= 0:
                         x, label, domain, length = x.cuda(self.gpu), label.cuda(self.gpu), domain.cuda(
                             self.gpu), length.cuda(
@@ -183,6 +184,7 @@ class DanTrainer:
                         acc_test, test_loss = [], []
                         for x_test, label_test, domain_test, length_test in next(
                                 mydata.next_batch_test_data(transform=None)):
+                            # x_test = linear_matrix_normalization(x_test)
                             if self.gpu >= 0:
                                 x_test, label_test, domain_test, length_test = x_test.cuda(self.gpu), label_test.cuda(
                                     self.gpu), domain_test.cuda(
