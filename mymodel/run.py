@@ -9,10 +9,10 @@ if __name__ == '__main__':
     parser.add_argument('-gpu', '--GPU', type=int, default=0, help='GPU ID')
     parser.add_argument('-ep', '--epoch', type=int, default=10, help='number of epoch')
 
-    parser.add_argument('-trp', '--train_path', type=str, default="../preprocess/train_{}.csv",
+    parser.add_argument('-trp', '--train_path', type=str, default="../preprocess/train_mini_{}.csv",
                         help='training data path')
-    parser.add_argument('-tep', '--test_path', type=str, default="../preprocess/test_{}.csv", help='test data path')
-    parser.add_argument('-vap', '--val_path', type=str, default="../preprocess/val_{}.csv", help='val data path')
+    parser.add_argument('-tep', '--test_path', type=str, default="../preprocess/test_mini_{}.csv", help='test data path')
+    parser.add_argument('-vap', '--val_path', type=str, default="../preprocess/val_mini_{}.csv", help='val data path')
     parser.add_argument('-p', '--patient', type=str, default="BDP", help='patient name')
     parser.add_argument('-m', '--model', type=str, default="train", help='style of train')
     parser.add_argument('-few', '--few_show_learning', type=bool, default=True, help='keep few shot learning open')
@@ -35,6 +35,7 @@ if __name__ == '__main__':
     few_shot_ratio = args.few_show_learning_ratio
     few_show_learning = args.few_show_learning
     train_path, test_path, val_path = train_path.format(patient), test_path.format(patient), val_path.format(patient)
+    print(args)
     dan_train = DanTrainer(epoch, bath_size=batch_size, lr=lr, gpu=gpu, train_path=train_path, test_path=test_path,
                            val_path=val_path, model=model, encoder_name=embedding, few_shot=few_show_learning,
                            few_show_ratio=few_shot_ratio)
