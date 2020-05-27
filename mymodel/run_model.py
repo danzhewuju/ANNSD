@@ -11,6 +11,7 @@ from PIL import Image
 import numpy as np
 from util.util_file import trans_numpy_cv2, linear_matrix_normalization
 import collections
+import pandas as pd
 
 
 class DanTrainer:
@@ -263,6 +264,12 @@ class DanTrainer:
                     'model_info': "validation information", 'show': False}
             self.draw_loss_plt(**info)
 
+    def segment_statistic(self, prey, y, length):
+        for i in range(len(prey)):
+            if prey[i] == y[i]:
+                self.result[length[i]] += [1]
+            else:
+                self.result[length[i]] += [0]
 
     def test(self):
         self.load_model()  # 加载模型
@@ -270,7 +277,7 @@ class DanTrainer:
         test_data_loader = mydata.data_loader(mode='test', transform=None)
         acc = []
         loss = []
-        result = collections.defaultdict([])
+        self.result = collections.defaultdict([])
         loss_func = nn.CrossEntropyLoss()
         for step, (x, label, domain, length) in enumerate(tqdm(test_data_loader)):
             if self.gpu >= 0:
@@ -281,15 +288,21 @@ class DanTrainer:
                 label_output = self.model(x, label, domain, length)
                 loss_label = loss_func(label_output, label)
                 loss_total = loss_label
-                pre_y = torch.max(label_output, 1)[1].data.cpu()
-                for i in range(len(pre_y)):
-                    if pre_y[i] == y[i]:
-                        result[length[i]] += []
+                prey = torch.max(label_output, 1)[1].data.cpu()
                 y = label.cpu()
-                acc += [1 if pre_y[i] == y[i] else 0 for i in range(len(y))]
+                acc += [1 if prey[i] == y[i] else 0 for i in range(len(y))]
                 loss.append(loss_total.data.cpu())
+                self.segment_statistic(prey, y, length)
         loss_avg = sum(loss) / len(loss)
         accuracy_avg = sum(acc) / len(acc)
         result = "Encoder:{}|Data size:{}| test loss:{:.6f}| Accuracy:{:.5f} ".format(self.encoder_name, len(acc),
                                                                                       loss_avg, accuracy_avg)
+        # 分段统计信息表
+        acc_result = {}
+        for l, p in self.result.items():
+            acc = sum(p) / len(p)
+            acc_result[l] = acc
+        dataframe = pd.DataFrame(acc_result)
+        dataframe.to_csv('../log_segment_statistic.csv')
+        print(dataframe)
         self.log_write(result)
