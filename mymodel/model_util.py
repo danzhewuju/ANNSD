@@ -11,9 +11,9 @@ class VAE(nn.Module):
         super(VAE, self).__init__()
         self.encoder = nn.Sequential(
             nn.Linear(input_shape[0] * input_shape[1], 512),
-            nn.ReLU(),
+            nn.Tanh(),
             nn.Linear(512, 128),
-            nn.ReLU(),
+            nn.Tanh(),
             nn.Linear(128, c_dim)
         )
 
@@ -48,8 +48,8 @@ class VAE(nn.Module):
     #     return abs(BCE + KLD)
 
     def forward(self, x):
-        x = torch.reshape(x, (-1, self.input_shape[0] * self.input_shape[1]))
-        z = self.encoder(x)
+        x_linear = torch.reshape(x, (-1, self.input_shape[0] * self.input_shape[1]))
+        z = self.encoder(x_linear)
         # mu = self.fc1(coded)
         # logvar = self.fc2(coded)
         # z = self.reparameterize(mu, logvar)
@@ -76,6 +76,7 @@ class CNNEncoder(nn.Module):
             nn.ReLU(),
             nn.MaxPool2d(kernel_size=2, stride=2),
             nn.Conv2d(64, 32, kernel_size=5, stride=1, padding=2),
+            nn.Dropout(0.5),
             nn.BatchNorm2d(32),
             nn.ReLU(),
             nn.MaxPool2d(kernel_size=2, stride=2),
@@ -232,7 +233,7 @@ class ContrastiveLoss(nn.Module):
         self.margin = margin
 
     def forward(self, output1, output2, target, use_domain=1, size_average=True):
-        distances = 100 * (output2 - output1).pow(2).sum(1) + 0.01  # squared distances
+        distances = 100 * (output2 - output1).pow(2).sum(1) + 0.001  # squared distances
         losses = 0.5 * (target.float() * distances +
                         (1 + -1 * target).float() * F.relu(self.margin - distances.sqrt()).pow(2))
         losses = losses * use_domain

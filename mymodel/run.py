@@ -11,8 +11,10 @@ if __name__ == '__main__':
 
     parser.add_argument('-trp', '--train_path', type=str, default="../preprocess/train_{}.csv",
                         help='training data path')
-    parser.add_argument('-tep', '--test_path', type=str, default="../preprocess/test_{}.csv", help='test data path')
-    parser.add_argument('-vap', '--val_path', type=str, default="../preprocess/val_{}.csv", help='val data path')
+    parser.add_argument('-tep', '--test_path', type=str, default="../preprocess/test_{}.csv",
+                        help='test data path')
+    parser.add_argument('-vap', '--val_path', type=str, default="../preprocess/val_{}.csv",
+                        help='val data path')
     parser.add_argument('-p', '--patient', type=str, default="BDP", help='patient name')
     parser.add_argument('-m', '--model', type=str, default="train", help='style of train')
     parser.add_argument('-few', '--few_show_learning', type=bool, default=True, help='keep few shot learning open')

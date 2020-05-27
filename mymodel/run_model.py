@@ -109,7 +109,7 @@ class DanTrainer:
         x = trans_data(x)
         result = np.array(x)
         result = result.reshape((result.shape[1:]))
-        noise = np.random.rand(result.shape[0], result.shape[1])
+        noise = 0.01*np.random.rand(result.shape[0], result.shape[1])
         result += noise
         return result
 
@@ -163,7 +163,7 @@ class DanTrainer:
                     if self.encoder_name == 'vae':
                         loss_total = (loss_label + loss_domain + loss_vae) / 3
                     else:
-                        loss_total = (loss_label + loss_domain) / 2
+                        loss_total = 0.4 * loss_label + 0.6 * loss_domain
 
                     optimizer.zero_grad()
                     loss_total.backward()
