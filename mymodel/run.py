@@ -3,7 +3,7 @@ import argparse
 
 if __name__ == '__main__':
     parser = argparse.ArgumentParser()
-    parser.add_argument('-lr', '--learning_ratio', type=float, default=0.0005, help='learning ratio of model')
+    parser.add_argument('-lr', '--learning_ratio', type=float, default=0.0001, help='learning ratio of model')
     parser.add_argument('-dim', '--output_dim', type=int, default=32, help='number of hidden units in encoder')
     parser.add_argument('-bs', '--batch_size', type=int, default=16, help='number of bath size')
     parser.add_argument('-gpu', '--GPU', type=int, default=0, help='GPU ID')
@@ -16,10 +16,10 @@ if __name__ == '__main__':
     parser.add_argument('-vap', '--val_path', type=str, default="../preprocess/val_{}.csv",
                         help='val data path')
     parser.add_argument('-p', '--patient', type=str, default="BDP", help='patient name')
-    parser.add_argument('-m', '--model', type=str, default="train", help='style of train')
+    parser.add_argument('-m', '--model', type=str, default="test", help='style of train')
     parser.add_argument('-few', '--few_show_learning', type=bool, default=True, help='keep few shot learning open')
     parser.add_argument('-fr', '--few_show_learning_ratio', type=float, default=0.2, help='few shot learning ratio')
-    parser.add_argument('-em', '--embedding', type=str, default="vae", help='method of embedding')
+    parser.add_argument('-em', '--embedding', type=str, default="cnn", help='method of embedding')
 
     args = parser.parse_args()
 

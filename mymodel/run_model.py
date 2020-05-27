@@ -267,9 +267,9 @@ class DanTrainer:
     def segment_statistic(self, prey, y, length):
         for i in range(len(prey)):
             if prey[i] == y[i]:
-                self.result[length[i]] += [1]
+                self.result[int(length[i] // 500) + 1] += [1]
             else:
-                self.result[length[i]] += [0]
+                self.result[int(length[i] // 500) + 1] += [0]
 
     def test(self):
         self.load_model()  # 加载模型
@@ -277,7 +277,7 @@ class DanTrainer:
         test_data_loader = mydata.data_loader(mode='test', transform=None)
         acc = []
         loss = []
-        self.result = collections.defaultdict([])
+        self.result = collections.defaultdict(list)
         loss_func = nn.CrossEntropyLoss()
         for step, (x, label, domain, length) in enumerate(tqdm(test_data_loader)):
             if self.gpu >= 0:
@@ -292,17 +292,20 @@ class DanTrainer:
                 y = label.cpu()
                 acc += [1 if prey[i] == y[i] else 0 for i in range(len(y))]
                 loss.append(loss_total.data.cpu())
-                self.segment_statistic(prey, y, length)
+                self.segment_statistic(prey, y, length.cpu())
         loss_avg = sum(loss) / len(loss)
         accuracy_avg = sum(acc) / len(acc)
         result = "Encoder:{}|Data size:{}| test loss:{:.6f}| Accuracy:{:.5f} ".format(self.encoder_name, len(acc),
                                                                                       loss_avg, accuracy_avg)
+        self.log_write(result)
         # 分段统计信息表
-        acc_result = {}
+        w, accs = [], []
         for l, p in self.result.items():
             acc = sum(p) / len(p)
-            acc_result[l] = acc
-        dataframe = pd.DataFrame(acc_result)
-        dataframe.to_csv('../log_segment_statistic.csv')
+            w.append(l)
+            accs.append(acc)
+        acc_data_frame = {'w': w, 'accs': accs}
+
+        dataframe = pd.DataFrame(acc_data_frame)
+        dataframe.to_csv('../log/segment_statistic.csv')
         print(dataframe)
-        self.log_write(result)

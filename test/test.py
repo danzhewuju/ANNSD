@@ -15,6 +15,7 @@ import os
 
 import torch
 import matplotlib.pyplot as plt
+import collections
 import argparse
 from util.run_util import get_gpu_used
 import torch.nn as nn
@@ -82,6 +83,10 @@ def test_4():
     print(code_x2_order)
 
 
-if __name__ == '__main__':
-    test_2()
+def test_5():
+    a = collections.defaultdict(list)
+    print(a)
 
+
+if __name__ == '__main__':
+    test_5()
