@@ -10,6 +10,7 @@ from torchvision import transforms
 from PIL import Image
 import numpy as np
 from util.util_file import trans_numpy_cv2, linear_matrix_normalization
+import collections
 
 
 class DanTrainer:
@@ -109,7 +110,7 @@ class DanTrainer:
         x = trans_data(x)
         result = np.array(x)
         result = result.reshape((result.shape[1:]))
-        noise = 0.01*np.random.rand(result.shape[0], result.shape[1])
+        noise = 0.01 * np.random.rand(result.shape[0], result.shape[1])
         result += noise
         return result
 
@@ -262,12 +263,14 @@ class DanTrainer:
                     'model_info': "validation information", 'show': False}
             self.draw_loss_plt(**info)
 
+
     def test(self):
         self.load_model()  # 加载模型
         mydata = MyData(self.train_path, self.test_path, self.val_path, self.batch_size)
         test_data_loader = mydata.data_loader(mode='test', transform=None)
         acc = []
         loss = []
+        result = collections.defaultdict([])
         loss_func = nn.CrossEntropyLoss()
         for step, (x, label, domain, length) in enumerate(tqdm(test_data_loader)):
             if self.gpu >= 0:
@@ -279,6 +282,9 @@ class DanTrainer:
                 loss_label = loss_func(label_output, label)
                 loss_total = loss_label
                 pre_y = torch.max(label_output, 1)[1].data.cpu()
+                for i in range(len(pre_y)):
+                    if pre_y[i] == y[i]:
+                        result[length[i]] += []
                 y = label.cpu()
                 acc += [1 if pre_y[i] == y[i] else 0 for i in range(len(y))]
                 loss.append(loss_total.data.cpu())
