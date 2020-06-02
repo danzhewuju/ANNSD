@@ -16,7 +16,7 @@ import pandas as pd
 
 class DanTrainer:
     def __init__(self, epoch=10, bath_size=16, lr=0.001, gpu=0, train_path=None, test_path=None, val_path=None,
-                 model='train', encoder_name='vae', few_shot=True, few_show_ratio=0.2):
+                 model='train', encoder_name='vae', few_shot=True, few_show_ratio=0.2, label_classifier_name='lstm'):
         self.epoch = epoch
         self.batch_size = bath_size
         self.lr = lr
@@ -27,10 +27,13 @@ class DanTrainer:
         self.gpu = gpu
         self.few_shot = few_shot
         self.few_shot_ratio = few_show_ratio
+        self.label_classifier_name = label_classifier_name
         if gpu >= 0:
-            self.model = DAN(gpu=gpu, model=model, encoder_name=encoder_name).cuda(gpu)  # 放入显存中
+            self.model = DAN(gpu=gpu, model=model, encoder_name=encoder_name,
+                             label_classifier_name=label_classifier_name).cuda(gpu)  # 放入显存中
         else:
-            self.model = DAN(gpu=gpu, model=model, encoder_name=encoder_name)  # 放入内存中
+            self.model = DAN(gpu=gpu, model=model, encoder_name=encoder_name,
+                             label_classifier_name=label_classifier_name)  # 放入内存中
 
     def save_mode(self, save_path='../save_model'):
         if not os.path.exists(save_path):

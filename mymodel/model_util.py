@@ -4,6 +4,10 @@ import torch
 import torch.nn.functional as F
 import random
 from util.util_file import linear_matrix_normalization
+import sys
+
+sys.path.append('../')
+from pytorch_pretrained import BertModel, BertTokenizer
 
 
 class VAE(nn.Module):
@@ -58,6 +62,25 @@ class VAE(nn.Module):
         return z, decoded
 
 
+# import bert model
+
+class Bert(nn.Module):
+
+    def __init__(self, config):
+        super(Bert, self).__init__()
+        self.bert = BertModel.from_pretrained(config.bert_path)
+        for param in self.bert.parameters():
+            param.requires_grad = True
+        self.fc = nn.Linear(config.hidden_size, config.num_classes)
+
+    def forward(self, x):
+        context = x[0]  # 输入的句子
+        mask = x[2]  # 对padding部分进行mask，和句子一个size，padding部分用0表示，如：[1, 1, 1, 1, 0, 0]
+        _, pooled = self.bert(context, attention_mask=mask, output_all_encoded_layers=False)
+        out = self.fc(pooled)
+        return out
+
+
 class CNNEncoder(nn.Module):
     def __init__(self, input_shape=(100, 500), c_dim=32):
         super(CNNEncoder, self).__init__()
@@ -91,7 +114,8 @@ class CNNEncoder(nn.Module):
 
 
 class DAN(nn.Module):
-    def __init__(self, input_shape=(100, 500), c_dim=32, gpu=0, resampling=500, model='train', encoder_name='vae'):
+    def __init__(self, input_shape=(100, 500), c_dim=32, gpu=0, resampling=500, model='train', encoder_name='vae',
+                 label_classifier_name='lstm'):
         '''
 
         :param c_dim:  表示的是encoder的输出,同时也是预测网络和对抗网络的输出
@@ -104,21 +128,28 @@ class DAN(nn.Module):
         self.resampling = resampling
         self.dim = c_dim
         self.encoder_name = encoder_name
+        self.label_classifier_name = label_classifier_name
         if encoder_name == 'vae':  # 使用vae作为编码器
             self.encoder = VAE(input_shape, c_dim=c_dim)  # 注意此时的训练方式，是将前一个的编码方式和我下一个的编码方式进行交叉求和
 
         else:
             self.encoder = CNNEncoder(input_shape, c_dim=c_dim)
 
-        self.label_classifier = nn.LSTM(
-            input_size=c_dim,
-            hidden_size=64,  # rnn hidden unit
-            num_layers=1,  # number of rnn layer
-            batch_first=True
-            # input & output will has batch size as 1s dimension. e.g. (batch, time_step, input_size)
-        )
-
-        self.label_fc = nn.Linear(64, 2)
+        if label_classifier_name == 'lstm':
+            self.label_classifier = nn.LSTM(
+                input_size=c_dim,
+                hidden_size=64,  # rnn hidden unit
+                num_layers=1,  # number of rnn layer
+                batch_first=True,
+                bidirectional=True
+                # input & output will has batch size as 1s dimension. e.g. (batch, time_step, input_size)
+            )
+            self.label_fc = nn.Linear(64, 2)
+        else:
+            self.label_classifier = BertModel.from_pretrained('../bert_pretrain')  # 加载预训练模型
+            for param in self.label_classifier.parameters():
+                param.requires_grad = True
+            self.label_fc = nn.Linear(768, 2)
 
         self.domain_classifier = nn.LSTM(
             input_size=c_dim,
@@ -127,7 +158,7 @@ class DAN(nn.Module):
             batch_first=True
             # input & output will has batch size as 1s dimension. e.g. (batch, time_step, input_size)
         )
-        self.domain_fc = nn.Linear(64, 5)
+        self.domain_fc = nn.Linear(64, 2)  # 判断病人是否来自于同一个人
 
     def trans_data(self, x, length):
         '''
@@ -172,7 +203,12 @@ class DAN(nn.Module):
             code_x1, loss_vae = self.trans_data(x, length)
         else:
             code_x1 = self.trans_data(x, length)
-        label_tmp, (_, _) = self.label_classifier(code_x1)
+        if self.label_classifier_name == 'lstm':  # 用不同的模型进行判别
+            label_tmp, (_, _) = self.label_classifier(code_x1)  # 使用lstm进行判别
+            # 引入attention机制
+
+        else:
+            _, label_tmp = self.label_classifier(code_x1)  # 利用bert模型
         y_label = self.label_fc(label_tmp[:, -1, :])
         if self.model == 'train':  # 模型的成对训练
             if self.gpu >= 0:
