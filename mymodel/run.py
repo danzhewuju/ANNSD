@@ -3,7 +3,7 @@ import argparse
 
 if __name__ == '__main__':
     parser = argparse.ArgumentParser()
-    parser.add_argument('-lr', '--learning_ratio', type=float, default=0.00001, help='learning ratio of model')
+    parser.add_argument('-lr', '--learning_ratio', type=float, default=0.0001, help='learning ratio of model')
     parser.add_argument('-dim', '--output_dim', type=int, default=32, help='number of hidden units in encoder')
     parser.add_argument('-bs', '--batch_size', type=int, default=16, help='number of bath size')
     parser.add_argument('-gpu', '--GPU', type=int, default=0, help='GPU ID')

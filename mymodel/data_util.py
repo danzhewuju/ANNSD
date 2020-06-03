@@ -37,6 +37,7 @@ class DataInfo:
         N = self.data_length
         start = 0
         end = batch_size
+        random.shuffle(self.data)
         while end < N:
             yield self.data[start:end]
             start = end
