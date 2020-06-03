@@ -144,6 +144,10 @@ class DAN(nn.Module):
                 bidirectional=True
                 # input & output will has batch size as 1s dimension. e.g. (batch, time_step, input_size)
             )
+            self.tanh1 = nn.Tanh()
+            self.w = nn.Parameter(torch.zeros(64 * 2))
+            self.tanh2 = nn.Tanh()
+            self.fc1 = nn.Linear(64 * 2, 64)
             self.label_fc = nn.Linear(64, 2)
         else:
             self.label_classifier = BertModel.from_pretrained('../bert_pretrain')  # 加载预训练模型
@@ -204,12 +208,19 @@ class DAN(nn.Module):
         else:
             code_x1 = self.trans_data(x, length)
         if self.label_classifier_name == 'lstm':  # 用不同的模型进行判别
-            label_tmp, (_, _) = self.label_classifier(code_x1)  # 使用lstm进行判别
+            label_tmp, _ = self.label_classifier(code_x1)  # 使用lstm进行判别
             # 引入attention机制
+            M = self.tanh1(label_tmp)
+            alpha = F.softmax(torch.matmul(M, self.w), dim=1).unsqueeze(-1)
+            out = label_tmp * alpha
+            out = torch.sum(out, 1)
+            out = F.relu(out)
+            out = self.fc1(out)
+
 
         else:
-            _, label_tmp = self.label_classifier(code_x1)  # 利用bert模型
-        y_label = self.label_fc(label_tmp[:, -1, :])
+            _, out = self.label_classifier(code_x1)  # 利用bert模型
+        y_label = self.label_fc(out)
         if self.model == 'train':  # 模型的成对训练
             if self.gpu >= 0:
                 code_x2 = torch.zeros(code_x1.shape).cuda(self.gpu)

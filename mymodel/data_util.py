@@ -129,6 +129,6 @@ class MyData:
     def next_batch_test_data(self, transform):
         data_info = DataInfo(self.path_val)
         dataset = MyDataset(next(data_info.next_batch_data(self.batch_size)), transform=transform)
-        next_batch_data_loader = DataLoader(dataset, batch_size=self.batch_size, shuffle=True,
+        next_batch_data_loader = DataLoader(dataset, batch_size=self.batch_size * 2, shuffle=True,
                                             collate_fn=self.collate_fn, )
         yield next_batch_data_loader
