@@ -120,7 +120,7 @@ class MyData:
                 data_info.data += few_shot_learning_list  # 将数据加载到模型进行训练
             dataset = MyDataset(data_info.data, transform=transform)
 
-        else:
+        else: # test
             data_info = DataInfo(self.path_test)
             dataset = MyDataset(data_info.data, transform=transform)
 

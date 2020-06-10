@@ -38,7 +38,8 @@ class DanTrainer:
     def save_mode(self, save_path='../save_model'):
         if not os.path.exists(save_path):
             os.mkdir(save_path)
-        save_full_path = os.path.join(save_path, 'DAN_encoder_{}_{}.pkl'.format(self.encoder_name, self.label_classifier_name))
+        save_full_path = os.path.join(save_path,
+                                      'DAN_encoder_{}_{}.pkl'.format(self.encoder_name, self.label_classifier_name))
         torch.save(self.model.state_dict(), save_full_path)
         print("Saving Model DAN in {}......".format(save_full_path))
         return
@@ -274,6 +275,11 @@ class DanTrainer:
                 self.result[int(length[i] // 500) + 1] += [0]
 
     def test(self):
+        '''
+
+        :param epoch: 多测试几遍用于检测方差
+        :return:
+        '''
         self.load_model()  # 加载模型
         mydata = MyData(self.train_path, self.test_path, self.val_path, self.batch_size)
         test_data_loader = mydata.data_loader(mode='test', transform=None)
@@ -301,12 +307,21 @@ class DanTrainer:
                                                                                       loss_avg, accuracy_avg)
         self.log_write(result)
         # 分段统计信息表
-        w, accs = [], []
+        w, accs, vars = [], [], []
+        # 增加方差的计算
+        epoch = 5  # 将数据分组用于计算方差
+        batch_size = len(acc) // epoch  # 每一个batch size 的大小
         for l, p in self.result.items():
-            acc = sum(p) / len(p)
+            acc_ep = []
+            for j in range(epoch):
+                tmp = p[(j - 1) * batch_size:j * batch_size]
+                acc_ep.append(sum(tmp) / len(tmp))
+            acc = np.mean(acc_ep)
+            var = np.var(acc_ep)
             w.append(l)
             accs.append(acc)
-        acc_data_frame = {'w': w, 'accs': accs}
+            vars.append(var)
+        acc_data_frame = {'w': w, 'accs': accs, 'var':vars}
 
         dataframe = pd.DataFrame(acc_data_frame)
         dataframe.to_csv('../log/segment_statistic.csv')
