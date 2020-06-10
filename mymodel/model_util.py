@@ -3,6 +3,7 @@ from torch.autograd import Function
 import torch
 import torch.nn.functional as F
 import random
+from Transformer import Transformer
 from util.util_file import linear_matrix_normalization
 import sys
 
@@ -36,21 +37,6 @@ class VAE(nn.Module):
         eps = torch.randn_like(std)
         return mu + eps * std
 
-    # def loss_function(self, recon_x, x, mu, logvar):
-    #     # recon_x = linear_matrix_normalization(recon_x)
-    #     # x = linear_matrix_normalization(x)
-    #     # x = torch.sigmoid(x)
-    #     # x = torch.reshape(x, (-1, self.input_shape[0] * self.input_shape[1]))
-    #     BCE = F.binary_cross_entropy(recon_x, x, reduction='mean')
-    #
-    #     # see Appendix B from VAE paper:
-    #     # Kingma and Welling. Auto-Encoding Variational Bayes. ICLR, 2014
-    #     # https://arxiv.org/abs/1312.6114
-    #     # 0.5 * sum(1 + log(sigma^2) - mu^2 - sigma^2)
-    #     KLD = -0.5 * torch.sum(1 + logvar - mu.pow(2) - logvar.exp())
-    #
-    #     return abs(BCE + KLD)
-
     def forward(self, x):
         x_linear = torch.reshape(x, (-1, self.input_shape[0] * self.input_shape[1]))
         z = self.encoder(x_linear)
@@ -60,25 +46,6 @@ class VAE(nn.Module):
         decoded = self.decoder(z)
         decoded = torch.reshape(decoded, (self.input_shape[0], self.input_shape[1]))
         return z, decoded
-
-
-# import bert model
-
-class Bert(nn.Module):
-
-    def __init__(self, config):
-        super(Bert, self).__init__()
-        self.bert = BertModel.from_pretrained(config.bert_path)
-        for param in self.bert.parameters():
-            param.requires_grad = True
-        self.fc = nn.Linear(config.hidden_size, config.num_classes)
-
-    def forward(self, x):
-        context = x[0]  # 输入的句子
-        mask = x[2]  # 对padding部分进行mask，和句子一个size，padding部分用0表示，如：[1, 1, 1, 1, 0, 0]
-        _, pooled = self.bert(context, attention_mask=mask, output_all_encoded_layers=False)
-        out = self.fc(pooled)
-        return out
 
 
 class CNNEncoder(nn.Module):
@@ -149,11 +116,9 @@ class DAN(nn.Module):
             self.tanh2 = nn.Tanh()
             self.fc1 = nn.Linear(64 * 2, 64)
             self.label_fc = nn.Linear(64, 2)
-        else:
-            self.label_classifier = BertModel.from_pretrained('../bert_pretrain')  # 加载预训练模型
-            for param in self.label_classifier.parameters():
-                param.requires_grad = True
-            self.label_fc = nn.Linear(768, 2)
+        else:  # 使用transformer 模型
+            self.label_classifier = Transformer()
+            # self.label_fc = nn.Linear(768, 2)
 
         self.domain_classifier = nn.LSTM(
             input_size=c_dim,
@@ -170,7 +135,10 @@ class DAN(nn.Module):
         :param x:
         :return:
         '''
-        max_length = length[0] // self.resampling
+        if self.label_classifier_name == 'transformer':
+            max_length = 15
+        else:
+            max_length = length[0] // self.resampling
         bat = x.shape[0]
         if self.encoder_name == 'vae':
             loss_func = nn.functional.mse_loss
@@ -216,11 +184,9 @@ class DAN(nn.Module):
             out = torch.sum(out, 1)
             out = F.relu(out)
             out = self.fc1(out)
-
-
+            y_label = self.label_fc(out)
         else:
-            _, out = self.label_classifier(code_x1)  # 利用bert模型
-        y_label = self.label_fc(out)
+            y_label = self.label_classifier(code_x1)  # 利用transformer模型
         if self.model == 'train':  # 模型的成对训练
             if self.gpu >= 0:
                 code_x2 = torch.zeros(code_x1.shape).cuda(self.gpu)
@@ -280,7 +246,7 @@ class ContrastiveLoss(nn.Module):
         self.margin = margin
 
     def forward(self, output1, output2, target, use_domain=1, size_average=True):
-        distances = 100 * (output2 - output1).pow(2).sum(1) + 0.001  # squared distances
+        distances = 1e3 * (output2 - output1).pow(2).sum(1) + 0.001  # squared distances
         losses = 0.5 * (target.float() * distances +
                         (1 + -1 * target).float() * F.relu(self.margin - distances.sqrt()).pow(2))
         losses = losses * use_domain

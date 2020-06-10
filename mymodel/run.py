@@ -20,7 +20,7 @@ if __name__ == '__main__':
     parser.add_argument('-few', '--few_show_learning', type=bool, default=True, help='keep few shot learning open')
     parser.add_argument('-fr', '--few_show_learning_ratio', type=float, default=0.2, help='few shot learning ratio')
     parser.add_argument('-em', '--embedding', type=str, default="cnn", help='method of embedding')
-    parser.add_argument('-lac', '--label_classifier_name', type=str, default='lstm', help='choosing label classifier')
+    parser.add_argument('-lac', '--label_classifier_name', type=str, default='transformer', help='choosing label classifier')
 
     args = parser.parse_args()
 

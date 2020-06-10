@@ -38,13 +38,13 @@ class DanTrainer:
     def save_mode(self, save_path='../save_model'):
         if not os.path.exists(save_path):
             os.mkdir(save_path)
-        save_full_path = os.path.join(save_path, 'DAN_encoder_{}.pkl'.format(self.encoder_name))
+        save_full_path = os.path.join(save_path, 'DAN_encoder_{}_{}.pkl'.format(self.encoder_name, self.label_classifier_name))
         torch.save(self.model.state_dict(), save_full_path)
         print("Saving Model DAN in {}......".format(save_full_path))
         return
 
-    def load_model(self, model_path='../save_model/DAN_encoder_{}.pkl'):
-        model_path = model_path.format(self.encoder_name)
+    def load_model(self, model_path='../save_model/DAN_encoder_{}_{}.pkl'):
+        model_path = model_path.format(self.encoder_name, self.label_classifier_name)
         if os.path.exists(model_path):
             self.model.load_state_dict(torch.load(model_path))
             print("Loading Mode DAN from {}".format(model_path))
@@ -162,7 +162,6 @@ class DanTrainer:
                     else:
                         label_output, domain_output_1, domain_output_2, domain_label = self.model(x, label, domain,
                                                                                                   length)
-                        loss_vae = 0
                     loss_label = loss_func(label_output, label)
                     loss_domain = loss_func_domain(domain_output_1, domain_output_2, domain_label)
                     if self.encoder_name == 'vae':
