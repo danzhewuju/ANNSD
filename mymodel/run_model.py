@@ -16,7 +16,8 @@ import pandas as pd
 
 class DanTrainer:
     def __init__(self, epoch=10, bath_size=16, lr=0.001, gpu=0, train_path=None, test_path=None, val_path=None,
-                 model='train', encoder_name='vae', few_shot=True, few_show_ratio=0.2, label_classifier_name='lstm'):
+                 model='train', encoder_name='vae', few_shot=True, few_show_ratio=0.2, label_classifier_name='lstm',
+                 check_point=False):
         self.epoch = epoch
         self.batch_size = bath_size
         self.lr = lr
@@ -28,12 +29,16 @@ class DanTrainer:
         self.few_shot = few_shot
         self.few_shot_ratio = few_show_ratio
         self.label_classifier_name = label_classifier_name
+        self.check_point = check_point
         if gpu >= 0:
             self.model = DAN(gpu=gpu, model=model, encoder_name=encoder_name,
                              label_classifier_name=label_classifier_name).cuda(gpu)  # 放入显存中
         else:
             self.model = DAN(gpu=gpu, model=model, encoder_name=encoder_name,
                              label_classifier_name=label_classifier_name)  # 放入内存中
+        if self.check_point:
+            self.load_model()  # 如果是断点训练
+            print(" Start checkpoint training")
 
     def save_mode(self, save_path='../save_model'):
         if not os.path.exists(save_path):
@@ -270,9 +275,9 @@ class DanTrainer:
     def segment_statistic(self, prey, y, length):
         for i in range(len(prey)):
             if prey[i] == y[i]:
-                self.result[int(length[i] // 500) + 1] += [1]
+                self.result[int(length[i] // 500)] += [1]
             else:
-                self.result[int(length[i] // 500) + 1] += [0]
+                self.result[int(length[i] // 500)] += [0]
 
     def test(self):
         '''
@@ -310,19 +315,20 @@ class DanTrainer:
         w, accs, vars = [], [], []
         # 增加方差的计算
         epoch = 5  # 将数据分组用于计算方差
-        batch_size = len(acc) // epoch  # 每一个batch size 的大小
+
         for l, p in self.result.items():
             acc_ep = []
+            batch_size = len(p) // epoch  # 每一个batch size 的大小
             for j in range(epoch):
-                tmp = p[(j - 1) * batch_size:j * batch_size]
+                tmp = p[j * batch_size:(j + 1) * batch_size]
                 acc_ep.append(sum(tmp) / len(tmp))
             acc = np.mean(acc_ep)
-            var = np.var(acc_ep)
+            var = np.std(acc_ep)
             w.append(l)
             accs.append(acc)
             vars.append(var)
-        acc_data_frame = {'w': w, 'accs': accs, 'var':vars}
+        acc_data_frame = {'w': w, 'accs': accs, 'var': vars}
 
         dataframe = pd.DataFrame(acc_data_frame)
-        dataframe.to_csv('../log/segment_statistic.csv')
+        dataframe.to_csv('../log/segment_statistic_{}_{}.csv'.format(self.encoder_name, self.label_classifier_name))
         print(dataframe)
