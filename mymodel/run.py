@@ -20,9 +20,9 @@ if __name__ == '__main__':
     parser.add_argument('-few', '--few_show_learning', type=bool, default=True, help='keep few shot learning open')
     parser.add_argument('-fr', '--few_show_learning_ratio', type=float, default=0.2, help='few shot learning ratio')
     parser.add_argument('-em', '--embedding', type=str, default="cnn", help='method of embedding')
-    parser.add_argument('-lac', '--label_classifier_name', type=str, default='transformer', help='choosing label classifier')
+    parser.add_argument('-lac', '--label_classifier_name', type=str, default='transformer',
+                        help='choosing label classifier')
     parser.add_argument('-chp', '--check_point', type=bool, default=False, help='Whether to continue training')
-
 
     args = parser.parse_args()
 
@@ -46,7 +46,8 @@ if __name__ == '__main__':
     print(args)
     dan_train = DanTrainer(epoch, bath_size=batch_size, lr=lr, gpu=gpu, train_path=train_path, test_path=test_path,
                            val_path=val_path, model=model, encoder_name=embedding, few_shot=few_show_learning,
-                           few_show_ratio=few_shot_ratio, label_classifier_name=label_classifier_name, check_point = check_point)
+                           few_show_ratio=few_shot_ratio, label_classifier_name=label_classifier_name,
+                           check_point=check_point)
     if model == 'train':
         dan_train.train()
     elif model == 'test':
