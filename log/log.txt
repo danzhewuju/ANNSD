@@ -59,3 +59,6 @@ Encoder:cnn|Data size:6000| test loss:0.536100| Accuracy:0.73400 	2020-06-10 19:
 Encoder:cnn|Data size:6000| test loss:0.352263| Accuracy:0.84033 	2020-06-10 19:59:17
 Encoder:cnn|Data size:6000| test loss:0.552771| Accuracy:0.72350 	2020-06-10 20:11:24
 Encoder:cnn|Data size:6000| test loss:0.362484| Accuracy:0.83333 	2020-06-10 20:15:33
+Encoder:cnn|Data size:6000| test loss:0.347767| Accuracy:0.85567 	2020-06-16 18:53:40
+Encoder:cnn|Data size:6000| test loss:0.353246| Accuracy:0.85400 	2020-06-16 19:42:48
+Encoder:cnn|Data size:6000| test loss:0.352874| Accuracy:0.85633 	2020-06-16 19:52:36

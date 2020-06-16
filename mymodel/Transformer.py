@@ -50,7 +50,7 @@ class Transformer(nn.Module):
         self.encoders = nn.ModuleList([
             copy.deepcopy(self.encoder)
             # Encoder(config.dim_model, config.num_head, config.hidden, config.dropout)
-            for _ in range(2)])
+            for _ in range(5)])
 
         self.fc1 = nn.Linear(480, 2)
         # self.fc2 = nn.Linear(config.last_hidden, config.num_classes)

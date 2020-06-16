@@ -13,4 +13,13 @@ def get_gpu_used(index):
     pynvml.nvmlInit()
     handle = pynvml.nvmlDeviceGetHandleByIndex(index)
     memoryinfo = pynvml.nvmlDeviceGetMemoryInfo(handle)
+
     return memoryinfo.used
+
+
+def get_gpu_free(index):
+    pynvml.nvmlInit()
+    handle = pynvml.nvmlDeviceGetHandleByIndex(index)
+    memoryinfo = pynvml.nvmlDeviceGetMemoryInfo(handle)
+
+    return memoryinfo.free
