@@ -17,7 +17,7 @@ def run():
     parser.add_argument('-vap', '--val_path', type=str, default="../preprocess/val_{}.csv",
                         help='val data path')
     parser.add_argument('-p', '--patient', type=str, default="BDP", help='patient name')
-    parser.add_argument('-m', '--model', type=str, default="train", help='style of train')
+    parser.add_argument('-m', '--model', type=str, default="test", help='style of train')
     parser.add_argument('-few', '--few_show_learning', type=bool, default=True, help='keep few shot learning open')
     parser.add_argument('-fr', '--few_show_learning_ratio', type=float, default=0.25, help='few shot learning ratio')
     parser.add_argument('-em', '--embedding', type=str, default="cnn", help='method of embedding')
@@ -26,6 +26,7 @@ def run():
     parser.add_argument('-chp', '--check_point', type=bool, default=False, help='Whether to continue training')
 
     args = parser.parse_args()
+    args.test_path = "../preprocess/attention_test.csv"
 
     # 超参设置
     lr = args.learning_ratio

@@ -478,3 +478,23 @@ def get_path(patient_name):
     col = ['ID', 'chan_name']
     csv_frame = pd.DataFrame(columns=col, data=to_csv)
     csv_frame.to_csv('./' + patient_name + '_seq.csv', encoding='utf-8')
+
+
+def draw_seeg_picture(data, sampling=500, x_axis='Time(s)', y_axis='Channel'):
+    '''
+
+    :param data: SEEG读取的信号， 进行可视化的读取
+    :return:
+    '''
+    width = data.shape[1]
+    height = data.shape[0]
+    dpi = 50
+    plt.figure(figsize=(width // (dpi * 5), height // dpi), dpi=200)
+    # my_x_ticks = np.arange(0, width // sampling, 1.0 / sampling)  # 原始数据有width个数据，故此处为设置从0开始，间隔为1/sampling
+    # plt.xticks(my_x_ticks)
+    plt.xlabel(x_axis)
+    plt.ylabel(y_axis)
+    # plt.axis('off')
+    plt.imshow(data, aspect='auto')
+    plt.show()
+    plt.close()

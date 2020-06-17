@@ -3,7 +3,7 @@ from torch.autograd import Function
 import torch
 import torch.nn.functional as F
 import random
-from Transformer import Transformer
+from Transformer import Transformer, TransformerAttention
 from util.util_file import linear_matrix_normalization
 import sys
 
@@ -118,6 +118,7 @@ class DAN(nn.Module):
             self.label_fc = nn.Linear(64, 2)
         else:  # 使用transformer 模型
             self.label_classifier = Transformer()
+            # self.attention_model = TransformerAttention()
             # self.label_fc = nn.Linear(768, 2)
 
         self.domain_classifier = nn.LSTM(

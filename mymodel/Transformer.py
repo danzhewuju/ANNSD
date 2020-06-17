@@ -7,39 +7,49 @@ import copy
 '''Attention Is All You Need'''
 
 
-# class Config(object):
-#     """配置参数"""
-#
-#     def __init__(self, dataset, embedding):
-#         self.model_name = 'Transformer'
-#         # self.train_path = dataset + '/data/train.txt'  # 训练集
-#         # self.dev_path = dataset + '/data/dev.txt'  # 验证集
-#         # self.test_path = dataset + '/data/test.txt'  # 测试集
-#         # self.class_list = [x.strip() for x in open(
-#         #     dataset + '/data/class.txt', encoding='utf-8').readlines()]  # 类别名单
-#         # self.vocab_path = dataset + '/data/vocab.pkl'  # 词表
-#         # self.save_path = dataset + '/saved_dict/' + self.model_name + '.ckpt'  # 模型训练结果
-#         # self.log_path = dataset + '/log/' + self.model_name
-#         # self.embedding_pretrained = torch.tensor(
-#         #     np.load(dataset + '/data/' + embedding)["embeddings"].astype('float32')) \
-#         #     if embedding != 'random' else None  # 预训练词向量
-#         self.device = torch.device('cuda' if torch.cuda.is_available() else 'cpu')  # 设备
-#
-#         self.dropout = 0.5  # 随机失活
-#         self.require_improvement = 2000  # 若超过1000batch效果还没提升，则提前结束训练
-#         self.num_classes = len(self.class_list)  # 类别数
-#         self.n_vocab = 0  # 词表大小，在运行时赋值
-#         self.num_epochs = 20  # epoch数
-#         self.batch_size = 128  # mini-batch大小
-#         self.pad_size = 32  # 每句话处理成的长度(短填长切)
-#         self.learning_rate = 5e-4  # 学习率
-#         self.embed = self.embedding_pretrained.size(1) \
-#             if self.embedding_pretrained is not None else 300  # 字向量维度
-#         self.dim_model = 300
-#         self.hidden = 512
-#         self.last_hidden = 512
-#         self.num_head = 5
-#         self.num_encoder = 2
+class Config(object):
+    """配置参数"""
+
+    def __init__(self):
+        self.model_name = 'Transformer'
+        self.device = torch.device('cuda' if torch.cuda.is_available() else 'cpu')  # 设备
+
+        self.dropout = 0.5  # 随机失活
+        self.num_classes = 2  # 类别数
+        self.num_epochs = 20  # epoch数
+        self.batch_size = 16  # mini-batch大小
+        self.pad_size = 32  # 每句话处理成的长度(短填长切)
+        self.dim_model = 32
+        self.hidden = 512
+        self.last_hidden = 512
+        self.num_head = 5
+        self.num_encoder = 2
+
+
+class TransformerAttention(nn.Module):
+    def __init__(self):
+        super(TransformerAttention)
+        self.config = Config()
+        self.postion_embedding = Positional_Encoding(embed=32, pad_size=15, dropout=0.5, device=0)
+        self.encoder = Encoder(dim_model=32, num_head=1, hidden=512, dropout=0.5)
+        self.encoders = nn.ModuleList([
+            copy.deepcopy(self.encoder)
+            # Encoder(config.dim_model, config.num_head, config.hidden, config.dropout)
+            for _ in range(self.config.num_encoder)])
+
+        self.fc1 = nn.Linear(480, 2)
+
+    def forward(self, x):
+        out = self.postion_embedding(x)  # embedding shape (128, 32, 300)
+        for index, encoder in enumerate(self.encoders):
+            if index == self.config.num_encoder - 1:
+                out, attention = encoder(out, att=True)
+            out = encoder(out)
+
+        out = out.view(out.size(0), -1)
+        # out = torch.mean(out, 1)
+        out = self.fc1(out)
+        return out, attention
 
 
 class Transformer(nn.Module):
@@ -50,7 +60,7 @@ class Transformer(nn.Module):
         self.encoders = nn.ModuleList([
             copy.deepcopy(self.encoder)
             # Encoder(config.dim_model, config.num_head, config.hidden, config.dropout)
-            for _ in range(5)])
+            for _ in range(2)])
 
         self.fc1 = nn.Linear(480, 2)
         # self.fc2 = nn.Linear(config.last_hidden, config.num_classes)
@@ -81,10 +91,16 @@ class Encoder(nn.Module):
         self.attention = Multi_Head_Attention(dim_model, num_head, dropout)
         self.feed_forward = Position_wise_Feed_Forward(dim_model, hidden, dropout)
 
-    def forward(self, x):
-        out = self.attention(x)
+    def forward(self, x, att=False):
+        if att:
+            out, attention = self.attention(x, att)
+        else:
+            out = self.attention(x, att)
         out = self.feed_forward(out)
-        return out
+        if att:
+            return out, attention
+        else:
+            return out
 
 
 class Positional_Encoding(nn.Module):
@@ -116,7 +132,7 @@ class Scaled_Dot_Product_Attention(nn.Module):
     def __init__(self):
         super(Scaled_Dot_Product_Attention, self).__init__()
 
-    def forward(self, Q, K, V, scale=None):
+    def forward(self, Q, K, V, scale=None, att=False):
         '''
         Args:
             Q: [batch_size, len_Q, dim_Q]
@@ -132,8 +148,13 @@ class Scaled_Dot_Product_Attention(nn.Module):
         # if mask:  #
         #     attention = attention.masked_fill_(mask == 0, -1e9)
         attention = F.softmax(attention, dim=-1)
+        attention_npy = attention.cpu().data.numpy()
+        np.save('../log/attention.npy', attention_npy)
         context = torch.matmul(attention, V)
-        return context
+        if att:
+            return context, attention
+        else:
+            return context
 
 
 class Multi_Head_Attention(nn.Module):
@@ -145,12 +166,12 @@ class Multi_Head_Attention(nn.Module):
         self.fc_Q = nn.Linear(dim_model, num_head * self.dim_head)
         self.fc_K = nn.Linear(dim_model, num_head * self.dim_head)
         self.fc_V = nn.Linear(dim_model, num_head * self.dim_head)
-        self.attention = Scaled_Dot_Product_Attention()
+        self.attention = Scaled_Dot_Product_Attention()  # 计算attention
         self.fc = nn.Linear(num_head * self.dim_head, dim_model)
         self.dropout = nn.Dropout(dropout)
         self.layer_norm = nn.LayerNorm(dim_model)
 
-    def forward(self, x):
+    def forward(self, x, att):
         batch_size = x.size(0)
         Q = self.fc_Q(x)
         K = self.fc_K(x)
@@ -161,14 +182,20 @@ class Multi_Head_Attention(nn.Module):
         # if mask:  #
         #     mask = mask.repeat(self.num_head, 1, 1)
         scale = K.size(-1) ** -0.5  # 缩放因子
-        context = self.attention(Q, K, V, scale)
+        if att:
+            context, attention = self.attention(Q, K, V, scale, att)
+        else:
+            context = self.attention(Q, K, V, scale)
 
         context = context.view(batch_size, -1, self.dim_head * self.num_head)
         out = self.fc(context)
         out = self.dropout(out)
         out = out + x  # 残差连接
         out = self.layer_norm(out)
-        return out
+        if att:
+            return out, attention
+        else:
+            return out
 
 
 class Position_wise_Feed_Forward(nn.Module):
