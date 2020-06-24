@@ -3,6 +3,7 @@ from torch.utils.data import Dataset, DataLoader
 import numpy as np
 import sys
 import random
+import os
 
 sys.path.append('../')
 from util.util_tool import matrix_normalization, collate_fn
@@ -56,20 +57,22 @@ class MyDataset(Dataset):  # 重写dateset的相关类
     def __getitem__(self, index):
         fn, label, domain = self.data[index]
         data = np.load(fn)
+        # 获得该数据的
+        id = os.path.basename(fn).split('.')[0]
         if self.transform_data:
             data = self.transform_data(data)
         result = matrix_normalization(data, (100, 1000))
         result = result.astype('float32')
         result = result[np.newaxis, :]
         # result = trans_data(vae_model, result)
-        return result, label, domain
+        return result, label, domain, id
 
     def __len__(self):
         return len(self.data)
 
 
 class MyData:
-    def __init__(self, path_train, path_test, path_val, batch_size, few_shot=True, few_shot_ratio=0.25):
+    def __init__(self, path_train, path_test, path_val, path_att, batch_size, few_shot=True, few_shot_ratio=0.25):
         '''
 
         :param path_train: 训练集数据的路径
@@ -81,6 +84,7 @@ class MyData:
         self.path_train = path_train
         self.path_test = path_test
         self.path_val = path_val
+        self.path_att = path_att
         self.batch_size = batch_size
         self.few_shot = few_shot
         self.few_shot_ratio = few_shot_ratio
@@ -97,7 +101,8 @@ class MyData:
         labels = []  # 每个数据对应的标签
         length = []  # 记录真实的数目长度
         domains = []
-        for i, (d, label, patient) in enumerate(data):
+        ids = []  # 记录序列的 id
+        for i, (d, label, patient, id) in enumerate(data):
             d_shape = d.shape
             length.append(d.shape[-1])
             if d_shape[-1] < max_shape[-1]:
@@ -107,8 +112,9 @@ class MyData:
                 data[i] = d
             labels.append(label)
             domains.append(patient)
+            ids.append(id)
 
-        return torch.from_numpy(np.array(data)), torch.tensor(labels), torch.tensor(domains), torch.tensor(length)
+        return torch.from_numpy(np.array(data)), torch.tensor(labels), torch.tensor(domains), torch.tensor(length), ids
 
     def data_loader(self, transform, mode='train'):  # 这里只有两个模式，一个是train/一个是test
         if mode == 'train':
@@ -120,10 +126,12 @@ class MyData:
                 data_info.data += few_shot_learning_list  # 将数据加载到模型进行训练
             dataset = MyDataset(data_info.data, transform=transform)
 
-        else:  # test
+        elif mode == 'test':  # test
             data_info = DataInfo(self.path_test)
             dataset = MyDataset(data_info.data, transform=transform)
-
+        elif mode == 'attention':
+            data_info = DataInfo(self.path_att)
+            dataset = MyDataset(data_info.data, transform=transform)
         dataloader = DataLoader(dataset, batch_size=self.batch_size, shuffle=True, collate_fn=self.collate_fn)
         return dataloader
 

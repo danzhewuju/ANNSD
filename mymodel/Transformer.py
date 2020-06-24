@@ -28,7 +28,7 @@ class Config(object):
 
 class TransformerAttention(nn.Module):
     def __init__(self):
-        super(TransformerAttention)
+        super(TransformerAttention, self).__init__()
         self.config = Config()
         self.postion_embedding = Positional_Encoding(embed=32, pad_size=15, dropout=0.5, device=0)
         self.encoder = Encoder(dim_model=32, num_head=1, hidden=512, dropout=0.5)
@@ -148,8 +148,8 @@ class Scaled_Dot_Product_Attention(nn.Module):
         # if mask:  #
         #     attention = attention.masked_fill_(mask == 0, -1e9)
         attention = F.softmax(attention, dim=-1)
-        attention_npy = attention.cpu().data.numpy()
-        np.save('../log/attention.npy', attention_npy)
+        # attention_npy = attention.cpu().data.numpy()
+        # np.save('../log/attention.npy', attention_npy)
         context = torch.matmul(attention, V)
         if att:
             return context, attention

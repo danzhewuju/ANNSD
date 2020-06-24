@@ -14,28 +14,31 @@ import collections
 import pandas as pd
 
 
-class DanTrainer:
+class Dan:
     def __init__(self, epoch=10, bath_size=16, lr=0.001, gpu=0, train_path=None, test_path=None, val_path=None,
+                 att_path=None,
                  model='train', encoder_name='vae', few_shot=True, few_show_ratio=0.2, label_classifier_name='lstm',
-                 check_point=False):
+                 check_point=False, att=False):
         self.epoch = epoch
         self.batch_size = bath_size
         self.lr = lr
         self.train_path = train_path
         self.test_path = test_path
         self.val_path = val_path
+        self.att_path = att_path
         self.encoder_name = encoder_name
         self.gpu = gpu
         self.few_shot = few_shot
         self.few_shot_ratio = few_show_ratio
         self.label_classifier_name = label_classifier_name
         self.check_point = check_point
+        self.att = att  # 是否用于计算attention机制
         if gpu >= 0:
             self.model = DAN(gpu=gpu, model=model, encoder_name=encoder_name,
-                             label_classifier_name=label_classifier_name).cuda(gpu)  # 放入显存中
+                             label_classifier_name=label_classifier_name, att=att).cuda(gpu)  # 放入显存中
         else:
             self.model = DAN(gpu=gpu, model=model, encoder_name=encoder_name,
-                             label_classifier_name=label_classifier_name)  # 放入内存中
+                             label_classifier_name=label_classifier_name, att=att)  # 放入内存中
         if self.check_point:
             self.load_model()  # 如果是断点训练
             print(" Start checkpoint training")
@@ -155,7 +158,7 @@ class DanTrainer:
         with tqdm(total=self.epoch * len(train_data_loader)) as pbar:
             for epoch in tqdm(range(self.epoch)):
 
-                for step, (x, label, domain, length) in enumerate(tqdm(train_data_loader)):
+                for step, (x, label, domain, length, _) in enumerate(tqdm(train_data_loader)):
                     # x = linear_matrix_normalization(x)
                     if self.gpu >= 0:
                         x, label, domain, length = x.cuda(self.gpu), label.cuda(self.gpu), domain.cuda(
@@ -292,13 +295,13 @@ class DanTrainer:
         loss = []
         self.result = collections.defaultdict(list)
         loss_func = nn.CrossEntropyLoss()
-        for step, (x, label, domain, length) in enumerate(tqdm(test_data_loader)):
+        for step, (x, label, domain, length, _) in enumerate(tqdm(test_data_loader)):
             if self.gpu >= 0:
                 x, label, domain, length = x.cuda(self.gpu), label.cuda(self.gpu), domain.cuda(
                     self.gpu), length.cuda(
                     self.gpu)
             with torch.no_grad():
-                label_output = self.model(x, label, domain, length)
+                label_output, attention = self.model(x, label, domain, length)
                 loss_label = loss_func(label_output, label)
                 loss_total = loss_label
                 prey = torch.max(label_output, 1)[1].data.cpu()
@@ -332,3 +335,31 @@ class DanTrainer:
         dataframe = pd.DataFrame(acc_data_frame)
         dataframe.to_csv('../log/segment_statistic_{}_{}.csv'.format(self.encoder_name, self.label_classifier_name))
         print(dataframe)
+
+    def test_attention(self):
+        self.load_model()  # 加载模型
+        mydata = MyData(self.train_path, self.test_path, self.val_path, self.att_path, self.batch_size)
+        test_data_loader = mydata.data_loader(mode='attention', transform=None)
+        acc = []
+        loss = []
+        self.result = collections.defaultdict(list)
+        loss_func = nn.CrossEntropyLoss()
+        for step, (x, label, domain, length, ids) in enumerate(tqdm(test_data_loader)):
+            if self.gpu >= 0:
+                x, label, domain, length = x.cuda(self.gpu), label.cuda(self.gpu), domain.cuda(
+                    self.gpu), length.cuda(
+                    self.gpu)
+            with torch.no_grad():
+                label_output, attention = self.model(x, label, domain, length)
+                loss_label = loss_func(label_output, label)
+                loss_total = loss_label
+                prey = torch.max(label_output, 1)[1].data.cpu()
+                y = label.cpu()
+                acc += [1 if prey[i] == y[i] else 0 for i in range(len(y))]
+                loss.append(loss_total.data.cpu())
+                self.segment_statistic(prey, y, length.cpu())
+        loss_avg = sum(loss) / len(loss)
+        accuracy_avg = sum(acc) / len(acc)
+        result = "Encoder:{}|Data size:{}| test loss:{:.6f}| Accuracy:{:.5f} ".format(self.encoder_name, len(acc),
+                                                                                      loss_avg, accuracy_avg)
+        print(result)

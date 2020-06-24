@@ -1,4 +1,4 @@
-from run_model import DanTrainer
+from run_model import Dan
 import argparse
 
 
@@ -16,14 +16,17 @@ def run():
                         help='test data path')
     parser.add_argument('-vap', '--val_path', type=str, default="../preprocess/val_{}.csv",
                         help='val data path')
+    parser.add_argument('-atp', '--attention_path', type=str, default="../preprocess/attention_{}.csv",
+                        help='attention data path')
     parser.add_argument('-p', '--patient', type=str, default="BDP", help='patient name')
-    parser.add_argument('-m', '--model', type=str, default="test", help='style of train')
+    parser.add_argument('-m', '--model', type=str, default="attention", help='style of train')
     parser.add_argument('-few', '--few_show_learning', type=bool, default=True, help='keep few shot learning open')
     parser.add_argument('-fr', '--few_show_learning_ratio', type=float, default=0.25, help='few shot learning ratio')
     parser.add_argument('-em', '--embedding', type=str, default="cnn", help='method of embedding')
     parser.add_argument('-lac', '--label_classifier_name', type=str, default='transformer',
                         help='choosing label classifier')
     parser.add_argument('-chp', '--check_point', type=bool, default=False, help='Whether to continue training')
+    parser.add_argument('-att', '--attention_matrix', type=bool, default=True, help='Whether to get attention matrix')
 
     args = parser.parse_args()
     args.test_path = "../preprocess/attention_test.csv"
@@ -33,6 +36,7 @@ def run():
     train_path = args.train_path
     test_path = args.test_path
     val_path = args.val_path
+    att_path = args.attention_path
     batch_size = args.batch_size
     epoch = args.epoch
     gpu = args.GPU
@@ -43,17 +47,22 @@ def run():
     few_show_learning = args.few_show_learning
     label_classifier_name = args.label_classifier_name
     check_point = args.check_point
-    train_path, test_path, val_path = train_path.format(patient), test_path.format(patient), val_path.format(patient)
+    att = args.attention_matrix
+    train_path, test_path, val_path, att_path = train_path.format(patient), test_path.format(patient), val_path.format(
+        patient), att_path.format(patient)
 
     print(args)
-    dan_train = DanTrainer(epoch, bath_size=batch_size, lr=lr, gpu=gpu, train_path=train_path, test_path=test_path,
-                           val_path=val_path, model=model, encoder_name=embedding, few_shot=few_show_learning,
-                           few_show_ratio=few_shot_ratio, label_classifier_name=label_classifier_name,
-                           check_point=check_point)
+    dan_train = Dan(epoch, bath_size=batch_size, lr=lr, gpu=gpu, train_path=train_path, test_path=test_path,
+                    val_path=val_path, att_path=att_path, model=model, encoder_name=embedding,
+                    few_shot=few_show_learning,
+                    few_show_ratio=few_shot_ratio, label_classifier_name=label_classifier_name,
+                    check_point=check_point, att=att)
     if model == 'train':
         dan_train.train()
     elif model == 'test':
         dan_train.test()
+    elif model == 'attention':
+        dan_train.test_attention()
 
 
 if __name__ == '__main__':

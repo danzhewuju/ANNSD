@@ -82,7 +82,7 @@ class CNNEncoder(nn.Module):
 
 class DAN(nn.Module):
     def __init__(self, input_shape=(100, 500), c_dim=32, gpu=0, resampling=500, model='train', encoder_name='vae',
-                 label_classifier_name='lstm'):
+                 label_classifier_name='lstm', att=False):
         '''
 
         :param c_dim:  表示的是encoder的输出,同时也是预测网络和对抗网络的输出
@@ -96,6 +96,7 @@ class DAN(nn.Module):
         self.dim = c_dim
         self.encoder_name = encoder_name
         self.label_classifier_name = label_classifier_name
+        self.att = att  # 目前是有transformer 模型支持attention 机制
         if encoder_name == 'vae':  # 使用vae作为编码器
             self.encoder = VAE(input_shape, c_dim=c_dim)  # 注意此时的训练方式，是将前一个的编码方式和我下一个的编码方式进行交叉求和
 
@@ -117,7 +118,8 @@ class DAN(nn.Module):
             self.fc1 = nn.Linear(64 * 2, 64)
             self.label_fc = nn.Linear(64, 2)
         else:  # 使用transformer 模型
-            self.label_classifier = Transformer()
+
+            self.label_classifier = TransformerAttention() if self.att else Transformer()
             # self.attention_model = TransformerAttention()
             # self.label_fc = nn.Linear(768, 2)
 
@@ -187,7 +189,12 @@ class DAN(nn.Module):
             out = self.fc1(out)
             y_label = self.label_fc(out)
         else:
-            y_label = self.label_classifier(code_x1)  # 利用transformer模型
+            # 判断是不是进行attention的计算
+            if self.att:
+                y_label, attention = self.label_classifier(code_x1)  # 利用transformer模型+ attention模型
+            else:
+                y_label = self.label_classifier(code_x1)  # 利用transformer模型
+
         if self.model == 'train':  # 模型的成对训练
             if self.gpu >= 0:
                 code_x2 = torch.zeros(code_x1.shape).cuda(self.gpu)
@@ -220,7 +227,7 @@ class DAN(nn.Module):
 
 
         else:
-            return y_label
+            return y_label, attention if self.att else y_label
 
 
 class ReverseLayerF(Function):  # GRL模块，GRL模块在反向传播的过程中进行了梯度的反转

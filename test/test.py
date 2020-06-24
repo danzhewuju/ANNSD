@@ -98,32 +98,33 @@ def test_5():
 def test_6():
     path = "../data/BDP/pre_seizure/fb59ab43-789b-11ea-8178-e0d55e6ff654_pre-420_430.npy"
 
-    # data = np.load(path)
-    # draw_seeg_picture(data)
-    attention_path = "../log/attention.npy"
-    data_attention = np.load(attention_path)
-    # data_attention = np.random.randint(0, 10, (2, 3, 3))
-    att = data_attention.sum(axis=0) / 8
-    plt.figure()
-    plt.imshow(att, cmap='hot')
-    plt.xlabel('Time(s)-Query')
-    plt.ylabel('Time(s)-Key')
-    plt.show()
-    plt.close()
-    print(att)
-    att = att.sum(axis=0)
-    att = softmax(att)
-    print(att)
-    plt.figure()
-    plt.imshow(att, cmap='hot')
-    plt.xlabel('Time(s)')
-    plt.show()
-    plt.close()
+    data = np.load(path)
+    draw_seeg_picture(data)
+    # attention_path = "../log/attention.npy"
+    # data_attention = np.load(attention_path)
+    # # data_attention = np.random.randint(0, 10, (2, 3, 3))
+    # att = data_attention.sum(axis=0) / 8
+    # plt.figure()
+    # plt.imshow(att, cmap='hot')
+    # plt.xlabel('Time(s)-Query')
+    # plt.ylabel('Time(s)-Key')
+    # plt.show()
+    # plt.close()
+    # print(att)
+    # att = att.sum(axis=0)
+    # att = softmax(att)
+    # print(att)
+    # plt.figure()
+    # plt.imshow(att, cmap='hot')
+    # plt.xlabel('Time(s)')
+    # plt.show()
+    # plt.close()
 
 
 if __name__ == '__main__':
-    test_6()
-    # a = np.random.randn(2, 3)
-    # b = a.sum(axis=0)
-    # print(a)
-    # print(b)
+    # test_6()
+    a = np.random.randn(2, 3)
+    b = a.sum(axis=0)
+
+    print(a)
+    print(b)
