@@ -129,7 +129,8 @@ class Dan:
 
     def train(self):  # 用于模型的训练
 
-        mydata = MyData(self.train_path, self.test_path, self.val_path, self.batch_size, few_shot=self.few_shot,
+        mydata = MyData(self.train_path, self.test_path, self.val_path, self.att_path, self.batch_size,
+                        few_shot=self.few_shot,
                         few_shot_ratio=self.few_shot_ratio)
 
         train_data_loader = mydata.data_loader(None, mode='train')
@@ -195,7 +196,7 @@ class Dan:
                         if self.encoder_name == 'vae': loss_vae_vi.append(loss_vae.data.cpu())
 
                         acc_test, test_loss = [], []
-                        for x_test, label_test, domain_test, length_test in next(
+                        for x_test, label_test, domain_test, length_test, _ in next(
                                 mydata.next_batch_test_data(transform=None)):
                             # x_test = linear_matrix_normalization(x_test)
                             if self.gpu >= 0:
