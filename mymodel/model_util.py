@@ -8,7 +8,6 @@ from util.util_file import linear_matrix_normalization
 import sys
 
 sys.path.append('../')
-from pytorch_pretrained import BertModel, BertTokenizer
 
 
 class VAE(nn.Module):

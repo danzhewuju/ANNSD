@@ -68,7 +68,7 @@ def train_data_split(patient_name="BDP", data_info_path="../preprocess/data_info
     print("数据划分完成")
 
 
-def collate_fn(data):  #
+def collate_fn(data):
     '''
     用于自己构造时序数据，包含数据对齐以及数据长度
     :param data: torch dataloader 的返回形式

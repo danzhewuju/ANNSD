@@ -125,14 +125,15 @@ class MyData:
                 few_shot_learning_list = data_info_test.few_shot_learning_sampling(ratio=self.few_shot_ratio)
                 data_info.data += few_shot_learning_list  # 将数据加载到模型进行训练
             dataset = MyDataset(data_info.data, transform=transform)
-
+            dataloader = DataLoader(dataset, batch_size=self.batch_size, shuffle=True, collate_fn=self.collate_fn)
         elif mode == 'test':  # test
             data_info = DataInfo(self.path_test)
             dataset = MyDataset(data_info.data, transform=transform)
+            dataloader = DataLoader(dataset, batch_size=self.batch_size, shuffle=False, collate_fn=self.collate_fn)
         elif mode == 'attention':
             data_info = DataInfo(self.path_att)
             dataset = MyDataset(data_info.data, transform=transform)
-        dataloader = DataLoader(dataset, batch_size=self.batch_size, shuffle=True, collate_fn=self.collate_fn)
+            dataloader = DataLoader(dataset, batch_size=self.batch_size, shuffle=False, collate_fn=self.collate_fn)
         return dataloader
 
     def next_batch_test_data(self, transform):

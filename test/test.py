@@ -21,6 +21,7 @@ from util.seeg_utils import draw_seeg_picture
 import argparse
 from util.run_util import get_gpu_used
 import torch.nn as nn
+import re
 
 
 def softmax(x):
@@ -91,8 +92,9 @@ def test_4():
 
 
 def test_5():
-    a = collections.defaultdict(list)
-    print(a)
+    test = "159_161.npy"
+    b = re.findall(r'\d+', test)
+    print(b)
 
 
 def test_6():
@@ -122,9 +124,9 @@ def test_6():
 
 
 if __name__ == '__main__':
-    # test_6()
-    a = np.random.randn(2, 3)
-    b = a.sum(axis=0)
-
-    print(a)
-    print(b)
+    test_5()
+    # a = np.random.randn(2, 3)
+    # b = a.sum(axis=0)
+    #
+    # print(a)
+    # print(b)

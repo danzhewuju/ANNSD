@@ -276,45 +276,24 @@ class Dan:
             self.draw_loss_plt(**info)
 
     def segment_statistic(self, prey, y, length):
+        '''
+        模型分段预测的情况
+        :param prey: 预测的标签
+        :param y: 实际的标签
+        :param length: 输入的长度
+        :return:
+        '''
         for i in range(len(prey)):
             if prey[i] == y[i]:
                 self.result[int(length[i] // 500)] += [1]
             else:
                 self.result[int(length[i] // 500)] += [0]
 
-    def test(self):
+    def save_segment_statistic_info(self):
         '''
-
-        :param epoch: 多测试几遍用于检测方差
+        模型预测分段信息进行保存
         :return:
         '''
-        self.load_model()  # 加载模型
-        mydata = MyData(self.train_path, self.test_path, self.val_path, self.batch_size)
-        test_data_loader = mydata.data_loader(mode='test', transform=None)
-        acc = []
-        loss = []
-        self.result = collections.defaultdict(list)
-        loss_func = nn.CrossEntropyLoss()
-        for step, (x, label, domain, length, _) in enumerate(tqdm(test_data_loader)):
-            if self.gpu >= 0:
-                x, label, domain, length = x.cuda(self.gpu), label.cuda(self.gpu), domain.cuda(
-                    self.gpu), length.cuda(
-                    self.gpu)
-            with torch.no_grad():
-                label_output, attention = self.model(x, label, domain, length)
-                loss_label = loss_func(label_output, label)
-                loss_total = loss_label
-                prey = torch.max(label_output, 1)[1].data.cpu()
-                y = label.cpu()
-                acc += [1 if prey[i] == y[i] else 0 for i in range(len(y))]
-                loss.append(loss_total.data.cpu())
-                self.segment_statistic(prey, y, length.cpu())
-        loss_avg = sum(loss) / len(loss)
-        accuracy_avg = sum(acc) / len(acc)
-        result = "Encoder:{}|Data size:{}| test loss:{:.6f}| Accuracy:{:.5f} ".format(self.encoder_name, len(acc),
-                                                                                      loss_avg, accuracy_avg)
-        self.log_write(result)
-        # 分段统计信息表
         w, accs, vars = [], [], []
         # 增加方差的计算
         epoch = 5  # 将数据分组用于计算方差
@@ -336,12 +315,32 @@ class Dan:
         dataframe.to_csv('../log/segment_statistic_{}_{}.csv'.format(self.encoder_name, self.label_classifier_name))
         print(dataframe)
 
-    def test_attention(self):
+    def save_all_input_prediction_result(self, ids_list, grand_true, prediction,
+                                         save_path='../log/prediction_result.csv'):
+        '''
+
+        :return: saving all files' prediction result
+        '''
+        data = {'id': ids_list, 'grand true': grand_true, 'prediction': prediction}
+        dataframe = pd.DataFrame(data)
+        dataframe.to_csv(save_path)
+        print('Saving success!')
+
+    def test(self, recoding=False):
+        '''
+
+        :param recodeing: 是否将每一个样本的预测结果记录下来
+        :return:
+        '''
         self.load_model()  # 加载模型
         mydata = MyData(self.train_path, self.test_path, self.val_path, self.att_path, self.batch_size)
-        test_data_loader = mydata.data_loader(mode='attention', transform=None)
+        test_data_loader = mydata.data_loader(mode='test', transform=None)
         acc = []
         loss = []
+        if recoding:
+            ids_list = []
+            grand_true = []
+            prediction = []
         self.result = collections.defaultdict(list)
         loss_func = nn.CrossEntropyLoss()
         for step, (x, label, domain, length, ids) in enumerate(tqdm(test_data_loader)):
@@ -357,7 +356,64 @@ class Dan:
                 y = label.cpu()
                 acc += [1 if prey[i] == y[i] else 0 for i in range(len(y))]
                 loss.append(loss_total.data.cpu())
+                if recoding:
+                    ids_list += ids
+                    grand_true += [int(x) for x in y]
+                    prediction += [int(x) for x in prey]
+
                 self.segment_statistic(prey, y, length.cpu())
+        loss_avg = sum(loss) / len(loss)
+        accuracy_avg = sum(acc) / len(acc)
+        result = "Encoder:{}|Data size:{}| test loss:{:.6f}| Accuracy:{:.5f} ".format(self.encoder_name, len(acc),
+                                                                                      loss_avg, accuracy_avg)
+        self.log_write(result)
+        self.save_all_input_prediction_result(ids_list, grand_true, prediction)
+        # 分段统计信息表
+
+    def save_attention_matrix(self, attention_matrix, ids, result, save_dir='../log/attention'):
+        '''
+
+        :param attention_matrix: 需要写入的attention矩阵 shape(batch_size, maxlength, maxlength)
+        :param ids:  每一个原始文件对应的id序号
+        :param result : 预测的结果
+        :param save_dir: 保存文件夹
+
+        :return:
+        '''
+        if not os.path.exists(save_dir):
+            os.makedirs(save_dir)
+            print("Dir {} was created".format(save_dir))
+        for i in range(attention_matrix.shape[0]):
+            if result[i] == 1:  # 只有预测正确的才会保存attention
+                data = attention_matrix[i]
+                name = ids[i]
+                save_path = os.path.join(save_dir, name + '.npy')
+                np.save(save_path, data)
+        print("All files has been saved!")
+        return True
+
+    def test_attention(self):
+        self.load_model()  # 加载模型
+        mydata = MyData(self.train_path, self.test_path, self.val_path, self.att_path, self.batch_size)
+        test_data_loader = mydata.data_loader(mode='attention', transform=None)
+        acc = []
+        loss = []
+        loss_func = nn.CrossEntropyLoss()
+        for step, (x, label, domain, length, ids) in enumerate(tqdm(test_data_loader)):
+            if self.gpu >= 0:
+                x, label, domain, length = x.cuda(self.gpu), label.cuda(self.gpu), domain.cuda(
+                    self.gpu), length.cuda(
+                    self.gpu)
+            with torch.no_grad():
+                label_output, attention = self.model(x, label, domain, length)
+                loss_label = loss_func(label_output, label)
+                loss_total = loss_label
+                prey = torch.max(label_output, 1)[1].data.cpu()
+                y = label.cpu()
+                tmp = [1 if prey[i] == y[i] else 0 for i in range(len(y))]
+                acc += tmp
+                loss.append(loss_total.data.cpu())
+                self.save_attention_matrix(attention.cpu().data.numpy(), ids, tmp)
         loss_avg = sum(loss) / len(loss)
         accuracy_avg = sum(acc) / len(acc)
         result = "Encoder:{}|Data size:{}| test loss:{:.6f}| Accuracy:{:.5f} ".format(self.encoder_name, len(acc),

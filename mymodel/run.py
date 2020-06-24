@@ -19,7 +19,7 @@ def run():
     parser.add_argument('-atp', '--attention_path', type=str, default="../preprocess/attention_{}.csv",
                         help='attention data path')
     parser.add_argument('-p', '--patient', type=str, default="BDP", help='patient name')
-    parser.add_argument('-m', '--model', type=str, default="attention", help='style of train')
+    parser.add_argument('-m', '--model', type=str, default="test", help='style of train')
     parser.add_argument('-few', '--few_show_learning', type=bool, default=True, help='keep few shot learning open')
     parser.add_argument('-fr', '--few_show_learning_ratio', type=float, default=0.25, help='few shot learning ratio')
     parser.add_argument('-em', '--embedding', type=str, default="cnn", help='method of embedding')
@@ -29,7 +29,6 @@ def run():
     parser.add_argument('-att', '--attention_matrix', type=bool, default=True, help='Whether to get attention matrix')
 
     args = parser.parse_args()
-    args.test_path = "../preprocess/attention_test.csv"
 
     # 超参设置
     lr = args.learning_ratio
@@ -60,7 +59,7 @@ def run():
     if model == 'train':
         dan_train.train()
     elif model == 'test':
-        dan_train.test()
+        dan_train.test(recoding=True)
     elif model == 'attention':
         dan_train.test_attention()
 
