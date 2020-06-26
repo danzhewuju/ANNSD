@@ -1,15 +1,8 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <project version="4">
-  <component name="PublishConfigData" autoUpload="Always" serverName="lab3_remote" autoUploadExternalChanges="true">
+  <component name="PublishConfigData" autoUpload="Always" serverName="clab3" autoUploadExternalChanges="true">
     <serverData>
-      <paths name="lab3">
-        <serverdata>
-          <mappings>
-            <mapping local="$PROJECT_DIR$" web="/" />
-          </mappings>
-        </serverdata>
-      </paths>
-      <paths name="lab3_remote">
+      <paths name="clab3">
         <serverdata>
           <mappings>
             <mapping deploy="/SEEG_Timing" local="$PROJECT_DIR$" web="/" />

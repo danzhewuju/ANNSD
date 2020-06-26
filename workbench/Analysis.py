@@ -4,6 +4,7 @@ import collections
 import pandas as pd
 import re
 from matplotlib import pyplot as plt
+import argparse
 
 
 class Information:
@@ -88,6 +89,19 @@ class Information:
 
 if __name__ == '__main__':
     info = Information()
+    parse = argparse.ArgumentParser()
+    parse.add_argument('-cac', '--create_attention_csv', type=bool, default=False)
+    parse.add_argument('-cai', '--calculate_attention_info', type=bool, default=True)
+    parse.add_argument('-cp', '--calculation_prediction', type=bool, default=True)
+    args = parse.parse_args()
+    cac, cai, cp = args.create_attention_csv, args.calculate_attention_info, args.calculation_prediction
+    if cac:
+        info.create_attention_csv() # 选出符合条件范围的测试用例
+    if cai:
+        print(info.calculate_attention_info()) # 计算attention的信息
+    if cp:
+        print(info.calculation_prediction())  # 计算预测的结果
+
     # info.create_attention_csv()   # 选出符合条件范围的测试用例
-    # print(info.calculate_attention_info())
-    print(info.calculation_prediction())
+    # print(info.calculate_attention_info()) # 计算attention的信息
+    # print(info.calculation_prediction())  # 计算预测的结果

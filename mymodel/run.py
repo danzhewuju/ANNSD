@@ -27,6 +27,8 @@ def run():
                         help='choosing label classifier')
     parser.add_argument('-chp', '--check_point', type=bool, default=False, help='Whether to continue training')
     parser.add_argument('-att', '--attention_matrix', type=bool, default=True, help='Whether to get attention matrix')
+    parser.add_argument('-rec', '--recoding', type=bool, default=False, help='Whether to recode result for every file')
+
 
     args = parser.parse_args()
 
@@ -47,6 +49,7 @@ def run():
     label_classifier_name = args.label_classifier_name
     check_point = args.check_point
     att = args.attention_matrix
+    rec = args.recoding
     train_path, test_path, val_path, att_path = train_path.format(patient), test_path.format(patient), val_path.format(
         patient), att_path.format(patient)
 
@@ -59,7 +62,7 @@ def run():
     if model == 'train':
         dan_train.train()
     elif model == 'test':
-        dan_train.test(recoding=True)
+        dan_train.test(recoding=rec)
     elif model == 'attention':
         dan_train.test_attention()
 

@@ -368,7 +368,8 @@ class Dan:
         result = "Encoder:{}|Data size:{}| test loss:{:.6f}| Accuracy:{:.5f} ".format(self.encoder_name, len(acc),
                                                                                       loss_avg, accuracy_avg)
         self.log_write(result)
-        self.save_all_input_prediction_result(ids_list, grand_true, prediction)
+        if recoding:
+            self.save_all_input_prediction_result(ids_list, grand_true, prediction)
         # 分段统计信息表
 
     def save_attention_matrix(self, attention_matrix, ids, result, save_dir='../log/attention'):
