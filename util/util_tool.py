@@ -27,17 +27,17 @@ def train_data_split(patient_name="BDP", data_info_path="../preprocess/data_info
 
     data = pd.read_csv(data_info_path, sep=',')
     ratio = 0.7
-    val = {'path': [], 'label': [], 'patient': []}
+    test = {'path': [], 'label': [], 'patient': []}
     paths = data['path']
     label = data['label']
     patient = data['patient']
     for i in range(len(paths)):
         if patient[i] == patient_name:
-            val['path'] += [paths[i]]
+            test['path'] += [paths[i]]
             paths.pop(i)
-            val['label'] += [label[i]]
+            test['label'] += [label[i]]
             label.pop(i)
-            val['patient'] += [patient[i]]
+            test['patient'] += [patient[i]]
             patient.pop(i)
     # 对于数据需要进行乱序的处理
     paths = paths.tolist()
@@ -52,19 +52,19 @@ def train_data_split(patient_name="BDP", data_info_path="../preprocess/data_info
     random.shuffle(patient)
     train_num = int(ratio * len(paths))
     train_data = {'path': paths[:train_num], 'label': label[:train_num], 'patient': patient[:train_num]}
-    test_data = {'path': paths[train_num:], 'label': label[train_num:], 'patient': patient[train_num:]}
+    val_data = {'path': paths[train_num:], 'label': label[train_num:], 'patient': patient[train_num:]}
     train_data = pd.DataFrame(train_data)
-    test_data = pd.DataFrame(test_data)
-    val_data = pd.DataFrame(val)
+    val_data = pd.DataFrame(val_data)
+    test_data = pd.DataFrame(test)
     train_path = './train_{}.csv'.format(patient_name)
-    test_path = './test_{}.csv'.format(patient_name)
     val_path = './val_{}.csv'.format(patient_name)
+    test_path = './test_{}.csv'.format(patient_name)
     with open(train_path, 'w') as f:
         train_data.to_csv(f, index=None)
-    with open(test_path, 'w') as f:
-        test_data.to_csv(f, index=None)
     with open(val_path, 'w') as f:
         val_data.to_csv(f, index=None)
+    with open(test_path, 'w') as f:
+        test_data.to_csv(f, index=None)
     print("数据划分完成")
 
 
@@ -90,6 +90,7 @@ def collate_fn(data):
         labels.append(label)
 
     return torch.from_numpy(np.array(data)), torch.tensor(labels), length
+
 
 class Data_info():
     def __init__(self, path_train):
@@ -133,6 +134,3 @@ class MyDataset(Dataset):  # 重写dateset的相关类
 
     def __len__(self):
         return len(self.imgs)
-
-
-

@@ -14,6 +14,7 @@ import pandas as pd
 from tqdm import tqdm
 import json
 import re
+from util.util_tool import train_data_split
 
 
 class GenData:
@@ -135,4 +136,5 @@ def get_data_info(path_dir="../data/"):
 
 if __name__ == '__main__':
     # process_data()  # 数据的生成, 主要是用与生成时序数据
-    get_data_info()  # 生成数据的划分文件·
+    # get_data_info()  # 生成数据的划分文件· 生成 data_info 文件
+    train_data_split('ZK')  # 病人训练数据集的划分  {'BDP': 0, 'LK': 1, 'SYF': 2, 'WSH': 3, 'ZK': 4}

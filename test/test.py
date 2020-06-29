@@ -9,6 +9,7 @@
 import random
 
 from torch.autograd import Variable
+from util.seeg_utils import *
 from tqdm import tqdm
 import time
 import os
@@ -92,9 +93,10 @@ def test_4():
 
 
 def test_5():
-    test = "159_161.npy"
-    b = re.findall(r'\d+', test)
-    print(b)
+    path = "/home/cbd109-3/Users/data/yh/Program/Python/SEEG/data/raw_data/BDP/BDP_Pre_seizure/BDP_SZ2_pre_seizure_raw.fif"
+    data = read_raw(path)
+    time = get_recorder_time(data)
+    print(time)
 
 
 def test_6():
