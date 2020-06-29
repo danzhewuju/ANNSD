@@ -15,10 +15,11 @@ import pandas as pd
 
 
 class Dan:
-    def __init__(self, epoch=10, bath_size=16, lr=0.001, gpu=0, train_path=None, test_path=None, val_path=None,
+    def __init__(self, patient, epoch=10, bath_size=16, lr=0.001, gpu=0, train_path=None, test_path=None, val_path=None,
                  att_path=None,
-                 model='train', encoder_name='vae', few_shot=True, few_show_ratio=0.2, label_classifier_name='lstm',
+                 model='train', encoder_name='cnn', few_shot=True, few_show_ratio=0.2, label_classifier_name='lstm',
                  check_point=False, att=False):
+        self.patient = patient
         self.epoch = epoch
         self.batch_size = bath_size
         self.lr = lr
@@ -47,13 +48,14 @@ class Dan:
         if not os.path.exists(save_path):
             os.mkdir(save_path)
         save_full_path = os.path.join(save_path,
-                                      'DAN_encoder_{}_{}.pkl'.format(self.encoder_name, self.label_classifier_name))
+                                      'DAN_encoder_{}_{}_{}.pkl'.format(self.encoder_name, self.label_classifier_name,
+                                                                        self.patient))
         torch.save(self.model.state_dict(), save_full_path)
         print("Saving Model DAN in {}......".format(save_full_path))
         return
 
-    def load_model(self, model_path='../save_model/DAN_encoder_{}_{}.pkl'):
-        model_path = model_path.format(self.encoder_name, self.label_classifier_name)
+    def load_model(self, model_path='../save_model/DAN_encoder_{}_{}_{}.pkl'):
+        model_path = model_path.format(self.encoder_name, self.label_classifier_name, self.patient)
         if os.path.exists(model_path):
             self.model.load_state_dict(torch.load(model_path))
             print("Loading Mode DAN from {}".format(model_path))
@@ -365,8 +367,9 @@ class Dan:
                 self.segment_statistic(prey, y, length.cpu())
         loss_avg = sum(loss) / len(loss)
         accuracy_avg = sum(acc) / len(acc)
-        result = "Encoder:{}|Data size:{}| test loss:{:.6f}| Accuracy:{:.5f} ".format(self.encoder_name, len(acc),
-                                                                                      loss_avg, accuracy_avg)
+        result = "Encoder:{}|Label classifier {}|Patient {}|Data size:{}| test loss:{:.6f}| Accuracy:{:.5f} ".format(
+            self.encoder_name, self.label_classifier_name, self.patient, len(acc),
+            loss_avg, accuracy_avg)
         self.log_write(result)
         if recoding:
             self.save_all_input_prediction_result(ids_list, grand_true, prediction)

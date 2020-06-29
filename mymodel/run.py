@@ -29,7 +29,6 @@ def run():
     parser.add_argument('-att', '--attention_matrix', type=bool, default=True, help='Whether to get attention matrix')
     parser.add_argument('-rec', '--recoding', type=bool, default=False, help='Whether to recode result for every file')
 
-
     args = parser.parse_args()
 
     # 超参设置
@@ -54,7 +53,8 @@ def run():
         patient), att_path.format(patient)
 
     print(args)
-    dan_train = Dan(epoch, bath_size=batch_size, lr=lr, gpu=gpu, train_path=train_path, test_path=test_path,
+    dan_train = Dan(patient, epoch, bath_size=batch_size, lr=lr, gpu=gpu, train_path=train_path,
+                    test_path=test_path,
                     val_path=val_path, att_path=att_path, model=model, encoder_name=embedding,
                     few_shot=few_show_learning,
                     few_show_ratio=few_shot_ratio, label_classifier_name=label_classifier_name,
