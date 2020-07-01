@@ -9,7 +9,7 @@ import matplotlib.pyplot as plt
 from torchvision import transforms
 from PIL import Image
 import numpy as np
-from util.util_file import trans_numpy_cv2, linear_matrix_normalization
+from util.util_file import trans_numpy_cv2
 import collections
 import pandas as pd
 
@@ -199,7 +199,7 @@ class Dan:
 
                         acc_test, test_loss = [], []
                         for x_test, label_test, domain_test, length_test, _ in next(
-                                mydata.next_batch_test_data(transform=None)):
+                                mydata.next_batch_val_data(transform=None)):
                             # x_test = linear_matrix_normalization(x_test)
                             if self.gpu >= 0:
                                 x_test, label_test, domain_test, length_test = x_test.cuda(self.gpu), label_test.cuda(

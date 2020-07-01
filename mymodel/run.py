@@ -8,7 +8,7 @@ def run():
     parser.add_argument('-dim', '--output_dim', type=int, default=32, help='number of hidden units in encoder')
     parser.add_argument('-bs', '--batch_size', type=int, default=16, help='number of bath size')
     parser.add_argument('-gpu', '--GPU', type=int, default=0, help='GPU ID')
-    parser.add_argument('-ep', '--epoch', type=int, default=20, help='number of epoch')
+    parser.add_argument('-ep', '--epoch', type=int, default=30, help='number of epoch')
 
     parser.add_argument('-trp', '--train_path', type=str, default="../preprocess/train_{}.csv",
                         help='training data path')
