@@ -9,7 +9,7 @@ import matplotlib.pyplot as plt
 from torchvision import transforms
 from PIL import Image
 import numpy as np
-from util.util_file import trans_numpy_cv2
+from util.util_file import trans_numpy_cv2, IndicatorCalculation
 import collections
 import pandas as pd
 
@@ -329,6 +329,23 @@ class Dan:
         dataframe.to_csv(save_path)
         print('Saving success!')
 
+    def evaluation(self, probability, y):
+        '''
+        评价指标的计算
+        :param prey: 预测的结果
+        :param y:    实际的结果
+        :return:  返回各个指标是的结果
+        '''
+        result = {'accuracy': 0, 'precision': 0, 'recall': 0, 'f1score': 0, 'auc': 0}
+        prey = [1 if x > 0.5 else 0 for x in probability]
+        cal = IndicatorCalculation(prey, y)
+        result['accuracy'] = cal.get_accuracy()
+        result['precision'] = cal.get_precision()
+        result['recall'] = cal.get_recall()
+        result['f1score'] = cal.get_f1score()
+        result['auc'] = cal.get_auc(probability, y)
+        return result
+
     def test(self, recoding=False):
         '''
 
@@ -340,10 +357,12 @@ class Dan:
         test_data_loader = mydata.data_loader(mode='test', transform=None)
         acc = []
         loss = []
-        if recoding:
-            ids_list = []
-            grand_true = []
-            prediction = []
+
+        ids_list = []
+        grand_true = []
+        prediction = []
+        probability = []
+
         self.result = collections.defaultdict(list)
         loss_func = nn.CrossEntropyLoss()
         for step, (x, label, domain, length, ids) in enumerate(tqdm(test_data_loader)):
@@ -356,24 +375,27 @@ class Dan:
                 loss_label = loss_func(label_output, label)
                 loss_total = loss_label
                 prey = torch.max(label_output, 1)[1].data.cpu()
+
                 y = label.cpu()
                 acc += [1 if prey[i] == y[i] else 0 for i in range(len(y))]
                 loss.append(loss_total.data.cpu())
-                if recoding:
-                    ids_list += ids
-                    grand_true += [int(x) for x in y]
-                    prediction += [int(x) for x in prey]
-
+                # if recoding:
+                ids_list += ids
+                grand_true += [int(x) for x in y]
+                prediction += [int(x) for x in prey]
+                probability += [float(x) for x in torch.softmax(label_output, dim=1)[:, 1]]
                 self.segment_statistic(prey, y, length.cpu())
         loss_avg = sum(loss) / len(loss)
         accuracy_avg = sum(acc) / len(acc)
-        result = "Encoder:{}|Label classifier {}|Patient {}|Data size:{}| test loss:{:.6f}| Accuracy:{:.5f} ".format(
-            self.encoder_name, self.label_classifier_name, self.patient, len(acc),
-            loss_avg, accuracy_avg)
+        res = self.evaluation(probability, grand_true)
+
+        result = "Encoder:{}|Label classifier {}|Patient {}|Data size:{}| test loss:{:.6f}| Accuracy:{:.5f} | Precision:" \
+                 "{:.5f}| Recall:{:.5f}| F1score:{:.5f}| AUC:{:.5f}".format(
+            self.encoder_name, self.label_classifier_name, self.patient, len(acc), loss_avg, res['accuracy'],
+            res['precision'], res['recall'], res['f1score'], res['auc'])
         self.log_write(result)
-        if recoding:
+        if recoding:  # 如果开启了记录模式，模型会记录所有的文件的预测结果
             self.save_all_input_prediction_result(ids_list, grand_true, prediction)
-        # 分段统计信息表
 
     def save_attention_matrix(self, attention_matrix, ids, result, save_dir='../log/attention'):
         '''

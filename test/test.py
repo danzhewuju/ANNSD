@@ -10,6 +10,7 @@ import random
 
 from torch.autograd import Variable
 from util.seeg_utils import *
+from util.util_file import IndicatorCalculation
 from tqdm import tqdm
 import time
 import os
@@ -125,8 +126,21 @@ def test_6():
     # plt.close()
 
 
+def test_7():
+    a = torch.randn((100, 2))
+    print(a)
+    c = a.argmax(dim=1)
+    b = torch.softmax(a, dim=1)
+    print(b)
+    b = b[:, 1]
+    print(b)
+    cal = IndicatorCalculation()
+    auc = cal.get_auc(b, c)
+    print(auc)
+
+
 if __name__ == '__main__':
-    test_5()
+    test_7()
     # a = np.random.randn(2, 3)
     # b = a.sum(axis=0)
     #

@@ -310,11 +310,11 @@ class IndicatorCalculation():  # 包含二分类中各种指标
         #     self.prediction = np.asarray(self.prediction)
         #     self.ground_truth = np.asarray(self.ground_truth)
         if y_real is None and y_pre is None:
-            y_predict = self.prediction.cpu()
-            y_real = self.ground_truth.cpu()
+            y_predict = self.prediction
+            y_real = self.ground_truth
         else:
-            y_predict = y_pre.cpu()
-            y_real = y_real.cpu()
+            y_predict = y_pre
+            y_real = y_real
         auc_score = metrics.roc_auc_score(y_real, y_predict)
         return auc_score
 
