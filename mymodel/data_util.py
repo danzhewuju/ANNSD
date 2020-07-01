@@ -129,7 +129,7 @@ class MyData:
         elif mode == 'test':  # test
             data_info = DataInfo(self.path_test)
             dataset = MyDataset(data_info.data, transform=transform)
-            dataloader = DataLoader(dataset, batch_size=self.batch_size, shuffle=False, collate_fn=self.collate_fn)
+            dataloader = DataLoader(dataset, batch_size=self.batch_size, shuffle=True, collate_fn=self.collate_fn)
         elif mode == 'attention':
             data_info = DataInfo(self.path_att)
             dataset = MyDataset(data_info.data, transform=transform)

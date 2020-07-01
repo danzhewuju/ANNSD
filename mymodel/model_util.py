@@ -226,7 +226,10 @@ class DAN(nn.Module):
 
 
         else:
-            return y_label, attention if self.att else y_label
+            if self.att:
+                return y_label, attention
+            else:
+                return y_label
 
 
 class ReverseLayerF(Function):  # GRL模块，GRL模块在反向传播的过程中进行了梯度的反转

@@ -72,3 +72,6 @@ Encoder:cnn|Label classifier transformer|Patient LK|Data size:6000| test loss:0.
 Encoder:cnn|Label classifier transformer|Patient SYF|Data size:6000| test loss:0.096486| Accuracy:0.96517 	2020-06-30 20:45:35
 Encoder:cnn|Label classifier transformer|Patient WSH|Data size:6000| test loss:0.016645| Accuracy:0.99450 	2020-07-01 09:54:09
 Encoder:cnn|Label classifier transformer|Patient BDP|Data size:6000| test loss:0.236193| Accuracy:0.90483 | Precision:0.86092| Recall:0.96567| F1score:0.91029| AUC:0.97467	2020-07-01 15:12:28
+Encoder:cnn|Label classifier transformer|Patient LK|Data size:6000| test loss:0.055947| Accuracy:0.98133 | Precision:0.97973| Recall:0.98300| F1score:0.98136| AUC:0.99799	2020-07-01 15:27:00
+Encoder:cnn|Label classifier transformer|Patient WSH|Data size:6000| test loss:0.018066| Accuracy:0.99417 | Precision:0.99698| Recall:0.99133| F1score:0.99415| AUC:0.99981	2020-07-01 15:45:40
+Encoder:cnn|Label classifier transformer|Patient SYF|Data size:6000| test loss:0.100100| Accuracy:0.96467 | Precision:0.97904| Recall:0.94967| F1score:0.96413| AUC:0.99384	2020-07-01 15:54:09

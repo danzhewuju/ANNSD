@@ -26,7 +26,7 @@ def run():
     parser.add_argument('-lac', '--label_classifier_name', type=str, default='transformer',
                         help='choosing label classifier')
     parser.add_argument('-chp', '--check_point', type=bool, default=False, help='Whether to continue training')
-    parser.add_argument('-att', '--attention_matrix', type=bool, default=True, help='Whether to get attention matrix')
+    parser.add_argument('-att', '--attention_matrix', type=bool, default=False, help='Whether to get attention matrix')
     parser.add_argument('-rec', '--recoding', type=bool, default=False, help='Whether to recode result for every file')
 
     args = parser.parse_args()
