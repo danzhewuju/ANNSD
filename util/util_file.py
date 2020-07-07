@@ -237,7 +237,7 @@ def time_add(h, m, s, seconds_add):
     return int(h), int(m), s
 
 
-class IndicatorCalculation():  # 包含二分类中各种指标
+class IndicatorCalculation:  # 包含二分类中各种指标
     '''
     tp, fp
     fn, tn
@@ -281,24 +281,36 @@ class IndicatorCalculation():  # 包含二分类中各种指标
         self.prediction = prediction
         self.ground_truth = ground_truth
 
-    def get_accuracy(self):
+    def get_accuracy(self, prediction=None, ground_truth=None):
+        if prediction is not None and ground_truth is not None:
+            self.prediction = prediction
+            self.ground_truth = ground_truth
         return (self.__tp() + self.__tn()) / (self.__tn() + self.__tp() + self.__fn() + self.__fp())
 
-    def get_recall(self):
+    def get_recall(self, prediction=None, ground_truth=None):
+        if prediction is not None and ground_truth is not None:
+            self.prediction = prediction
+            self.ground_truth = ground_truth
         divisor = self.__division_detection(self.__tp() + self.__fn())
         if divisor == 0:
             return 0
         else:
             return self.__tp() / divisor
 
-    def get_precision(self):
+    def get_precision(self, prediction=None, ground_truth=None):
+        if prediction is not None and ground_truth is not None:
+            self.prediction = prediction
+            self.ground_truth = ground_truth
         divisor = self.__division_detection(self.__tp() + self.__fp())
         if divisor == 0:
             return 0
         else:
             return self.__tp() / divisor
 
-    def get_f1score(self):
+    def get_f1score(self, prediction=None, ground_truth=None):
+        if prediction is not None and ground_truth is not None:
+            self.prediction = prediction
+            self.ground_truth = ground_truth
         if (self.get_recall() is None) or (self.get_precision() is None) or (
                 (self.get_recall() + self.get_precision()) == 0):
             return 0
@@ -436,7 +448,7 @@ class LogRecord:
         else:
             f = open(log_path, 'a')
         time_now = time.strftime("%Y-%m-%d %H:%M:%S", time.localtime())
-        result = "{}\n{}\n".format(time_now, log_txt)
+        result = "{}\t{}\n".format(log_txt, time_now)
         f.write(result)
         f.close()
 
@@ -450,3 +462,29 @@ def linear_matrix_normalization(M):
     m = (M - M.min()) / (M.max() - M.min())
 
     return m
+
+
+def calculation_result_standard_deviation(prediction, grand_truth, cal_def, epoch=5):
+    '''
+    : function 该方法用于附带标准差模型结果计算，计算原理是将预测结果和实际的结果按照批次进行采样
+    计算不同批次之间的标准差
+    :param prediction: 预测结果
+    :param grand_truth: 实际的标签
+    :param cal_def: 涉及到指标计算的方法
+    :param epoch: 划分的批次
+    :return:
+    '''
+    seed = time.time()
+    random.seed(seed)
+    random.shuffle(prediction)
+    random.seed(seed)
+    random.shuffle(grand_truth)
+    total_size = len(prediction)
+    batch_size = total_size // epoch
+    res = []
+    for i in range(epoch):
+        tmp_prediction = prediction[i * batch_size:(i + 1) * batch_size]
+        tmp_ground_truth = grand_truth[i * batch_size:(i + 1) * batch_size]
+        tmp_res = cal_def(tmp_prediction, tmp_ground_truth)
+        res.append(tmp_res)
+    return np.mean(res), np.std(res)

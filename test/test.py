@@ -9,6 +9,8 @@
 import random
 
 from torch.autograd import Variable
+import sys
+sys.path.append('../')
 from util.seeg_utils import *
 from util.util_file import IndicatorCalculation
 from tqdm import tqdm
@@ -140,9 +142,14 @@ def test_7():
 
 
 if __name__ == '__main__':
-    test_7()
-    # a = np.random.randn(2, 3)
-    # b = a.sum(axis=0)
-    #
-    # print(a)
-    # print(b)
+    # test_7()
+    # prediction = list(range(100))
+    # ground_truth = prediction.copy()
+    # seed = time.time()
+    # random.seed(seed)
+    # random.shuffle(prediction)
+    # random.seed(seed)
+    # random.shuffle(ground_truth)
+    # print(prediction, ground_truth)
+    cal = IndicatorCalculation()
+    print(cal.get_accuracy([1, 1, 1, 0, 0, 0], [1, 1, 0, 1, 0, 0]))

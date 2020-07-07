@@ -75,3 +75,10 @@ Encoder:cnn|Label classifier transformer|Patient BDP|Data size:6000| test loss:0
 Encoder:cnn|Label classifier transformer|Patient LK|Data size:6000| test loss:0.055947| Accuracy:0.98133 | Precision:0.97973| Recall:0.98300| F1score:0.98136| AUC:0.99799	2020-07-01 15:27:00
 Encoder:cnn|Label classifier transformer|Patient WSH|Data size:6000| test loss:0.018066| Accuracy:0.99417 | Precision:0.99698| Recall:0.99133| F1score:0.99415| AUC:0.99981	2020-07-01 15:45:40
 Encoder:cnn|Label classifier transformer|Patient SYF|Data size:6000| test loss:0.100100| Accuracy:0.96467 | Precision:0.97904| Recall:0.94967| F1score:0.96413| AUC:0.99384	2020-07-01 15:54:09
+Encoder:cnn|Label classifier lstm|Patient SYF|Data size:6000| test loss:0.131547| Accuracy:0.95300 | Precision:0.94038| Recall:0.96733| F1score:0.95366| AUC:0.99295	2020-07-02 17:45:31Baselines:VMAML(voting)|Accuracy:0.6903976384789026|Recall:0.7507908611599297|Precision:0.6654205607476635|F1score:0.705532617671346|AUC:0.6911126577591	2020-07-07 11:29:02
+Patient:BDP|Baselines:VMAML(voting)|Accuracy:0.8263587428372982|Recall:0.8147375738616615|Precision:0.8338669512628958|F1score:0.8241912798874824|AUC:0.8263486620175761	2020-07-07 11:38:50
+Patient:SYF|Baselines:VMAML(voting)|Accuracy:0.6014933148115993|Recall:0.6358620689655172|Precision:0.5981187155368148|F1score:0.6164131706501755|AUC:0.601246879183703	2020-07-07 11:38:50
+Patient:WSH|Baselines:VMAML(voting)|Accuracy:0.9304580407890337|Recall:0.9396175779939617|Precision:0.9222917352650642|F1score:0.9308740445330674|AUC:0.9304885624058447	2020-07-07 11:38:50
+Patient:ZK|Baselines:VMAML(voting)|Accuracy:0.605139781212016|Recall:0.5939032936229853|Precision:0.603202846975089|F1score:0.5985169491525424|AUC:0.6050411476720778	2020-07-07 11:38:50
+Patient:LK|Baselines:VMAML(voting)|Accuracy:0.6903976384789026|Recall:0.7507908611599297|Precision:0.6654205607476635|F1score:0.705532617671346|AUC:0.6911126577591	2020-07-07 11:38:50
+Encoder:cnn|Label classifier lstm|Patient BDP|Data size:6000| test loss:0.235434| Accuracy:0.90717 | Precision:0.85457| Recall:0.98133| F1score:0.91358| AUC:0.98179	2020-07-07 14:38:07

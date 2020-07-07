@@ -41,7 +41,7 @@ class Information:
         self.draw_plt_bar(dict(res), 'Time(s)', 'Count')
         return dict(res)
 
-    def create_attention_csv(self, file_name='../preprocess/attention_BDP.csv', time=(340, 400),
+    def create_attention_csv(self, file_name='../preprocess/attention_BDP.csv', time=(340, 400), # 选出符合条件范围的测试用例
                              test_file='../preprocess/test_BDP.csv'):
         test_data = pd.read_csv(test_file)
         path = test_data['path'].tolist()
