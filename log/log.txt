@@ -1,0 +1,85 @@
+Data size:6000| Val loss:1.105235| Accuracy:0.46883 	2020-05-06 20:05:16
+Data size:6000| Val loss:1.673726| Accuracy:0.49833 	2020-05-06 23:14:09
+Data size:6000| Val loss:1.661124| Accuracy:0.50167 	2020-05-07 10:08:38
+Data size:7200| Val loss:0.184506| Accuracy:0.93333 	2020-05-07 10:20:49
+Data size:6000| Val loss:1.229265| Accuracy:0.47283 	2020-05-12 09:52:20
+Data size:6000| Val loss:0.693179| Accuracy:0.50133 	2020-05-12 14:54:56
+Encoder:vae|Data size:6000| Val loss:1.167587| Accuracy:0.49383 	2020-05-12 23:04:29
+Encoder:cnn|Data size:6000| Val loss:0.921267| Accuracy:0.53133 	2020-05-13 20:00:38
+Encoder:vae|Data size:6000| Val loss:0.620116| Accuracy:0.68700 	2020-05-13 23:31:17
+Encoder:cnn|Data size:6000| Val loss:0.555993| Accuracy:0.70217 	2020-05-14 00:03:32
+Encoder:cnn|Data size:6000| Val loss:0.693943| Accuracy:0.50217 	2020-05-14 10:16:34
+Encoder:cnn|Data size:6000| Val loss:0.694206| Accuracy:0.50150 	2020-05-14 10:19:57
+Encoder:cnn|Data size:6000| test loss:0.693135| Accuracy:0.50233 	2020-05-14 19:40:28
+Encoder:cnn|Data size:6000| test loss:0.357515| Accuracy:0.84133 	2020-05-14 23:30:36
+Encoder:cnn|Data size:6000| test loss:0.489322| Accuracy:0.75367 	2020-05-15 22:37:05
+Encoder:vae|Data size:6000| test loss:0.693068| Accuracy:0.50117 	2020-05-17 17:21:09
+Encoder:vae|Data size:6000| test loss:0.693148| Accuracy:0.50000 	2020-05-17 21:12:30
+Encoder:vae|Data size:6000| test loss:0.693380| Accuracy:0.49983 	2020-05-18 08:13:03
+Encoder:vae|Data size:6000| test loss:0.648471| Accuracy:0.64450 	2020-05-21 08:45:00
+Encoder:vae|Data size:599| test loss:0.707183| Accuracy:0.68447 	2020-05-26 10:36:17
+Encoder:cnn|Data size:599| test loss:0.194340| Accuracy:0.94825 	2020-05-26 10:36:45
+Encoder:cnn|Data size:599| test loss:0.178394| Accuracy:0.96160 	2020-05-26 10:38:32
+Encoder:cnn|Data size:599| test loss:0.191241| Accuracy:0.94157 	2020-05-26 10:38:44
+Encoder:vae|Data size:599| test loss:0.726749| Accuracy:0.02003 	2020-05-26 15:39:00
+Encoder:vae|Data size:599| test loss:0.732845| Accuracy:0.02838 	2020-05-26 16:47:26
+Encoder:cnn|Data size:599| test loss:0.193629| Accuracy:0.94825 	2020-05-26 17:28:19
+Encoder:cnn|Data size:599| test loss:0.636020| Accuracy:0.63439 	2020-05-26 17:33:23
+Encoder:cnn|Data size:599| test loss:0.009030| Accuracy:1.00000 	2020-05-26 17:40:49
+Encoder:cnn|Data size:599| test loss:0.009818| Accuracy:1.00000 	2020-05-26 17:41:10
+Encoder:cnn|Data size:719| test loss:0.205501| Accuracy:0.91794 	2020-05-26 17:50:00
+Encoder:cnn|Data size:7200| test loss:0.233808| Accuracy:0.90681 	2020-05-26 17:56:15
+Encoder:cnn|Data size:6000| test loss:2.385243| Accuracy:0.50067 	2020-05-26 18:10:39
+Encoder:cnn|Data size:599| test loss:0.009489| Accuracy:1.00000 	2020-05-26 18:11:08
+Encoder:cnn|Data size:599| test loss:0.008618| Accuracy:1.00000 	2020-05-26 18:12:15
+Encoder:cnn|Data size:599| test loss:0.083464| Accuracy:0.98664 	2020-05-26 18:28:43
+Encoder:cnn|Data size:6000| test loss:1.975096| Accuracy:0.53117 	2020-05-26 18:30:57
+Encoder:cnn|Data size:6000| test loss:0.616436| Accuracy:0.65967 	2020-05-26 20:42:26
+Encoder:cnn|Data size:599| test loss:0.513437| Accuracy:0.73456 	2020-05-26 20:47:09
+Encoder:cnn|Data size:2999| test loss:0.009130| Accuracy:1.00000 	2020-05-27 18:09:06
+Encoder:cnn|Data size:6000| test loss:2.641136| Accuracy:0.50083 	2020-05-27 18:41:56
+Encoder:cnn|Data size:6000| test loss:0.547738| Accuracy:0.71967 	2020-05-27 21:56:29
+Encoder:cnn|Data size:6000| test loss:0.541041| Accuracy:0.71883 	2020-05-27 22:05:13
+Encoder:cnn|Data size:6000| test loss:0.541786| Accuracy:0.72333 	2020-05-27 22:08:48
+Encoder:cnn|Data size:6000| test loss:0.465044| Accuracy:0.79500 	2020-05-28 11:03:13
+Encoder:cnn|Data size:6000| test loss:0.712422| Accuracy:0.59233 	2020-06-03 18:47:53
+Encoder:cnn|Data size:6000| test loss:0.453869| Accuracy:0.78117 	2020-06-03 21:01:59
+Encoder:cnn|Data size:6000| test loss:0.457828| Accuracy:0.77500 	2020-06-03 21:23:05
+Encoder:cnn|Data size:6000| test loss:0.269655| Accuracy:0.89533 	2020-06-04 11:35:43
+Encoder:cnn|Data size:6000| test loss:0.265266| Accuracy:0.89583 	2020-06-05 15:54:35
+Encoder:cnn|Data size:6000| test loss:0.263848| Accuracy:0.90233 	2020-06-05 15:59:19
+Encoder:cnn|Data size:6000| test loss:0.588167| Accuracy:0.67617 	2020-06-06 21:01:39
+Encoder:cnn|Data size:6000| test loss:0.274119| Accuracy:0.88467 	2020-06-09 20:33:28
+Encoder:cnn|Data size:6000| test loss:0.351007| Accuracy:0.83717 	2020-06-10 15:16:20
+Encoder:cnn|Data size:6000| test loss:0.358748| Accuracy:0.83333 	2020-06-10 15:42:51
+Encoder:cnn|Data size:6000| test loss:0.541809| Accuracy:0.73667 	2020-06-10 19:44:57
+Encoder:cnn|Data size:6000| test loss:0.541262| Accuracy:0.73583 	2020-06-10 19:50:49
+Encoder:cnn|Data size:6000| test loss:0.544220| Accuracy:0.73683 	2020-06-10 19:55:10
+Encoder:cnn|Data size:6000| test loss:0.536100| Accuracy:0.73400 	2020-06-10 19:57:07
+Encoder:cnn|Data size:6000| test loss:0.352263| Accuracy:0.84033 	2020-06-10 19:59:17
+Encoder:cnn|Data size:6000| test loss:0.552771| Accuracy:0.72350 	2020-06-10 20:11:24
+Encoder:cnn|Data size:6000| test loss:0.362484| Accuracy:0.83333 	2020-06-10 20:15:33
+Encoder:cnn|Data size:6000| test loss:0.347767| Accuracy:0.85567 	2020-06-16 18:53:40
+Encoder:cnn|Data size:6000| test loss:0.353246| Accuracy:0.85400 	2020-06-16 19:42:48
+Encoder:cnn|Data size:6000| test loss:0.352874| Accuracy:0.85633 	2020-06-16 19:52:36
+Encoder:cnn|Data size:6000| test loss:0.246313| Accuracy:0.90317 	2020-06-26 13:33:10
+Encoder:cnn|Data size:6000| test loss:0.252281| Accuracy:0.90000 	2020-06-26 13:35:42
+Encoder:cnn|Data size:6000| test loss:0.244322| Accuracy:0.90017 	2020-06-26 13:38:01
+Encoder:cnn|Data size:6000| test loss:0.248782| Accuracy:0.90283 	2020-06-26 14:03:01
+Encoder:cnn|Data size:6000| test loss:0.274339| Accuracy:0.89567 	2020-06-27 09:16:46
+Encoder:cnn|Data size:6000| test loss:0.237105| Accuracy:0.90300 	2020-06-27 09:22:31
+Encoder:cnn|Label classifier transformer|Patient LK|Data size:6000| test loss:0.061997| Accuracy:0.98100 	2020-06-30 09:58:46
+Encoder:cnn|Label classifier transformer|Patient SYF|Data size:6000| test loss:0.096486| Accuracy:0.96517 	2020-06-30 20:45:35
+Encoder:cnn|Label classifier transformer|Patient WSH|Data size:6000| test loss:0.016645| Accuracy:0.99450 	2020-07-01 09:54:09
+Encoder:cnn|Label classifier transformer|Patient BDP|Data size:6000| test loss:0.236193| Accuracy:0.90483 | Precision:0.86092| Recall:0.96567| F1score:0.91029| AUC:0.97467	2020-07-01 15:12:28
+Encoder:cnn|Label classifier transformer|Patient LK|Data size:6000| test loss:0.055947| Accuracy:0.98133 | Precision:0.97973| Recall:0.98300| F1score:0.98136| AUC:0.99799	2020-07-01 15:27:00
+Encoder:cnn|Label classifier transformer|Patient WSH|Data size:6000| test loss:0.018066| Accuracy:0.99417 | Precision:0.99698| Recall:0.99133| F1score:0.99415| AUC:0.99981	2020-07-01 15:45:40
+Encoder:cnn|Label classifier transformer|Patient SYF|Data size:6000| test loss:0.100100| Accuracy:0.96467 | Precision:0.97904| Recall:0.94967| F1score:0.96413| AUC:0.99384	2020-07-01 15:54:09
+Encoder:cnn|Label classifier lstm|Patient SYF|Data size:6000| test loss:0.131547| Accuracy:0.95300 | Precision:0.94038| Recall:0.96733| F1score:0.95366| AUC:0.99295	2020-07-02 17:45:31Baselines:VMAML(voting)|Accuracy:0.6903976384789026|Recall:0.7507908611599297|Precision:0.6654205607476635|F1score:0.705532617671346|AUC:0.6911126577591	2020-07-07 11:29:02
+Patient:BDP|Baselines:VMAML(voting)|Accuracy:0.8263587428372982|Recall:0.8147375738616615|Precision:0.8338669512628958|F1score:0.8241912798874824|AUC:0.8263486620175761	2020-07-07 11:38:50
+Patient:SYF|Baselines:VMAML(voting)|Accuracy:0.6014933148115993|Recall:0.6358620689655172|Precision:0.5981187155368148|F1score:0.6164131706501755|AUC:0.601246879183703	2020-07-07 11:38:50
+Patient:WSH|Baselines:VMAML(voting)|Accuracy:0.9304580407890337|Recall:0.9396175779939617|Precision:0.9222917352650642|F1score:0.9308740445330674|AUC:0.9304885624058447	2020-07-07 11:38:50
+Patient:ZK|Baselines:VMAML(voting)|Accuracy:0.605139781212016|Recall:0.5939032936229853|Precision:0.603202846975089|F1score:0.5985169491525424|AUC:0.6050411476720778	2020-07-07 11:38:50
+Patient:LK|Baselines:VMAML(voting)|Accuracy:0.6903976384789026|Recall:0.7507908611599297|Precision:0.6654205607476635|F1score:0.705532617671346|AUC:0.6911126577591	2020-07-07 11:38:50
+Encoder:cnn|Label classifier lstm|Patient BDP|Data size:6000| test loss:0.235434| Accuracy:0.90717 | Precision:0.85457| Recall:0.98133| F1score:0.91358| AUC:0.98179	2020-07-07 14:38:07
+Encoder:cnn|Label classifier lstm|Patient ZK|Data size:5997| test loss:0.152128| Accuracy:0.94647 | Precision:0.91051| Recall:0.99033| F1score:0.94875| AUC:0.99284	2020-07-07 14:47:17
