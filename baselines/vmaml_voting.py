@@ -2,6 +2,8 @@
 本文件主要是用于vmaml模型预测结果的voting处理过程，为了是结果更具有健壮性
 '''
 import numpy as np
+import sys
+sys.path.append('../')
 from util.util_file import IndicatorCalculation, calculation_result_standard_deviation
 from util.util_file import LogRecord
 
@@ -45,13 +47,13 @@ class VmamlVoting:
             tmp_prediction = sum(prediction[count:count + k])
             if tmp_grand_truth == k:  # 为阳性
                 grand_truth_g.append(1)
-                if tmp_prediction >= k * ration:
+                if tmp_prediction > k * ration:
                     prediction_g.append(1)
                 else:
                     prediction_g.append(0)
             elif tmp_grand_truth == 0:
                 grand_truth_g.append(0)
-                if tmp_prediction <= k * (1 - ration):
+                if tmp_prediction < k * (1 - ration):
                     prediction_g.append(0)
                 else:
                     prediction_g.append(1)

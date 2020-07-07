@@ -85,8 +85,3 @@ Encoder:cnn|Label classifier lstm|Patient BDP|Data size:6000| test loss:0.235434
 Encoder:cnn|Label classifier lstm|Patient ZK|Data size:5997| test loss:0.152128| Accuracy:0.94647 | Precision:0.91051| Recall:0.99033| F1score:0.94875| AUC:0.99284	2020-07-07 14:47:17
 Encoder:cnn|Label classifier lstm|Patient WSH|Data size:6000| test loss:0.029433| Accuracy:0.99100 | Precision:0.99264| Recall:0.98933| F1score:0.99098| AUC:0.99952	2020-07-07 17:12:14
 Encoder:cnn|Label classifier lstm|Patient LK|Data size:6000| test loss:0.187552| Accuracy:0.92667 | Precision:0.99193| Recall:0.86033| F1score:0.92146| AUC:0.99616	2020-07-07 17:19:02
-Patient:BDP|Baselines:VMAML(voting)|Accuracy:0.826238|std:0.012101|Recall:0.833941|std:0.012126|Precision:0.814872|std:0.019204|F1score:0.823984|std:0.006743|AUC:0.826353|std:0.013154	2020-07-07 21:39:51
-Patient:SYF|Baselines:VMAML(voting)|Accuracy:0.759340|std:0.008530|Recall:0.749627|std:0.023747|Precision:0.773693|std:0.016582|F1score:0.761401|std:0.019485|AUC:0.759494|std:0.005956	2020-07-07 21:39:51
-Patient:WSH|Baselines:VMAML(voting)|Accuracy:0.930435|std:0.002963|Recall:0.922250|std:0.010305|Precision:0.939519|std:0.003589|F1score:0.931041|std:0.004874|AUC:0.930349|std:0.005439	2020-07-07 21:39:51
-Patient:ZK|Baselines:VMAML(voting)|Accuracy:0.784014|std:0.003831|Recall:0.772265|std:0.009395|Precision:0.802095|std:0.010925|F1score:0.786362|std:0.011937|AUC:0.784309|std:0.015672	2020-07-07 21:39:51
-Patient:LK|Baselines:VMAML(voting)|Accuracy:0.809904|std:0.010242|Recall:0.792437|std:0.016956|Precision:0.845127|std:0.021638|F1score:0.818149|std:0.004096|AUC:0.809305|std:0.013716	2020-07-07 21:39:51
