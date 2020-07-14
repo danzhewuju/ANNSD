@@ -94,8 +94,8 @@ class Baselines:
 
             for epoch in tqdm(range(self.epoch)):
                 for step, (b_x, b_y, _, length, _) in enumerate(tqdm(train_data_loader)):  # gives batch data
-                    b_x_g = b_x.cuda(0)
-                    b_y_g = b_y.cuda(0)
+                    b_x_g = b_x.cuda(self.gpu)
+                    b_y_g = b_y.cuda(self.gpu)
                     # b_x = b_x.view(-1, 100, 1000)  # reshape x to (batch, time_step, input_size)
                     output = self.model(b_x_g)  #
                     loss = loss_func(output, b_y_g)  # cross entropy loss
