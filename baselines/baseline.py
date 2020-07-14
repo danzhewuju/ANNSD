@@ -179,7 +179,7 @@ class Baselines:
                     self.gpu), length.cuda(
                     self.gpu)
             with torch.no_grad():
-                label_output = self.model(x, label, domain, length)
+                label_output = self.model(x)
                 loss_label = loss_func(label_output, label)
                 loss_total = loss_label
                 prey = torch.max(label_output, 1)[1].data.cpu()
