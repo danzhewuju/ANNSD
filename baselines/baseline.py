@@ -121,9 +121,8 @@ class Baselines:
                             with torch.no_grad():
                                 label_output_test = self.model(x_test)
                                 loss_label = loss_func(label_output_test, label_test)
-                                y_test = label_test.cpu()
                                 pre_y_test = torch.max(label_output_test, 1)[1].data
-                                acc_test += [1 if pre_y_test[i] == y_test[i] else 0 for i in range(len(y_test))]
+                                acc_test += [1 if pre_y_test[i] == label_test[i] else 0 for i in range(len(label_test))]
                                 loss_test.append(loss_label.data.cpu())
                         acc_train_avg = sum(acc_train) / len(acc_train)
                         loss_train_avg = sum(loss_train) / len(loss_train)
