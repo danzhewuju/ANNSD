@@ -72,7 +72,7 @@ class MyDataset(Dataset):  # 重写dateset的相关类
 
 
 class MyData:
-    def __init__(self, path_train, path_test, path_val, path_att, batch_size, few_shot=True, few_shot_ratio=0.25):
+    def __init__(self, path_train, path_test, path_val, path_att=None, batch_size=16, few_shot=True, few_shot_ratio=0.25):
         '''
 
         :param path_train: 训练集数据的路径

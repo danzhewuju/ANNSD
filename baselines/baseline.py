@@ -17,7 +17,6 @@ class BaseModel:  # 主要用于选择各种各样的模型
             else:
                 self.model = clstm(gpu, input_size, Resampling)
 
-    @staticmethod
     def get_model(self):  # 获取构建的模型
         return self.model
 
@@ -40,7 +39,7 @@ class Baselines:
         self.few_shot = few_shot  # 微调系数开关
         self.few_shot_ratio = few_show_ratio  # 微调系数大小
         self.check_point = check_point  # 断点检查
-        basemodel = BaseModel(gpu, input_size=self.dim, Resampling=500)  # 构建basemodel方法
+        basemodel = BaseModel(gpu, basename, input_size=self.dim, Resampling=500)  # 构建basemodel方法
         self.model = basemodel.get_model()
         if self.check_point:
             self.load_model()  # 如果是断点训练
@@ -79,7 +78,8 @@ class Baselines:
         print("Generating log!")
 
     def train(self):
-        mydata = MyData(self.train_path, self.test_path, self.val_path, self.att_path, self.batch_size,
+        mydata = MyData(path_train=self.train_path, path_test=self.test_path, path_val=self.val_path,
+                        batch_size=self.batch_size,
                         few_shot=self.few_shot, few_shot_ratio=self.few_shot_ratio)
 
         train_data_loader = mydata.data_loader(None, mode='train')
@@ -87,14 +87,15 @@ class Baselines:
         loss_func = nn.CrossEntropyLoss()
 
         acc_train, loss_train = [], []
-        with tqdm(torch=self.epoch * len(train_data_loader)) as tq:
+        last_test_accuracy = 0
+        with tqdm(total=self.epoch * len(train_data_loader)) as tq:
 
             for epoch in tqdm(range(self.epoch)):
                 for step, (b_x, b_y, _, length, _) in enumerate(tqdm(train_data_loader)):  # gives batch data
                     b_x_g = b_x.cuda(0)
                     b_y_g = b_y.cuda(0)
                     # b_x = b_x.view(-1, 100, 1000)  # reshape x to (batch, time_step, input_size)
-                    output = clstm(b_x_g)  # rnn output
+                    output = self.model(b_x_g)  #
                     loss = loss_func(output, b_y_g)  # cross entropy loss
 
                     optimizer.zero_grad()  # clear gradients for this training step
@@ -160,12 +161,12 @@ class Baselines:
 
     def test(self):
         self.load_model()  # 加载模型
-        mydata = MyData(self.train_path, self.test_path, self.val_path, self.att_path, self.batch_size)
+        mydata = MyData(path_train=self.train_path, path_test=self.test_path, path_val=self.val_path,
+                        batch_size=self.batch_size)
         test_data_loader = mydata.data_loader(mode='test', transform=None)
         acc = []
         loss = []
 
-        ids_list = []
         grand_true = []
         prediction = []
         probability = []

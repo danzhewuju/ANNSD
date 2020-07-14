@@ -39,7 +39,7 @@ class clstm(nn.Module):
             nn.ReLU(),
             nn.MaxPool2d(kernel_size=2, stride=2)
         )
-        self.fc1 = nn.Linear(6 * 31 * 32, 100)  # x_ y_ 和你输入的矩阵有关系
+        self.fc1 = nn.Linear(6 * 31 * 32, 32)  # x_ y_ 和你输入的矩阵有关系
 
         self.rnn = nn.LSTM(  # if use nn.RNN(), it hardly learns
             input_size=self.input_size,  # 输入向量的长度
@@ -54,20 +54,24 @@ class clstm(nn.Module):
         # res = []
         # batch_size = x.size(0)
         # 需要对数据进行处理
+        bat = x.shape[0]
         if self.gpu is not None:
-            res = torch.zeros((1, 15, 100)).cuda(self.gpu)
+            res = torch.zeros((bat, 15, 32)).cuda(self.gpu)
         else:
-            res = torch.zeros((1, 15, 100))
-        length = x.size(-1) / self.Resampling
-        for i in range(int(length)):
-            tmx = x[:, :, :, i * 500:(i + 1) * 500]
-            tmx = self.layer1(tmx)
-            tmx = self.layer2(tmx)
-            tmx = self.layer3(tmx)
-            tmx = self.layer4(tmx)
-            tmx = tmx.reshape(1, -1)  # 这里面的-1代表的是自适应的意思。
-            tmx = self.fc1(tmx)
-            res[0][i] = tmx
+            res = torch.zeros((bat, 15, 32))
+        for i in range(bat):
+            tmp_x = x[i][0]
+            length = tmp_x.shape[-1] // self.Resampling
+            for j in range(length):
+                tmp_split = tmp_x[:, self.Resampling * j:(j + 1) * self.Resampling]
+                tmp_split = torch.reshape(tmp_split, (1, 1, 100, self.Resampling))
+                tmx = self.layer1(tmp_split)
+                tmx = self.layer2(tmx)
+                tmx = self.layer3(tmx)
+                tmx = self.layer4(tmx)
+                tmx = tmx.reshape(1, -1)  # 这里面的-1代表的是自适应的意思。
+                tmx = self.fc1(tmx)
+                res[i][j] = tmx
 
         r_out, (h_n, h_c) = self.rnn(res, None)  # None represents zero initial hidden state
         # choose r_out at the last time step

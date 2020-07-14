@@ -20,7 +20,7 @@ def run():
                         help='attention data path')
     parser.add_argument('-p', '--patient', type=str, default="BDP", help='patient name')
     parser.add_argument('-ban', '--basename', type=str, default='clstm', help='The name of baselines')
-    parser.add_argument('-m', '--model', type=str, default="test", help='style of train')
+    parser.add_argument('-m', '--model', type=str, default="train", help='style of train')
     parser.add_argument('-few', '--few_show_learning', type=bool, default=True, help='keep few shot learning open')
     parser.add_argument('-fr', '--few_show_learning_ratio', type=float, default=0.25, help='few shot learning ratio')
     parser.add_argument('-chp', '--check_point', type=bool, default=False, help='Whether to continue training')
@@ -55,3 +55,7 @@ def run():
         bl.train()
     elif model == 'test':
         bl.test()
+
+
+if __name__ == '__main__':
+    run()
