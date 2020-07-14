@@ -2,6 +2,8 @@
 import os
 import torch
 from model import clstm
+import sys
+sys.path.append('../')
 import time
 from mymodel.data_util import MyData
 from torch import nn
@@ -48,13 +50,13 @@ class Baselines:
     def save_mode(self, save_path='../save_model'):
         if not os.path.exists(save_path):
             os.mkdir(save_path)
-        save_full_path = os.path.join(save_path, 'Baselines_{}_{}.pkl'.format(self.encoder_name, self.patient))
+        save_full_path = os.path.join(save_path, 'Baselines_{}_{}.pkl'.format(self.basename, self.patient))
         torch.save(self.model.state_dict(), save_full_path)
         print("Saving Model in {}......".format(save_full_path))
         return
 
     def load_model(self, model_path='../save_model/Baselines_{}_{}.pkl'):
-        model_path = model_path.format(self.encoder_name, self.patient)
+        model_path = model_path.format(self.basename, self.patient)
         if os.path.exists(model_path):
             self.model.load_state_dict(torch.load(model_path))
             print("Loading Baseline Mode from {}".format(model_path))
