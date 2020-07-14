@@ -7,9 +7,12 @@ from util.util_tool import *
 from torch.utils.data import Dataset, DataLoader
 import torch.nn.functional as F
 
+
 class clstm(nn.Module):
-    def __init__(self, gpu=None):
+    def __init__(self, gpu=None, input_size=32, Resampling=500):
         super(clstm, self).__init__()
+        self.input_size = input_size
+        self.Resampling = Resampling
         self.layer1 = nn.Sequential(
             nn.Conv2d(in_channels=1, out_channels=16, kernel_size=5, stride=1, padding=2),
             nn.BatchNorm2d(16),
@@ -39,7 +42,7 @@ class clstm(nn.Module):
         self.fc1 = nn.Linear(6 * 31 * 32, 100)  # x_ y_ 和你输入的矩阵有关系
 
         self.rnn = nn.LSTM(  # if use nn.RNN(), it hardly learns
-            input_size=INPUT_SIZE,
+            input_size=self.input_size,  # 输入向量的长度
             hidden_size=64,  # rnn hidden unit
             num_layers=1,  # number of rnn layer
             batch_first=True,  # input & output will has batch size as 1s dimension. e.g. (batch, time_step, input_size)
@@ -55,7 +58,7 @@ class clstm(nn.Module):
             res = torch.zeros((1, 15, 100)).cuda(self.gpu)
         else:
             res = torch.zeros((1, 15, 100))
-        length = x.size(-1) / Resampling
+        length = x.size(-1) / self.Resampling
         for i in range(int(length)):
             tmx = x[:, :, :, i * 500:(i + 1) * 500]
             tmx = self.layer1(tmx)
