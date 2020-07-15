@@ -1,7 +1,7 @@
 # 运行各种baselines的方法
 import os
 import torch
-from model import clstm
+from .model import clstm
 import sys
 sys.path.append('../')
 import time
