@@ -96,3 +96,4 @@ Patient:WSH|Baselines:VMAML(voting)|Accuracy:0.930435|std:0.006943|Recall:0.9223
 Patient:ZK|Baselines:VMAML(voting)|Accuracy:0.784188|std:0.009777|Recall:0.772252|std:0.017468|Precision:0.802176|std:0.029151|F1score:0.786717|std:0.014581|AUC:0.784307|std:0.010060	2020-07-14 16:46:39
 Patient:LK|Baselines:VMAML(voting)|Accuracy:0.810252|std:0.008699|Recall:0.792524|std:0.018550|Precision:0.845497|std:0.011994|F1score:0.818027|std:0.003365|AUC:0.809513|std:0.009003	2020-07-14 16:46:40
 Baselins: clstm|Patient BDP|Data size:6000| test loss:0.385764| Accuracy:0.83067 | Precision:0.86605| Recall:0.78233| F1score:0.82207| AUC:0.91098	2020-07-14 23:03:34
+Baselins: clstm|Patient ZK|Data size:5997| test loss:0.373314| Accuracy:0.80990 | Precision:0.73390| Recall:0.97267| F1score:0.83658| AUC:0.91455	2020-07-15 17:13:49
