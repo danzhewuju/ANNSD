@@ -1,7 +1,7 @@
 # 运行各种baselines的方法
 import os
 import torch
-from .model import clstm
+from model import clstm
 import sys
 sys.path.append('../')
 import time
@@ -62,6 +62,7 @@ class Baselines:
             print("Loading Baseline Mode from {}".format(model_path))
         else:
             print("Model is not exist in {}".format(model_path))
+            exit()
         return
 
     def log_write(self, result, path='../log/log.txt'):

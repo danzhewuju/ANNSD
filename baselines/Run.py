@@ -1,5 +1,5 @@
 import argparse
-from .baseline import Baselines
+from baseline import Baselines
 
 
 def run():
