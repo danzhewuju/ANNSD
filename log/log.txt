@@ -98,6 +98,5 @@ Patient:ZK|Baselines:VMAML(voting)|Accuracy:0.784188|std:0.009777|Recall:0.77225
 Patient:LK|Baselines:VMAML(voting)|Accuracy:0.810252|std:0.008699|Recall:0.792524|std:0.018550|Precision:0.845497|std:0.011994|F1score:0.818027|std:0.003365|AUC:0.809513|std:0.009003	2020-07-14 16:46:40
 Baselins: clstm|Patient BDP|Data size:6000| test loss:0.385764| Accuracy:0.83067 | Precision:0.86605| Recall:0.78233| F1score:0.82207| AUC:0.91098	2020-07-14 23:03:34
 Baselins: clstm|Patient ZK|Data size:5997| test loss:0.283491| Accuracy:0.86977 | Precision:0.80372| Recall:0.97867| F1score:0.88261| AUC:0.96114	2020-07-15 18:36:53
-Baselins: clstm|Patient LK|Data size:6000| test loss:0.109653| Accuracy:0.95833 | Precision:0.98212| Recall:0.93367| F1score:0.95728| AUC:0.99501	2020-07-15 21:35:40
 Baselins: clstm|Patient LK|Data size:6000| test loss:0.112132| Accuracy:0.95800 | Precision:0.97708| Recall:0.93800| F1score:0.95714| AUC:0.99467	2020-07-15 21:55:48
-Baselins: clstm|Patient LK|Data size:6000| test loss:0.103283| Accuracy:0.96167 | Precision:0.98359| Recall:0.93900| F1score:0.96078| AUC:0.99559	2020-07-15 22:01:51
+Baselins: clstm|Patient SYF|Data size:6000| test loss:0.130076| Accuracy:0.94367 | Precision:0.96257| Recall:0.92367| F1score:0.94272| AUC:0.97560	2020-07-15 23:53:55
