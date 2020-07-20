@@ -2,14 +2,16 @@
 本文件主要是用于vmaml模型预测结果的voting处理过程，为了是结果更具有健壮性
 '''
 import numpy as np
+import argparse
 import sys
+
 sys.path.append('../')
 from util.util_file import IndicatorCalculation, calculation_result_standard_deviation
 from util.util_file import LogRecord
 
 
 class VmamlVoting:
-    def __init__(self, path, time_group=16, ration=0.6, patient=None):
+    def __init__(self, path, vote_length=16, ration=0.6, patient=None):
         '''
 
         :param path: 分析文件的位置
@@ -41,7 +43,7 @@ class VmamlVoting:
         # 计算经过了voting数据的准确率
         grand_truth_g, prediction_g = [], []
         count = 0
-        k = time_group // 2
+        k = vote_length // 2
         while count + k < len(data):
             tmp_grand_truth = sum(grand_truth[count:count + k])
             tmp_prediction = sum(prediction[count:count + k])
@@ -65,8 +67,8 @@ class VmamlVoting:
         f1score, f_std = calculation_result_standard_deviation(prediction_g, grand_truth_g, cal.get_f1score)
         auc, auc_std = calculation_result_standard_deviation(prediction_g, grand_truth_g, cal.get_auc)
         # voting 需要进行特殊的方差处理， 进行抽样计算
-        result = "Patient:{}|Baselines:VMAML(voting)|Accuracy:{:.6f}|std:{:.6f}|Recall:{:.6f}|std:{:.6f}|Precision:{:.6f}|std:{:.6f}|F1score:{:.6f}|std:{:.6f}|AUC:{:.6f}|std:{:.6f}".format(
-            patient, accuracy, a_std,
+        result = "Vote Length:{}|Patient:{}|Baselines:VMAML(voting)|Accuracy:{:.6f}|std:{:.6f}|Recall:{:.6f}|std:{:.6f}|Precision:{:.6f}|std:{:.6f}|F1score:{:.6f}|std:{:.6f}|AUC:{:.6f}|std:{:.6f}".format(
+            vote_length, patient, accuracy, a_std,
             precision, p_std,
             recall, r_std, f1score, f_std,
             auc, auc_std)
@@ -76,8 +78,13 @@ class VmamlVoting:
 
 
 if __name__ == '__main__':
+    parser = argparse.ArgumentParser()
+    parser.add_argument('-vl', '--vote_length', type=int, default=15, help="Length of voting time")
+    arg = parser.parse_args()
+    vote_length = arg.vote_length
+
     patients = ['BDP', 'SYF', 'WSH', 'ZK', 'LK']
     for p in patients:
         path = './vmodel_prediction/{}_val_prediction.pkl'
         tmp = path.format(p)
-        vmaml_voting = VmamlVoting(tmp, patient=p)
+        vmaml_voting = VmamlVoting(tmp, vote_length, patient=p)
