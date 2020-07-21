@@ -8,6 +8,7 @@ import sys
 sys.path.append('../')
 from util.util_file import IndicatorCalculation, calculation_result_standard_deviation
 from util.util_file import LogRecord
+import pandas as pd
 
 
 class VmamlVoting:
@@ -77,7 +78,11 @@ class VmamlVoting:
         print("Voting:{}".format(result))
 
 
-if __name__ == '__main__':
+def processing_vmaml_baseline():
+    '''
+
+    :return: 不同人的的vmaml voting 的计算
+    '''
     parser = argparse.ArgumentParser()
     parser.add_argument('-vl', '--vote_length', type=int, default=15, help="Length of voting time")
     arg = parser.parse_args()
@@ -88,3 +93,69 @@ if __name__ == '__main__':
         path = './vmodel_prediction/{}_val_prediction.pkl'
         tmp = path.format(p)
         vmaml_voting = VmamlVoting(tmp, vote_length, patient=p)
+    return
+
+
+def processing_accuracy_time():
+    def accuracy_for_time(path_id_index, prediction_file, label, save_file, time_quantum=300):
+        '''
+
+        :param path_id_index:  时间序列列表
+        :param prediction_file:  预测结果的文件
+        :param label: 对于指定类别的数据进行统计分析
+        :param time_quantum:    统计一段时间的准确率
+        :return:
+        '''
+        dict_label = {'pre_seizure': 1, 'non_seizure': 0}
+        prediction_result = np.load(prediction_file, allow_pickle=True)
+        data = pd.read_csv(path_id_index)
+        # 过滤掉正常睡眠的信息
+        data = data[data['labels'] == label]
+        id_list, start_time = data['id'].tolist(), data['start time'].tolist()
+        print("id list data size:{}".format(len(id_list)))
+        data_time = dict(zip(id_list, start_time))  # 由id构成字典
+
+        # 需要进行分段统计， 第 time_quantum 的时间范围内的结果
+        print("data size:{}".format(len(data_time)))
+        result = {}  # 用于存储分段的统计信息
+        for id_, start_time in data_time.items():
+            index = start_time // time_quantum
+            # if id_ in prediction_result.keys():
+            g, p = prediction_result[id_]['ground truth'], prediction_result[id_]['prediction']
+            if index not in result.keys():
+                result[index] = {'ground truth': [g], 'prediction': [p]}
+            else:
+                result[index]['ground truth'].append(g)
+                result[index]['prediction'].append(p)
+        cal = IndicatorCalculation()
+        time_, acc, std = [], [], []
+        for index_, d in result.items():
+            time_.append(index_)
+            cal.set_values(d['prediction'], d['ground truth'])
+            tmp_acc, tmp_std = calculation_result_standard_deviation(d['prediction'], d['ground truth'],
+                                                                     cal.get_accuracy, epoch=2)
+            acc.append(tmp_acc)
+            std.append(tmp_std)
+        # 保留数据小数点
+        std = [round(x, 5) for x in std]
+        acc = [round(x, 5) for x in acc]
+        data_dict = {'Time': time_, 'Accuracy': acc, 'Std': std}
+        dataFrame = pd.DataFrame(data_dict)
+        dataFrame.sort_values(by='Time', inplace=True)
+        # 文件的保存
+        dataFrame.to_csv(save_file, index=False)
+        print("{} file has been created.".format(save_file))
+        return True
+
+    patient = 'BDP'
+    label = 'pre_seizure'
+    path_id_index = './vmodel_prediction/{}_time_index.csv'.format(patient)
+    prediction_file = './vmodel_prediction/{}_single_prediction.pkl'.format(patient)
+    save_file = './vmodel_prediction/{}_time_accuracy_{}.csv'.format(patient, label)
+    accuracy_for_time(path_id_index, prediction_file, label=label, save_file=save_file, time_quantum=300)
+    return
+
+
+if __name__ == '__main__':
+    # processing_vmaml_baseline() #不同人的的vmaml voting 的计算
+    processing_accuracy_time()  # 分析时间段的准确率
