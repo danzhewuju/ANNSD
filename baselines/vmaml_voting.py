@@ -120,8 +120,8 @@ def processing_accuracy_time():
         result = {}  # 用于存储分段的统计信息
         for id_, start_time in data_time.items():
             index = start_time // time_quantum
-            # if id_ in prediction_result.keys():
-            g, p = prediction_result[id_]['ground truth'], prediction_result[id_]['prediction']
+            if id_ in prediction_result.keys():
+                g, p = prediction_result[id_]['ground truth'], prediction_result[id_]['prediction']
             if index not in result.keys():
                 result[index] = {'ground truth': [g], 'prediction': [p]}
             else:
@@ -139,6 +139,7 @@ def processing_accuracy_time():
         # 保留数据小数点
         std = [round(x, 5) for x in std]
         acc = [round(x, 5) for x in acc]
+        time_ = [x*time_quantum for x in time_]
         data_dict = {'Time': time_, 'Accuracy': acc, 'Std': std}
         dataFrame = pd.DataFrame(data_dict)
         dataFrame.sort_values(by='Time', inplace=True)
@@ -149,10 +150,10 @@ def processing_accuracy_time():
 
     patient = 'BDP'
     label = 'pre_seizure'
-    path_id_index = './vmodel_prediction/{}_time_index.csv'.format(patient)
-    prediction_file = './vmodel_prediction/{}_single_prediction.pkl'.format(patient)
+    path_id_index = './vmodel_prediction/{}_time_index_pre2.csv'.format(patient)
+    prediction_file = './vmodel_prediction/{}_prediction_pre2.pkl'.format(patient)
     save_file = './vmodel_prediction/{}_time_accuracy_{}.csv'.format(patient, label)
-    accuracy_for_time(path_id_index, prediction_file, label=label, save_file=save_file, time_quantum=300)
+    accuracy_for_time(path_id_index, prediction_file, label=label, save_file=save_file, time_quantum=180)
     return
 
 

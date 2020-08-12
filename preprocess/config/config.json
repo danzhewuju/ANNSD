@@ -76,14 +76,14 @@
     "non_seizure": {
       "raw_data_path": [
         "/home/cbd109-3/Users/data/yh/Program/Python/SEEG/data/raw_data/ZK/ZK_SLEEP/ZK_Sleep_raw.fif",
-        "/home/cbd109-3/Users/data/yh/Program/Python/SEEG/data/raw_data/ZK/ZK_SLEEP/ZK_Sleep_raw-11.fif",
-        "/home/cbd109-3/Users/data/yh/Program/Python/SEEG/data/raw_data/ZK/ZK_SLEEP/ZK_Sleep_raw-22.fif",
-        "/home/cbd109-3/Users/data/yh/Program/Python/SEEG/data/raw_data/ZK/ZK_SLEEP/ZK_Sleep_raw-33.fif",
-        "/home/cbd109-3/Users/data/yh/Program/Python/SEEG/data/raw_data/ZK/ZK_SLEEP/ZK_Sleep_raw-44.fif",
-        "/home/cbd109-3/Users/data/yh/Program/Python/SEEG/data/raw_data/ZK/ZK_SLEEP/ZK_Sleep_raw-55.fif",
-        "/home/cbd109-3/Users/data/yh/Program/Python/SEEG/data/raw_data/ZK/ZK_SLEEP/ZK_Sleep_raw-66.fif",
-        "/home/cbd109-3/Users/data/yh/Program/Python/SEEG/data/raw_data/ZK/ZK_SLEEP/ZK_Sleep_raw-77.fif",
-        "/home/cbd109-3/Users/data/yh/Program/Python/SEEG/data/raw_data/ZK/ZK_SLEEP/ZK_Sleep_raw-88.fif"
+        "/home/cbd109-3/Users/data/yh/Program/Python/SEEG/data/raw_data/ZK/ZK_SLEEP/ZK_Sleep_raw-1.fif",
+        "/home/cbd109-3/Users/data/yh/Program/Python/SEEG/data/raw_data/ZK/ZK_SLEEP/ZK_Sleep_raw-2.fif",
+        "/home/cbd109-3/Users/data/yh/Program/Python/SEEG/data/raw_data/ZK/ZK_SLEEP/ZK_Sleep_raw-3.fif",
+        "/home/cbd109-3/Users/data/yh/Program/Python/SEEG/data/raw_data/ZK/ZK_SLEEP/ZK_Sleep_raw-4.fif",
+        "/home/cbd109-3/Users/data/yh/Program/Python/SEEG/data/raw_data/ZK/ZK_SLEEP/ZK_Sleep_raw-5.fif",
+        "/home/cbd109-3/Users/data/yh/Program/Python/SEEG/data/raw_data/ZK/ZK_SLEEP/ZK_Sleep_raw-6.fif",
+        "/home/cbd109-3/Users/data/yh/Program/Python/SEEG/data/raw_data/ZK/ZK_SLEEP/ZK_Sleep_raw-7.fif",
+        "/home/cbd109-3/Users/data/yh/Program/Python/SEEG/data/raw_data/ZK/ZK_SLEEP/ZK_Sleep_raw-8.fif"
       ],
       "save_dir": "../data/ZK/non_seizure"
     },
