@@ -150,10 +150,10 @@ def processing_accuracy_time():
 
     patient = 'BDP'
     label = 'pre_seizure'
-    path_id_index = './vmodel_prediction/{}_time_index_pre2.csv'.format(patient)
-    prediction_file = './vmodel_prediction/{}_prediction_pre2.pkl'.format(patient)
+    path_id_index = './vmodel_prediction/{}_time_index.csv'.format(patient)
+    prediction_file = './vmodel_prediction/{}_single_prediction.pkl'.format(patient)
     save_file = './vmodel_prediction/{}_time_accuracy_{}.csv'.format(patient, label)
-    accuracy_for_time(path_id_index, prediction_file, label=label, save_file=save_file, time_quantum=180)
+    accuracy_for_time(path_id_index, prediction_file, label=label, save_file=save_file, time_quantum=600)
     return
 
 
