@@ -4,7 +4,7 @@
 import numpy as np
 import argparse
 import sys
-
+import collections
 sys.path.append('../')
 from util.util_file import IndicatorCalculation, calculation_result_standard_deviation
 from util.util_file import LogRecord
@@ -96,6 +96,76 @@ def processing_vmaml_baseline():
     return
 
 
+def cal_cluster_distribution():
+    '''
+
+    :param path_id_index:  id 时间序列的映射表
+    :param path_label_cluster:  # id 簇的映射表
+    :param file_name:  # 文件类别
+    :param time_quantum: 时间窗口
+    :return:
+    '''
+    # 计算簇随着时间的分布情况
+    def cluster_distribution(path_id_index, path_label_cluster,path_prediction, label , time_quantum=600):
+        dict_label = {'pre_seizure': 1, 'non_seizure': 0}
+        data = pd.read_csv(path_id_index)
+        data = data[data['labels'] == label] # 过滤需要的信息
+        id_list, start_time = data['id'].tolist(), data['start time'].tolist()
+        print("id list data size:{}".format(len(id_list)))
+        data_time = dict(zip(id_list, start_time))  # 由id构成字典
+        cluster_info = np.load(path_label_cluster, allow_pickle=True)
+        number_cluster = len(cluster_info)
+        dict_cluster = collections.defaultdict(int)
+        # 构造key-cluster 的构造
+        for cluster, d in cluster_info.items():
+            for k in d:
+                dict_cluster[k] = cluster
+
+        res = {}
+        data = np.load(path_prediction, allow_pickle=True)
+        for key, d_dict in data.items():
+            ground_truth = d_dict['ground truth']
+            prediction = d_dict['prediction']
+            if ground_truth == dict_label[label] and ground_truth == prediction:
+                if key in dict_cluster.keys():
+                    id_cluster = dict_cluster[key] # 属于第几簇
+                    start = data_time[key]  # 开始的时间
+                    n = start // time_quantum # 插入的第几个序列
+                    if n not in res:
+                        res[n] = [0]*number_cluster
+                    res[n][id_cluster] += 1
+        # 进行归一化处理
+        ans = {}
+        for n, num_list in res.items():
+            sum_ = sum(num_list)
+            if n not in ans:
+                ans[n] = [0]*number_cluster
+            for i, d in enumerate(num_list):
+                r = d / sum_
+                r = round(r, 4)
+                ans[n][i] = r
+        print(ans)
+        return
+    patient = 'BDP'
+    label = 'pre_seizure'
+    file = 'pre2'
+    path_id_index = './vmodel_prediction/{}_time_index_{}.csv'.format(patient,file)
+    prediction_file = './vmodel_prediction/{}_prediction_{}.pkl'.format(patient, file)
+    path_best_cluster = './vmodel_prediction/Best_label_cluster.pkl'
+    cluster_distribution(path_id_index, path_best_cluster, prediction_file, label, time_quantum=600)
+
+
+        # time_ = ans.keys().sort()
+        # cluster_id = {}
+        # for n, cluster_list in ans.items():
+
+
+
+
+
+
+
+
 def processing_accuracy_time():
     def accuracy_for_time(path_id_index, prediction_file, label, save_file, time_quantum=300):
         '''
@@ -139,7 +209,7 @@ def processing_accuracy_time():
         # 保留数据小数点
         std = [round(x, 5) for x in std]
         acc = [round(x, 5) for x in acc]
-        time_ = [x*time_quantum for x in time_]
+        time_ = [x * time_quantum for x in time_]
         data_dict = {'Time': time_, 'Accuracy': acc, 'Std': std}
         dataFrame = pd.DataFrame(data_dict)
         dataFrame.sort_values(by='Time', inplace=True)
@@ -159,4 +229,6 @@ def processing_accuracy_time():
 
 if __name__ == '__main__':
     # processing_vmaml_baseline() #不同人的的vmaml voting 的计算
-    processing_accuracy_time()  # 分析时间段的准确率
+    # processing_accuracy_time()  # 分析时间段的准确率
+    cal_cluster_distribution()     # 分析簇的分布情况
+
