@@ -1,12 +1,13 @@
+import os
+import random
+import sys
+
+import numpy as np
 import pandas as pd
 from torch.utils.data import Dataset, DataLoader
-import numpy as np
-import sys
-import random
-import os
 
 sys.path.append('../')
-from util.util_tool import matrix_normalization, collate_fn
+from util.util_tool import matrix_normalization
 import torch
 
 
@@ -24,11 +25,10 @@ class DataInfo:
         self.data_length = len(self.data)
 
     def few_shot_learning_sampling(self, ratio=0.2):
-        '''
-
+        """
         :param ratio:  所占的整体数据的比例
         :return:
-        '''
+        """
         sampling_k = int(ratio * self.data_length)  # 采样的个数
         random_index = random.sample(range(self.data_length), sampling_k)
         few_shot_sampling_list = [self.data[p] for p in random_index]
@@ -58,28 +58,29 @@ class MyDataset(Dataset):  # 重写dateset的相关类
         fn, label, domain = self.data[index]
         data = np.load(fn)
         # 获得该数据的
-        id = os.path.basename(fn).split('.')[0]
+        id_ = os.path.basename(fn).split('.')[0]
         if self.transform_data:
             data = self.transform_data(data)
         result = matrix_normalization(data, (100, 1000))
         result = result.astype('float32')
         result = result[np.newaxis, :]
         # result = trans_data(vae_model, result)
-        return result, label, domain, id
+        return result, label, domain, id_
 
     def __len__(self):
         return len(self.data)
 
 
 class MyData:
-    def __init__(self, path_train, path_test, path_val, path_att=None, batch_size=16, few_shot=True, few_shot_ratio=0.25):
-        '''
+    def __init__(self, path_train, path_test, path_val, path_att=None, batch_size=16, few_shot=True,
+                 few_shot_ratio=0.25):
+        """
 
         :param path_train: 训练集数据的路径
         :param path_test: 测试集数据的路径
         :param path_val: 验证集数据的路径
         :param batch_size: 批量的数据
-        '''
+        """
 
         self.path_train = path_train
         self.path_test = path_test
@@ -90,11 +91,11 @@ class MyData:
         self.few_shot_ratio = few_shot_ratio
 
     def collate_fn(self, data):  #
-        '''
+        """
         用于自己构造时序数据，包含数据对齐以及数据长度
         :param data: torch dataloader 的返回形式
         :return:
-        '''
+        """
         # 主要是用数据的对齐
         data.sort(key=lambda x: x[0].shape[-1], reverse=True)
         max_shape = data[0][0].shape
@@ -102,21 +103,23 @@ class MyData:
         length = []  # 记录真实的数目长度
         domains = []
         ids = []  # 记录序列的 id
-        for i, (d, label, patient, id) in enumerate(data):
-            d_shape = d.shape
+        for i, (d, label, patient, id_) in enumerate(data):
+            reshape = d.shape
             length.append(d.shape[-1])
-            if d_shape[-1] < max_shape[-1]:
-                tmp_d = np.pad(d, ((0, 0), (0, 0), (0, max_shape[-1] - d_shape[-1])), 'constant')
+            if reshape[-1] < max_shape[-1]:
+                tmp_d = np.pad(d, ((0, 0), (0, 0), (0, max_shape[-1] - reshape[-1])), 'constant')
                 data[i] = tmp_d
             else:
                 data[i] = d
+
             labels.append(label)
             domains.append(patient)
-            ids.append(id)
+            ids.append(id_)
 
         return torch.from_numpy(np.array(data)), torch.tensor(labels), torch.tensor(domains), torch.tensor(length), ids
 
     def data_loader(self, transform, mode='train'):  # 这里只有两个模式，一个是train/一个是test
+        dataloader = None
         if mode == 'train':
             # 如果加入了少样本学习的方法，需要额外的处理
             data_info = DataInfo(self.path_train)
@@ -138,7 +141,7 @@ class MyData:
 
     def next_batch_val_data(self, transform):
         data_info = DataInfo(self.path_val)
-        dataset = MyDataset(next(data_info.next_batch_data(self.batch_size*2)), transform=transform)
+        dataset = MyDataset(next(data_info.next_batch_data(self.batch_size * 2)), transform=transform)
         next_batch_data_loader = DataLoader(dataset, batch_size=self.batch_size * 2, shuffle=True,
                                             collate_fn=self.collate_fn, )
         yield next_batch_data_loader
