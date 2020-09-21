@@ -1,8 +1,9 @@
+import copy
+
+import numpy as np
 import torch
 import torch.nn as nn
 import torch.nn.functional as F
-import numpy as np
-import copy
 
 '''Attention Is All You Need'''
 
@@ -12,6 +13,7 @@ class Config(object):
 
     def __init__(self):
         self.model_name = 'Transformer'
+        # torch.cuda.set_device(gpu)
         self.device = torch.device('cuda' if torch.cuda.is_available() else 'cpu')  # 设备
 
         self.dropout = 0.5  # 随机失活
@@ -27,10 +29,10 @@ class Config(object):
 
 
 class TransformerAttention(nn.Module):
-    def __init__(self):
+    def __init__(self, gpu):
         super(TransformerAttention, self).__init__()
         self.config = Config()
-        self.postion_embedding = Positional_Encoding(embed=32, pad_size=15, dropout=0.5, device=0)
+        self.postion_embedding = Positional_Encoding(embed=32, pad_size=15, dropout=0.5, device=gpu)
         self.encoder = Encoder(dim_model=32, num_head=1, hidden=512, dropout=0.5)
         self.encoders = nn.ModuleList([
             copy.deepcopy(self.encoder)
@@ -53,9 +55,9 @@ class TransformerAttention(nn.Module):
 
 
 class Transformer(nn.Module):
-    def __init__(self):
+    def __init__(self, gpu):
         super(Transformer, self).__init__()
-        self.postion_embedding = Positional_Encoding(embed=32, pad_size=15, dropout=0.5, device=0)
+        self.postion_embedding = Positional_Encoding(embed=32, pad_size=15, dropout=0.5, device=gpu)
         self.encoder = Encoder(dim_model=32, num_head=4, hidden=512, dropout=0.5)
         self.encoders = nn.ModuleList([
             copy.deepcopy(self.encoder)

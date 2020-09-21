@@ -118,7 +118,7 @@ class DAN(nn.Module):
             self.label_fc = nn.Linear(64, 2)
         else:  # 使用transformer 模型
 
-            self.label_classifier = TransformerAttention() if self.att else Transformer()
+            self.label_classifier = TransformerAttention(gpu=self.gpu) if self.att else Transformer(self.gpu)
             # self.attention_model = TransformerAttention()
             # self.label_fc = nn.Linear(768, 2)
 

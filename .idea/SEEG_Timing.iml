@@ -7,7 +7,7 @@
       <sourceFolder url="file://$MODULE_DIR$/mymodel" isTestSource="false" />
       <sourceFolder url="file://$MODULE_DIR$/baselines" isTestSource="false" />
     </content>
-    <orderEntry type="jdk" jdkName="Remote Python 3.6.9 (sftp://cbd109-3@219.228.60.91:22/home/cbd109-3/applications/anaconda3/envs/ching/bin/python3.6)" jdkType="Python SDK" />
+    <orderEntry type="jdk" jdkName="Remote Python 3.7.9 (sftp://yh@172.20.3.62:22/home/yh/anaconda3/envs/ching/bin/python3.7)" jdkType="Python SDK" />
     <orderEntry type="sourceFolder" forTests="false" />
   </component>
 </module>
