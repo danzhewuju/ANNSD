@@ -11,7 +11,7 @@ from util.util_tool import matrix_normalization
 import torch
 
 
-class SingleData:
+class SingleDataInfo:
     """
     单个文件的存储读取，用于验证
     """
