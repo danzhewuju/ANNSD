@@ -7,9 +7,10 @@
 # @Software: PyCharm
 # from data.generatedata import generate_data
 import random
+import sys
 
 from torch.autograd import Variable
-import sys
+
 sys.path.append('../')
 from util.seeg_utils import *
 from util.util_file import IndicatorCalculation
@@ -19,13 +20,8 @@ import os
 
 import torch
 import matplotlib.pyplot as plt
-import collections
 import numpy as np
 from util.seeg_utils import draw_seeg_picture
-import argparse
-from util.run_util import get_gpu_used
-import torch.nn as nn
-import re
 
 
 def softmax(x):
@@ -141,15 +137,15 @@ def test_7():
     print(auc)
 
 
+def test_8():
+    import argparse
+    parser = argparse.ArgumentParser()
+    parser.add_argument('-a', '--ale', type=int, default=1)
+    arg = parser.parse_args()
+    parser.add_argument('-b', '--ble', type=int, default=1111)
+    arg = parser.parse_args()
+    print(arg.ble)
+
+
 if __name__ == '__main__':
-    # test_7()
-    # prediction = list(range(100))
-    # ground_truth = prediction.copy()
-    # seed = time.time()
-    # random.seed(seed)
-    # random.shuffle(prediction)
-    # random.seed(seed)
-    # random.shuffle(ground_truth)
-    # print(prediction, ground_truth)
-    cal = IndicatorCalculation()
-    print(cal.get_accuracy([1, 1, 1, 0, 0, 0], [1, 1, 0, 1, 0, 0]))
+    print(test_8())

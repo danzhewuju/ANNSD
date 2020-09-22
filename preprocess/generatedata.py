@@ -7,13 +7,14 @@
 # @Software: PyCharm
 
 
-from util.seeg_utils import *
-import numpy as npo
+import json
 import os
+import re
+
 import pandas as pd
 from tqdm import tqdm
-import json
-import re
+
+from util.seeg_utils import *
 from util.util_tool import train_data_split
 
 

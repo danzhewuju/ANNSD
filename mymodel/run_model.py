@@ -1,17 +1,21 @@
-import torch
-from data_util import MyData
-from model_util import DAN, ContrastiveLoss
-import torch.nn as nn
-from tqdm import tqdm
+import collections
+import json
 import os
 import time
+
 import matplotlib.pyplot as plt
-from torchvision import transforms
-from PIL import Image
 import numpy as np
-from util.util_file import trans_numpy_cv2, IndicatorCalculation
-import collections
 import pandas as pd
+import torch
+import torch.nn as nn
+from PIL import Image
+from torchvision import transforms
+from tqdm import tqdm
+
+from data_util import MyData
+from model_util import DAN, ContrastiveLoss
+from util.seeg_utils import read_raw, re_sampling, select_channel_data_mne
+from util.util_file import trans_numpy_cv2, IndicatorCalculation
 
 
 class Dan:
@@ -320,14 +324,15 @@ class Dan:
 
     def save_all_input_prediction_result(self, ids_list, grand_true, prediction,
                                          save_path='../log/prediction_result.csv'):
-        '''
+        """
 
         :return: saving all files' prediction result
-        '''
+        """
         data = {'id': ids_list, 'grand true': grand_true, 'prediction': prediction}
         dataframe = pd.DataFrame(data)
         dataframe.to_csv(save_path)
         print('Saving success!')
+        return
 
     def evaluation(self, probability, y):
         '''
@@ -396,6 +401,30 @@ class Dan:
         self.log_write(result)
         if recoding:  # 如果开启了记录模式，模型会记录所有的文件的预测结果
             self.save_all_input_prediction_result(ids_list, grand_true, prediction)
+
+    def prediction_real_data(self, file_path, label, save_file, data_length, config_path):
+        """
+        :function 在实际的情况下的模型的准确率
+        :param file_path: 原始数据的文件路径
+        :param label: 文件的实际标签
+        :param save_file: 保存结果的文件路径
+        :param data_length: 设定的数据划分长度
+        :param config_path: 相关的配置文件的目录
+        :return:
+        """
+        with open(config_path, 'r') as f:
+            config = json.load(f)
+        data = read_raw(file_path)
+        data = re_sampling(data, fz=500)  # 对于数据进行重采样
+        key = "{}_data_path".format(self.patient)
+        channel_path = config[key]["data_channel_path"]  # 获取相关的保存位置信息
+        channel_name = pd.read_csv(channel_path)
+        channels_name = list(channel_name['chan_name'])
+        data = select_channel_data_mne(data, channels_name)
+
+        data, _ = data[:, :]  # 获取原始数据的形式
+        label_dict = {'pre_seizure': 1, 'non_seizure': 0}
+        label = label_dict[label]  # 获取标签
 
     def save_attention_matrix(self, attention_matrix, ids, result, save_dir='../log/attention'):
         '''

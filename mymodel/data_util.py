@@ -24,7 +24,7 @@ class SingleDataInfo:
         """
         self.dict_label = {"pre_seizure": 1, "non_seizure": 0}
         self.input = data  # 数据源
-        self.label = label  # 数据标签
+        self.label = self.dict_label[label]  # 数据标签
         self.resampling = 500  # 系统自带的采样频率
         length = self.data.shape[-1]  # 数据的长度
         time_info = []  # 用保存截取数据的时间位置信息
@@ -32,6 +32,29 @@ class SingleDataInfo:
             start, end = i * self.resampling * data_length, (i + 1) * self.resampling * data_length
             time_info.append((start, end))
         self.time_info = time_info
+
+
+class SingleDataset(Dataset):
+    # 重写单个样本的 dataset
+    def __init__(self, data, time_info, label):
+        self.data = data
+        self.time_info = time_info
+        self.label = label
+
+    def __getitem__(self, item):
+        start, end = self.time_info[item][0], self.time_info[item][1]
+        data = self.data[:, start:end]
+        result = matrix_normalization(data, (100, -1))
+        result = result.astype('float32')
+        result = result[np.newaxis, :]
+        return result, self.label
+
+    def __len__(self):
+        """
+        数据的长度
+        :return:
+        """
+        return len(self.time_info)
 
 
 class DataInfo:

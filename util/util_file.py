@@ -51,7 +51,7 @@ def get_all_file_path(path, suffix='fif'):  # 主要是获取某文件夹下面�
     return file_map
 
 
-def matrix_normalization(data, resize_shape=(130, 200)):
+def matrix_normalization(data, resize_shape=(130, -1)):
     '''
     矩阵的归一化，主要是讲不通形状的矩阵变换为特定形状的矩阵, 矩阵的归一化主要是更改序列
     也就是主要更改行

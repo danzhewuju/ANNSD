@@ -64,8 +64,10 @@ def run():
         dan_train.train()
     elif model == 'test':
         dan_train.test(recoding=rec)
-    elif model == 'attention':
+    elif model == 'attention':  # 需要计算attention的值
         dan_train.test_attention()
+    elif model == 'prediction':  # 单个样本的预测模型
+
 
 
 if __name__ == '__main__':
