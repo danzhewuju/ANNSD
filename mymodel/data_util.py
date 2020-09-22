@@ -11,7 +11,26 @@ from util.util_tool import matrix_normalization
 import torch
 
 
+class SingleData:
+    """
+    单个文件的存储读取，用于验证
+    """
+
+    def __init__(self, data, label):
+        """
+        :param file_path: 文件的名称
+        :param label:  文件的标签
+        """
+        self.dict_label = {"pre_seizure": 1, "non_seizure": 0}
+        self.data = data  # 数据源
+        self.label = label  # 数据标签
+
+
 class DataInfo:
+    """
+    用于模型训练的分段信息
+    """
+
     def __init__(self, path_data):
         self.dict_label = {"pre_seizure": 1, "non_seizure": 0}
         self.dict_domain = {'BDP': 0, 'LK': 1, 'SYF': 2, 'WSH': 3, 'ZK': 4}
@@ -73,7 +92,7 @@ class MyDataset(Dataset):  # 重写dateset的相关类
 
 class MyData:
     def __init__(self, path_train, path_test, path_val, path_att=None, batch_size=16, few_shot=True,
-                 few_shot_ratio=0.25):
+                 few_shot_ratio=0.2):
         """
 
         :param path_train: 训练集数据的路径

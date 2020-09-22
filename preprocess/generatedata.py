@@ -36,11 +36,11 @@ class GenData:
         return res
 
     def input_data(self, data_path, channel_path):
-        '''
-
+        """
+        对于输入的数据进行预处理
         :param data_path: 数据的输入处理
         :return:
-        '''
+        """
         data = read_raw(data_path)
         data = re_sampling(data, fz=500)  # 对于数据进行重采样
         channel_name = pd.read_csv(channel_path)

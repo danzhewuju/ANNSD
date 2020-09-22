@@ -1,10 +1,11 @@
-import numpy as np
-import os
-import collections
-import pandas as pd
-import re
-from matplotlib import pyplot as plt
 import argparse
+import collections
+import os
+import re
+
+import numpy as np
+import pandas as pd
+from matplotlib import pyplot as plt
 
 
 class Information:
@@ -41,7 +42,7 @@ class Information:
         self.draw_plt_bar(dict(res), 'Time(s)', 'Count')
         return dict(res)
 
-    def create_attention_csv(self, file_name='../preprocess/attention_BDP.csv', time=(340, 400), # 选出符合条件范围的测试用例
+    def create_attention_csv(self, file_name='../preprocess/attention_BDP.csv', time=(340, 400),  # 选出符合条件范围的测试用例
                              test_file='../preprocess/test_BDP.csv'):
         test_data = pd.read_csv(test_file)
         path = test_data['path'].tolist()
@@ -96,9 +97,9 @@ if __name__ == '__main__':
     args = parse.parse_args()
     cac, cai, cp = args.create_attention_csv, args.calculate_attention_info, args.calculation_prediction
     if cac:
-        info.create_attention_csv() # 选出符合条件范围的测试用例
+        info.create_attention_csv()  # 选出符合条件范围的测试用例
     if cai:
-        print(info.calculate_attention_info()) # 计算attention的信息
+        print(info.calculate_attention_info())  # 计算attention的信息
     if cp:
         print(info.calculation_prediction())  # 计算预测的结果
 
