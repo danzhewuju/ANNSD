@@ -16,14 +16,22 @@ class SingleData:
     单个文件的存储读取，用于验证
     """
 
-    def __init__(self, data, label):
+    def __init__(self, data, label, data_length):
         """
         :param file_path: 文件的名称
         :param label:  文件的标签
+        :param data_length: 设置的数据长度
         """
         self.dict_label = {"pre_seizure": 1, "non_seizure": 0}
-        self.data = data  # 数据源
+        self.input = data  # 数据源
         self.label = label  # 数据标签
+        self.resampling = 500  # 系统自带的采样频率
+        length = self.data.shape[-1]  # 数据的长度
+        time_info = []  # 用保存截取数据的时间位置信息
+        for i in range(length // (self.resampling * data_length)):
+            start, end = i * self.resampling * data_length, (i + 1) * self.resampling * data_length
+            time_info.append((start, end))
+        self.time_info = time_info
 
 
 class DataInfo:
