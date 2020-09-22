@@ -67,9 +67,6 @@ def run():
     elif model == 'attention':  # 需要计算attention的值
         dan_train.test_attention()
     elif model == 'prediction':  # 单个样本的预测模型
-        return
-
-        return
 
 
 
