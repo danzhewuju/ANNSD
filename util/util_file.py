@@ -4,23 +4,22 @@
 #  以及常见的文件存储的方法
 # ---------------------------------
 import glob
+import math
 import os
 import random
+import smtplib
+import time
+from collections import Counter
+from email.header import Header
+from email.mime.text import MIMEText
 
 import cv2
-import numpy as np
-from sklearn import metrics
-import smtplib
-from email.mime.text import MIMEText
-from email.header import Header
-from dtw import dtw
-import math
-from scipy.fftpack import fft, ifft
 import matplotlib.pyplot as plt
-from collections import Counter
+import numpy as np
+from dtw import dtw
+from scipy.fftpack import fft
 from scipy.stats import wasserstein_distance
-import time
-import torch
+from sklearn import metrics
 
 
 def sigmoid(x):
@@ -439,7 +438,7 @@ def histogram_spectrum(data, file_pass=10):
 class LogRecord:
 
     @staticmethod
-    def write_log(log_txt, log_path="/home/cbd109-3/Users/data/yh/Program/Python/SEEG/log/Running_result.txt"):
+    def write_log(log_txt, log_path="../log/Running_result.txt"):
         base_dir = os.path.dirname(log_path)
         if not os.path.exists(base_dir):
             os.makedirs(base_dir)
@@ -451,6 +450,9 @@ class LogRecord:
         result = "{}\t{}\n".format(log_txt, time_now)
         f.write(result)
         f.close()
+        print(log_txt)
+        print("generate log message!")
+        return
 
 
 def linear_matrix_normalization(M):

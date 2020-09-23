@@ -2,10 +2,14 @@ import argparse
 import collections
 import os
 import re
+import sys
 
+sys.path.append('../')
 import numpy as np
 import pandas as pd
 from matplotlib import pyplot as plt
+
+from util.util_file import IndicatorCalculation, LogRecord
 
 
 class Information:
@@ -87,22 +91,63 @@ class Information:
         self.draw_plt_bar(acc_info, x_laebl='Time(min)', y_label='Accuracy')
         return acc_info
 
+    @staticmethod
+    def calculation_index(file_path, log_file, patient):
+        """
+        # 用于计算指定指定文件预测的各种指标
+        :param file_path 文件的路径，分析病人的指标
+        """
+        data = pd.read_csv(file_path)
+        data.sort_values(by='id', ascending=True, inplace=True)
+        id_list = data['id'].tolist()
+        ground_true = data['ground truth'].tolist()
+        prediction = data['prediction'].tolist()
+        cal = IndicatorCalculation(prediction, ground_true)
+        Accuracy, Precision, Recall, F1score, AUC = cal.get_accuracy(), cal.get_precision(), cal.get_recall(), cal.get_f1score(), cal.get_auc()
+        result = "Patient:{}|DataSize:{}|Acuracy:{:.6f}|Precision:{:.6f}|Recall:{:.6f}|F1score:{:.6f}| AUC:{:.6f}".format(
+            patient,
+            len(
+                id_list),
+            Accuracy,
+            Precision,
+            Recall,
+            F1score, AUC)
+        LogRecord.write_log(result, log_file)
+        return
 
-if __name__ == '__main__':
-    info = Information()
+
+def menu():
     parse = argparse.ArgumentParser()
     parse.add_argument('-cac', '--create_attention_csv', type=bool, default=False)
     parse.add_argument('-cai', '--calculate_attention_info', type=bool, default=True)
     parse.add_argument('-cp', '--calculation_prediction', type=bool, default=True)
+    parse.add_argument('-m', '--model', type=str, default='analysis', help="Analysis data information ")
+    parse.add_argument('-fp', '--file_path', type=str, help="Analysis file path")
+    parse.add_argument('-p', '--patient', type=str, help="Patient name")
+    parse.add_argument('-lf', '--log_file', type=str, help="Log file", default='../log/log.txt')
     args = parse.parse_args()
-    cac, cai, cp = args.create_attention_csv, args.calculate_attention_info, args.calculation_prediction
-    if cac:
-        info.create_attention_csv()  # 选出符合条件范围的测试用例
-    if cai:
-        print(info.calculate_attention_info())  # 计算attention的信息
-    if cp:
-        print(info.calculation_prediction())  # 计算预测的结果
+    info = Information()
 
-    # info.create_attention_csv()   # 选出符合条件范围的测试用例
-    # print(info.calculate_attention_info()) # 计算attention的信息
-    # print(info.calculation_prediction())  # 计算预测的结果
+    cac, cai, cp = args.create_attention_csv, args.calculate_attention_info, args.calculation_prediction
+    model = args.model
+
+    if model == 'analysis':
+        file_path = args.file_path
+        log_file = args.log_file
+        patient = args.patient
+        Information.calculation_index(file_path, log_file, patient)
+    else:
+        if cac:
+            info.create_attention_csv()  # 选出符合条件范围的测试用例
+        if cai:
+            print(info.calculate_attention_info())  # 计算attention的信息
+        if cp:
+            print(info.calculation_prediction())  # 计算预测的结果
+
+
+if __name__ == '__main__':
+    menu()
+
+# info.create_attention_csv()   # 选出符合条件范围的测试用例
+# print(info.calculate_attention_info()) # 计算attention的信息
+# print(info.calculation_prediction())  # 计算预测的结果
