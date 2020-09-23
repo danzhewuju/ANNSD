@@ -47,7 +47,7 @@ class SingleDataset(Dataset):
         result = matrix_normalization(data, (100, -1))
         result = result.astype('float32')
         result = result[np.newaxis, :]
-        return result, self.label
+        return result, self.label, self.time_info[item]
 
     def __len__(self):
         """
@@ -122,7 +122,7 @@ class MyDataset(Dataset):  # 重写dateset的相关类
 
 
 class MyData:
-    def __init__(self, path_train, path_test, path_val, path_att=None, batch_size=16, few_shot=True,
+    def __init__(self, path_train=None, path_test=None, path_val=None, path_att=None, batch_size=16, few_shot=True,
                  few_shot_ratio=0.2):
         """
 
@@ -187,7 +187,9 @@ class MyData:
             data_info = DataInfo(self.path_att)
             dataset = MyDataset(data_info.data, transform=transform)
             dataloader = DataLoader(dataset, batch_size=self.batch_size, shuffle=False, collate_fn=self.collate_fn)
+
         return dataloader
+
 
     def next_batch_val_data(self, transform):
         data_info = DataInfo(self.path_val)

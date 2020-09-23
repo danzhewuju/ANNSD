@@ -67,7 +67,20 @@ def run():
     elif model == 'attention':  # 需要计算attention的值
         dan_train.test_attention()
     elif model == 'prediction':  # 单个样本的预测模型
+        parser.add_argument('-fp', '--file_path', type=str, default=False,
+                            help='Testing file path')
+        parser.add_argument('-ts', '--test_seizure', type=str, default='pre_seizure',
+                            help='Seizure status, Please input: pre_seizure or non_seizure')
+        parser.add_argument('-dl', '--data_length', type=int, default=15, help='data length of segment')
+        parser.add_argument('-cp', '--config_path', type=str, default='../preprocess/config/config.json',
+                            help='config file path')
+        parser.add_argument('-sf', '--save_file', type=str, default='../log/{}_prediction_result.csv',
+                            help='save file path')
+        args = parser.parse_args()
+        file_path, label, save_file, data_length, config_path = args.file_path, args.test_seizure, args.data_length, args.config_path, args.save_file
+        dan_train.prediction_real_data(file_path, label, save_file, data_length, config_path)
 
+    return
 
 
 if __name__ == '__main__':

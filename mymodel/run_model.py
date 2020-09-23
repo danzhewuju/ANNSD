@@ -9,10 +9,11 @@ import pandas as pd
 import torch
 import torch.nn as nn
 from PIL import Image
+from torch.utils.data import DataLoader
 from torchvision import transforms
 from tqdm import tqdm
 
-from data_util import MyData
+from data_util import MyData, SingleDataInfo, SingleDataset
 from model_util import DAN, ContrastiveLoss
 from util.seeg_utils import read_raw, re_sampling, select_channel_data_mne
 from util.util_file import trans_numpy_cv2, IndicatorCalculation
@@ -284,7 +285,7 @@ class Dan:
 
     def segment_statistic(self, prey, y, length):
         '''
-        模型分段预测的情况
+        模型分段预测的情况,针对不同长长度的分段数据
         :param prey: 预测的标签
         :param y: 实际的标签
         :param length: 输入的长度
@@ -391,7 +392,6 @@ class Dan:
                 probability += [float(x) for x in torch.softmax(label_output, dim=1)[:, 1]]
                 self.segment_statistic(prey, y, length.cpu())
         loss_avg = sum(loss) / len(loss)
-        accuracy_avg = sum(acc) / len(acc)
         res = self.evaluation(probability, grand_true)
 
         result = "Encoder:{}|Label classifier {}|Patient {}|Data size:{}| test loss:{:.6f}| Accuracy:{:.5f} | Precision:" \
@@ -404,7 +404,7 @@ class Dan:
 
     def prediction_real_data(self, file_path, label, save_file, data_length, config_path):
         """
-        :function 在实际的情况下的模型的准确率
+        :function 在实际的情况下的模型的准确率,单个文件的预测结果
         :param file_path: 原始数据的文件路径
         :param label: 文件的实际标签
         :param save_file: 保存结果的文件路径
@@ -412,6 +412,7 @@ class Dan:
         :param config_path: 相关的配置文件的目录
         :return:
         """
+        label_dict = {'pre_seizure': 1, 'non_seizure': 0}
         with open(config_path, 'r') as f:
             config = json.load(f)
         data = read_raw(file_path)
@@ -423,8 +424,34 @@ class Dan:
         data = select_channel_data_mne(data, channels_name)
 
         data, _ = data[:, :]  # 获取原始数据的形式
-        label_dict = {'pre_seizure': 1, 'non_seizure': 0}
-        label = label_dict[label]  # 获取标签
+        single_data_info = SingleDataInfo(data, label, data_length=data_length)
+        # 由单个文件构成的数据集
+        single_dataset = SingleDataset(single_data_info.input, single_data_info.time_info, single_data_info.label)
+        dataloader = DataLoader(single_dataset, batch_size=self.batch_size, shuffle=False)
+
+        ids_list, prediction, probability = [], [], []
+        label_int = label_dict[label]
+        loss_func = nn.CrossEntropyLoss()
+        for step, (x, y, time_) in enumerate(tqdm(dataloader)):
+            if self.gpu >= 0:
+                x, y = x.cuda(self.gpu), y.cuda(self.gpu)
+            with torch.no_grad():
+                label_output = self.model(x, y, None, data_length)
+                prey = torch.max(label_output, 1)[1].data.cpu()
+                ids_list += ["{}_{}_{}_{}".format(file_path, self.patient, label, t[0]) for t in time_]
+                prediction += [int(x) for x in prey]
+                probability += [1 if x == label_int else 0 for x in prediction]
+
+        accuracy = sum(probability) / len(probability)
+        log = "Encoder:{}|Label classifier {}|Patient {}|Data size:{}| Accuracy:{:.5f}".format(
+            self.encoder_name, self.label_classifier_name, self.patient, len(dataloader), len(accuracy))
+        self.log_write(log)
+
+        result = {'id': ids_list, 'ground truth': [label_int] * len(dataloader), 'prediction': prediction}
+        dataframe = pd.DataFrame(result)
+        dataframe.to_csv(save_file, index=False, mode='a')
+        print("All information has been save in {}".format(save_file))
+        return None
 
     def save_attention_matrix(self, attention_matrix, ids, result, save_dir='../log/attention'):
         '''

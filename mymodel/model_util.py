@@ -1,11 +1,12 @@
-import torch.nn as nn
-from torch.autograd import Function
-import torch
-import torch.nn.functional as F
 import random
-from Transformer import Transformer, TransformerAttention
-from util.util_file import linear_matrix_normalization
 import sys
+
+import torch
+import torch.nn as nn
+import torch.nn.functional as F
+from torch.autograd import Function
+
+from Transformer import Transformer, TransformerAttention
 
 sys.path.append('../')
 
