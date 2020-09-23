@@ -412,6 +412,8 @@ class Dan:
         :param config_path: 相关的配置文件的目录
         :return:
         """
+        self.load_model()  # 加载模型 加载模型
+        resampling = 500
         label_dict = {'pre_seizure': 1, 'non_seizure': 0}
         with open(config_path, 'r') as f:
             config = json.load(f)
@@ -423,8 +425,8 @@ class Dan:
         channels_name = list(channel_name['chan_name'])
         data = select_channel_data_mne(data, channels_name)
 
-        data, _ = data[:, :]  # 获取原始数据的形式
-        single_data_info = SingleDataInfo(data, label, data_length=data_length)
+        new_data, _ = data[:, :]  # 获取原始数据的形式
+        single_data_info = SingleDataInfo(new_data, label, data_length=data_length)
         # 由单个文件构成的数据集
         single_dataset = SingleDataset(single_data_info.input, single_data_info.time_info, single_data_info.label)
         dataloader = DataLoader(single_dataset, batch_size=self.batch_size, shuffle=False)
@@ -436,20 +438,24 @@ class Dan:
             if self.gpu >= 0:
                 x, y = x.cuda(self.gpu), y.cuda(self.gpu)
             with torch.no_grad():
-                label_output = self.model(x, y, None, data_length)
+                inputlength = [data_length * resampling] * len(x)
+                label_output = self.model(x, y, None, inputlength)
                 prey = torch.max(label_output, 1)[1].data.cpu()
-                ids_list += ["{}_{}_{}_{}".format(file_path, self.patient, label, t[0]) for t in time_]
+
+                ids_list += ["{}_{}_{}_{}".format(os.path.basename(file_path), self.patient, label, t // resampling) for
+                             t in time_[0]]
                 prediction += [int(x) for x in prey]
-                probability += [1 if x == label_int else 0 for x in prediction]
-
+        probability += [1 if t == label_int else 0 for t in prediction]
         accuracy = sum(probability) / len(probability)
-        log = "Encoder:{}|Label classifier {}|Patient {}|Data size:{}| Accuracy:{:.5f}".format(
-            self.encoder_name, self.label_classifier_name, self.patient, len(dataloader), len(accuracy))
+        log = "Encoder:{}|Label classifier {}|Patient {}|Data size:{}|Real data|Accuracy:{:.5f}".format(
+            self.encoder_name, self.label_classifier_name, self.patient, len(probability), accuracy)
         self.log_write(log)
-
-        result = {'id': ids_list, 'ground truth': [label_int] * len(dataloader), 'prediction': prediction}
+        # 文件日志的写入
+        result = {'id': ids_list, 'ground truth': [label_int] * len(prediction), 'prediction': prediction}
         dataframe = pd.DataFrame(result)
-        dataframe.to_csv(save_file, index=False, mode='a')
+        header = True if not os.path.exists(save_file) else False # 判断文件在不在
+        dataframe.to_csv(save_file, index=False, mode='a', header=header)
+
         print("All information has been save in {}".format(save_file))
         return None
 

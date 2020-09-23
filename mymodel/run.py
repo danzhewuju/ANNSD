@@ -20,7 +20,7 @@ def run():
     parser.add_argument('-atp', '--attention_path', type=str, default="../preprocess/attention_{}.csv",
                         help='attention data path')
     parser.add_argument('-p', '--patient', type=str, default="BDP", help='patient name')
-    parser.add_argument('-m', '--model', type=str, default="test", help='style of train')
+    parser.add_argument('-m', '--model', type=str, default="prediction", help='style of train')
     parser.add_argument('-few', '--few_show_learning', type=bool, default=True, help='keep few shot learning open')
     parser.add_argument('-fr', '--few_show_learning_ratio', type=float, default=0.2, help='few shot learning ratio')
     parser.add_argument('-em', '--embedding', type=str, default="cnn", help='method of embedding')
@@ -29,6 +29,18 @@ def run():
     parser.add_argument('-chp', '--check_point', type=bool, default=False, help='Whether to continue training')
     parser.add_argument('-att', '--attention_matrix', type=bool, default=False, help='Whether to get attention matrix')
     parser.add_argument('-rec', '--recoding', type=bool, default=False, help='Whether to recode result for every file')
+    # -------------------------------------------单文件测试模块----------------------------------------------------------
+    parser.add_argument('-fp', '--file_path', type=str,
+                        default="/data/yh/dataset/raw_data/BDP/BDP_Pre_seizure/BDP_SZ1_pre_seizure_raw.fif",
+                        help='Testing file path')
+    parser.add_argument('-ts', '--test_seizure', type=str, default='pre_seizure',
+                        help='Seizure status, Please input: pre_seizure or non_seizure')
+    parser.add_argument('-dl', '--data_length', type=int, default=15, help='data length of segment')
+    parser.add_argument('-cp', '--config_path', type=str, default='../preprocess/config/config.json',
+                        help='config file path')
+    parser.add_argument('-sf', '--save_file', type=str, default='../log/{}_prediction_result.csv',
+                        help='save file path')
+    # ---------------------------------------------------------------------------------------------------------------
 
     args = parser.parse_args()
 
@@ -67,17 +79,9 @@ def run():
     elif model == 'attention':  # 需要计算attention的值
         dan_train.test_attention()
     elif model == 'prediction':  # 单个样本的预测模型
-        parser.add_argument('-fp', '--file_path', type=str, default=False,
-                            help='Testing file path')
-        parser.add_argument('-ts', '--test_seizure', type=str, default='pre_seizure',
-                            help='Seizure status, Please input: pre_seizure or non_seizure')
-        parser.add_argument('-dl', '--data_length', type=int, default=15, help='data length of segment')
-        parser.add_argument('-cp', '--config_path', type=str, default='../preprocess/config/config.json',
-                            help='config file path')
-        parser.add_argument('-sf', '--save_file', type=str, default='../log/{}_prediction_result.csv',
-                            help='save file path')
-        args = parser.parse_args()
-        file_path, label, save_file, data_length, config_path = args.file_path, args.test_seizure, args.data_length, args.config_path, args.save_file
+
+        file_path, label, save_file, data_length, config_path = args.file_path, args.test_seizure, args.save_file, args.data_length, args.config_path
+        save_file = save_file.format(patient)
         dan_train.prediction_real_data(file_path, label, save_file, data_length, config_path)
 
     return

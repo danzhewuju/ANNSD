@@ -26,7 +26,7 @@ class SingleDataInfo:
         self.input = data  # 数据源
         self.label = self.dict_label[label]  # 数据标签
         self.resampling = 500  # 系统自带的采样频率
-        length = self.data.shape[-1]  # 数据的长度
+        length = self.input.shape[-1]  # 数据的长度
         time_info = []  # 用保存截取数据的时间位置信息
         for i in range(length // (self.resampling * data_length)):
             start, end = i * self.resampling * data_length, (i + 1) * self.resampling * data_length
@@ -189,7 +189,6 @@ class MyData:
             dataloader = DataLoader(dataset, batch_size=self.batch_size, shuffle=False, collate_fn=self.collate_fn)
 
         return dataloader
-
 
     def next_batch_val_data(self, transform):
         data_info = DataInfo(self.path_val)
