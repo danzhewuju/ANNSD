@@ -290,8 +290,7 @@ class IndicatorCalculation:  # 包含二分类中各种指标
         if prediction is not None and ground_truth is not None:
             self.prediction = prediction
             self.ground_truth = ground_truth
-        return self.__fp()/(self.__fp()+self.__tn())
-
+        return self.__fp() / (self.__fp() + self.__tn())
 
     def get_recall(self, prediction=None, ground_truth=None):
         if prediction is not None and ground_truth is not None:

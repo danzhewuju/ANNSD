@@ -360,6 +360,7 @@ class Dan:
         result['recall'] = cal.get_recall()
         result['f1score'] = cal.get_f1score()
         result['auc'] = cal.get_auc(probability, y)
+        result['far'] = cal.get_far()
         return result
 
     def test(self, recoding=False):
@@ -405,9 +406,9 @@ class Dan:
         res = self.evaluation(probability, grand_true)
 
         result = "Encoder:{}|Label classifier {}|Patient {}|Data size:{}| test loss:{:.6f}| Accuracy:{:.5f} | Precision:" \
-                 "{:.5f}| Recall:{:.5f}| F1score:{:.5f}| AUC:{:.5f}".format(
+                 "{:.5f}| Recall:{:.5f}| F1score:{:.5f}| AUC:{:.5f}| FAR:{:.5f}".format(
             self.encoder_name, self.label_classifier_name, self.patient, len(acc), loss_avg, res['accuracy'],
-            res['precision'], res['recall'], res['f1score'], res['auc'])
+            res['precision'], res['recall'], res['f1score'], res['auc'], res['far'])
         self.log_write(result)
         if recoding:  # 如果开启了记录模式，模型会记录所有的文件的预测结果
             self.save_all_input_prediction_result(ids_list, grand_true, prediction)
@@ -463,7 +464,7 @@ class Dan:
         # 文件日志的写入
         result = {'id': ids_list, 'ground truth': [label_int] * len(prediction), 'prediction': prediction}
         dataframe = pd.DataFrame(result)
-        header = True if not os.path.exists(save_file) else False # 判断文件在不在
+        header = True if not os.path.exists(save_file) else False  # 判断文件在不在
         dataframe.to_csv(save_file, index=False, mode='a', header=header)
 
         print("All information has been save in {}".format(save_file))
