@@ -86,6 +86,7 @@ class Dan:
     def draw_loss_plt(self, *args, **kwargs):
         # 画出train或者test过程中的loss曲线
         loss_l, loss_d, loss_t, acc = kwargs['loss_l'], kwargs['loss_d'], kwargs['loss_t'], kwargs['acc']
+        loss_vae = None
         if 'loss_vae' in kwargs.keys():
             loss_vae = kwargs['loss_vae']
         plot_save_path = kwargs['save_path']
@@ -163,6 +164,8 @@ class Dan:
         test_loss_vae_vi = []
 
         last_test_accuracy = 0
+        last_test_f1 = 0
+        cal = IndicatorCalculation()
         with tqdm(total=self.epoch * len(train_data_loader)) as pbar:
             for epoch in tqdm(range(self.epoch)):
 
@@ -203,6 +206,7 @@ class Dan:
                         if self.encoder_name == 'vae': loss_vae_vi.append(loss_vae.data.cpu())
 
                         acc_test, test_loss = [], []
+                        ground_test, prediction = [], []
                         for x_test, label_test, domain_test, length_test, _ in next(
                                 mydata.next_batch_val_data(transform=None)):
                             # x_test = linear_matrix_normalization(x_test)
@@ -229,6 +233,8 @@ class Dan:
                                 pre_y_test = torch.max(label_output_test, 1)[1].data
                                 acc_test += [1 if pre_y_test[i] == y_test[i] else 0 for i in range(len(y_test))]
                                 test_loss.append(loss_total.data.cpu())
+                                ground_test += y_test
+                                prediction += pre_y_test
                         # 测试集的数据可视化的整理
 
                         test_loss_vi.append(loss_total.data.cpu())
@@ -245,16 +251,20 @@ class Dan:
                         acc_vi.append(accuracy_avg)
                         test_acc_vi.append(test_accuracy_avg)
 
+                        # 测试级效果
+                        cal.set_values(prediction, ground_test)
+                        f1_tmp = cal.get_f1score()
+
                         print(
-                            'Epoch:{} | Step:{} | train loss:{:.6f} | val loss:{:.6f} | train accuracy:{:.5f} | val accuracy:{:.5f}'.format(
-                                epoch, step, loss_avg, test_loss_avg, accuracy_avg, test_accuracy_avg))
+                            'Epoch:{} | Step:{} | train loss:{:.6f} | val loss:{:.6f} | train accuracy:{:.5f} | val accuracy:{:.5f}| val f1score:{:.5f}'.format(
+                                epoch, step, loss_avg, test_loss_avg, accuracy_avg, test_accuracy_avg, f1_tmp))
                         acc.clear()
                         loss.clear()
-                        if last_test_accuracy == 1:
-                            last_test_accuracy = 0
-                        if last_test_accuracy <= test_accuracy_avg:
+                        if last_test_f1 == 1:
+                            last_test_f1 = 0
+                        if last_test_f1 <= f1_tmp:
                             self.save_mode()  # 保存较好的模型
-                            last_test_accuracy = test_accuracy_avg
+                            last_test_f1 = f1_tmp
                     pbar.update(1)
 
         if self.encoder_name == 'vae':
@@ -338,7 +348,7 @@ class Dan:
     def evaluation(self, probability, y):
         '''
         评价指标的计算
-        :param prey: 预测的结果
+        :param probability: 预测的结果
         :param y:    实际的结果
         :return:  返回各个指标是的结果
         '''
@@ -355,7 +365,7 @@ class Dan:
     def test(self, recoding=False):
         '''
 
-        :param recodeing: 是否将每一个样本的预测结果记录下来
+        :param recoding: 是否将每一个样本的预测结果记录下来
         :return:
         '''
         self.load_model()  # 加载模型
