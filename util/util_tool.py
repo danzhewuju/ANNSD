@@ -26,7 +26,7 @@ def train_data_split(patient_name="BDP", data_info_path="../preprocess/data_info
     '''
 
     data = pd.read_csv(data_info_path, sep=',')
-    ratio = 0.7
+    ratio = 0.8
     test = {'path': [], 'label': [], 'patient': []}
     paths = data['path']
     label = data['label']
