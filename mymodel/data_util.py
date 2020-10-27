@@ -4,7 +4,7 @@ import sys
 
 import numpy as np
 import pandas as pd
-from torch.utils.data import Dataset, DataLoader
+from torch.utils.data import Dataset, DataLoader, WeightedRandomSampler
 
 sys.path.append('../')
 from util.util_tool import matrix_normalization
@@ -47,7 +47,7 @@ class SingleDataset(Dataset):
         result = matrix_normalization(data, (100, -1))
         result = result.astype('float32')
         result = result[np.newaxis, :]
-        return result, self.label, self.time_info[item]
+        return result, self.time_info[item], self.label
 
     def __len__(self):
         """
@@ -71,7 +71,7 @@ class DataInfo:
         domain = data['patient'].tolist()
         self.data = []
         for i in range(len(data_path)):
-            self.data.append((data_path[i], self.dict_label[label[i]], self.dict_domain[domain[i]]))
+            self.data.append((data_path[i], self.dict_domain[domain[i]], self.dict_label[label[i]]))
         self.data_length = len(self.data)
 
     def few_shot_learning_sampling(self, ratio=0.2):
@@ -105,7 +105,7 @@ class MyDataset(Dataset):  # 重写dateset的相关类
         self.target_transform = target_transform
 
     def __getitem__(self, index):
-        fn, label, domain = self.data[index]
+        fn, domain, label = self.data[index]
         data = np.load(fn)
         # 获得该数据的
         id_ = os.path.basename(fn).split('.')[0]
@@ -115,7 +115,7 @@ class MyDataset(Dataset):  # 重写dateset的相关类
         result = result.astype('float32')
         result = result[np.newaxis, :]
         # result = trans_data(vae_model, result)
-        return result, label, domain, id_
+        return result, domain, id_, label
 
     def __len__(self):
         return len(self.data)
@@ -123,7 +123,7 @@ class MyDataset(Dataset):  # 重写dateset的相关类
 
 class MyData:
     def __init__(self, path_train=None, path_test=None, path_val=None, path_att=None, batch_size=16, few_shot=True,
-                 few_shot_ratio=0.2):
+                 few_shot_ratio=0.2, isUnbalance=1):
         """
 
         :param path_train: 训练集数据的路径
@@ -139,6 +139,7 @@ class MyData:
         self.batch_size = batch_size
         self.few_shot = few_shot
         self.few_shot_ratio = few_shot_ratio
+        self.isUnbalance = isUnbalance
 
     def collate_fn(self, data):  #
         """
@@ -153,7 +154,7 @@ class MyData:
         length = []  # 记录真实的数目长度
         domains = []
         ids = []  # 记录序列的 id
-        for i, (d, label, patient, id_) in enumerate(data):
+        for i, (d, patient, id_, label) in enumerate(data):
             reshape = d.shape
             length.append(d.shape[-1])
             if reshape[-1] < max_shape[-1]:
@@ -178,7 +179,18 @@ class MyData:
                 few_shot_learning_list = data_info_test.few_shot_learning_sampling(ratio=self.few_shot_ratio)
                 data_info.data += few_shot_learning_list  # 将数据加载到模型进行训练
             dataset = MyDataset(data_info.data, transform=transform)
-            dataloader = DataLoader(dataset, batch_size=self.batch_size, shuffle=True, collate_fn=self.collate_fn)
+
+            # 因为样本的数目不均衡，需要进行不均衡采样
+            # 需要计算每一个样本的权重值
+
+            if self.isUnbalance > 1:
+                weight = [self.isUnbalance if data_info.data[i][-1] == 1 else 1 for i in range(len(data_info.data))]
+                sampler = WeightedRandomSampler(weight, len(dataset), replacement=True)
+                dataloader = DataLoader(dataset, sampler=sampler, batch_size=self.batch_size,
+                                        collate_fn=self.collate_fn)
+            else:
+                dataloader = DataLoader(dataset, shuffle=True, batch_size=self.batch_size, collate_fn=self.collate_fn)
+
         elif mode == 'test':  # test
             data_info = DataInfo(self.path_test)
             dataset = MyDataset(data_info.data, transform=transform)

@@ -82,7 +82,7 @@ class CNNEncoder(nn.Module):
 
 class DAN(nn.Module):
     def __init__(self, input_shape=(100, 500), c_dim=32, gpu=0, resampling=500, model='train', encoder_name='vae',
-                 label_classifier_name='lstm', att=False):
+                 label_classifier_name='lstm', att=False, isUnbalance=True):
         '''
 
         :param c_dim:  表示的是encoder的输出,同时也是预测网络和对抗网络的输出
@@ -97,6 +97,7 @@ class DAN(nn.Module):
         self.encoder_name = encoder_name
         self.label_classifier_name = label_classifier_name
         self.att = att  # 目前是有transformer 模型支持attention 机制
+        self.isUnbalance = isUnbalance  # 是否是平衡的数据集
         if encoder_name == 'vae':  # 使用vae作为编码器
             self.encoder = VAE(input_shape, c_dim=c_dim)  # 注意此时的训练方式，是将前一个的编码方式和我下一个的编码方式进行交叉求和
 

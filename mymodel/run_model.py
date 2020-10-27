@@ -20,10 +20,8 @@ from util.util_file import trans_numpy_cv2, IndicatorCalculation
 
 
 class Dan:
-    def __init__(self, patient, epoch=10, bath_size=16, lr=0.001, gpu=0, train_path=None, test_path=None, val_path=None,
-                 att_path=None,
-                 model='train', encoder_name='cnn', few_shot=True, few_show_ratio=0.2, label_classifier_name='lstm',
-                 check_point=False, att=False):
+    def __init__(self, patient, epoch, bath_size, lr, gpu, train_path, test_path, val_path, att_path, model,
+                 encoder_name, few_shot, few_show_ratio, label_classifier_name, check_point, att, isUnbalance):
         self.patient = patient
         self.epoch = epoch
         self.batch_size = bath_size
@@ -39,12 +37,14 @@ class Dan:
         self.label_classifier_name = label_classifier_name
         self.check_point = check_point
         self.att = att  # 是否用于计算attention机制
+        self.isUnbalance = isUnbalance
         if gpu >= 0:
             self.model = DAN(gpu=gpu, model=model, encoder_name=encoder_name,
-                             label_classifier_name=label_classifier_name, att=att).cuda(gpu)  # 放入显存中
+                             label_classifier_name=label_classifier_name, att=att, isUnbalance=isUnbalance).cuda(
+                gpu)  # 放入显存中
         else:
             self.model = DAN(gpu=gpu, model=model, encoder_name=encoder_name,
-                             label_classifier_name=label_classifier_name, att=att)  # 放入内存中
+                             label_classifier_name=label_classifier_name, att=att, isUnbalance=isUnbalance)  # 放入内存中
         if self.check_point:
             self.load_model()  # 如果是断点训练
             print(" Start checkpoint training")
@@ -139,7 +139,7 @@ class Dan:
 
         mydata = MyData(self.train_path, self.test_path, self.val_path, self.att_path, self.batch_size,
                         few_shot=self.few_shot,
-                        few_shot_ratio=self.few_shot_ratio)
+                        few_shot_ratio=self.few_shot_ratio, isUnbalance=self.isUnbalance)
 
         train_data_loader = mydata.data_loader(None, mode='train')
         optimizer = torch.optim.Adam(self.model.parameters(), lr=self.lr)

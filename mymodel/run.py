@@ -20,7 +20,7 @@ def run():
     parser.add_argument('-atp', '--attention_path', type=str, default="../preprocess/attention_{}.csv",
                         help='attention data path')
     parser.add_argument('-p', '--patient', type=str, default="BDP", help='patient name')
-    parser.add_argument('-m', '--model', type=str, default="prediction", help='style of train')
+    parser.add_argument('-m', '--model', type=str, default="train", help='style of train')
     parser.add_argument('-few', '--few_show_learning', type=bool, default=True, help='keep few shot learning open')
     parser.add_argument('-fr', '--few_show_learning_ratio', type=float, default=0.2, help='few shot learning ratio')
     parser.add_argument('-em', '--embedding', type=str, default="cnn", help='method of embedding')
@@ -29,6 +29,8 @@ def run():
     parser.add_argument('-chp', '--check_point', type=bool, default=False, help='Whether to continue training')
     parser.add_argument('-att', '--attention_matrix', type=bool, default=False, help='Whether to get attention matrix')
     parser.add_argument('-rec', '--recoding', type=bool, default=False, help='Whether to recode result for every file')
+    parser.add_argument('-unb', '--unbalance_data', type=int, default=5,
+                        help="The negative sample is x times the positive sample")
     # -------------------------------------------单文件测试模块----------------------------------------------------------
     parser.add_argument('-fp', '--file_path', type=str,
                         default="/data/yh/dataset/raw_data/BDP/BDP_Pre_seizure/BDP_SZ1_pre_seizure_raw.fif",
@@ -62,6 +64,7 @@ def run():
     check_point = args.check_point
     att = args.attention_matrix
     rec = args.recoding
+    isUnbalance = args.unbalance_data # when is Unbalance == 1 mean balance
     train_path, test_path, val_path, att_path = train_path.format(patient), test_path.format(patient), val_path.format(
         patient), att_path.format(patient)
 
@@ -71,7 +74,7 @@ def run():
                     val_path=val_path, att_path=att_path, model=model, encoder_name=embedding,
                     few_shot=few_show_learning,
                     few_show_ratio=few_shot_ratio, label_classifier_name=label_classifier_name,
-                    check_point=check_point, att=att)
+                    check_point=check_point, att=att, isUnbalance=isUnbalance)
     if model == 'train':
         dan_train.train()
     elif model == 'test':
