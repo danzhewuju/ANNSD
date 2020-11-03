@@ -1,14 +1,17 @@
 # 运行各种baselines的方法
 import os
-import torch
-from model import clstm
 import sys
+
+import torch
+
+from model import clstm
+
 sys.path.append('../')
 import time
 from mymodel.data_util import MyData
 from torch import nn
 from tqdm import tqdm
-from util.util_file import IndicatorCalculation, calculation_result_standard_deviation
+from util.util_file import IndicatorCalculation
 
 
 class BaseModel:  # 主要用于选择各种各样的模型
@@ -26,7 +29,7 @@ class BaseModel:  # 主要用于选择各种各样的模型
 class Baselines:
     def __init__(self, patient, epoch=10, bath_size=16, dim=32, lr=0.001, gpu=0, train_path=None, test_path=None,
                  val_path=None,
-                 model='train', basename='clstm', few_shot=True, few_show_ratio=0.2, check_point=False):
+                 model='train', basename='clstm', few_shot=True, few_show_ratio=0.2, check_point=False, Unbalance=1):
         self.patient = patient  # 患者信息
         self.epoch = epoch  # 迭代次数
         self.batch_size = bath_size  # 批次的大小
@@ -41,6 +44,7 @@ class Baselines:
         self.few_shot = few_shot  # 微调系数开关
         self.few_shot_ratio = few_show_ratio  # 微调系数大小
         self.check_point = check_point  # 断点检查
+        self.unbalance = Unbalance  # 非平衡系数
         basemodel = BaseModel(gpu, basename, input_size=self.dim, Resampling=500)  # 构建basemodel方法
         self.model = basemodel.get_model()
         if self.check_point:
@@ -83,7 +87,7 @@ class Baselines:
     def train(self):
         mydata = MyData(path_train=self.train_path, path_test=self.test_path, path_val=self.val_path,
                         batch_size=self.batch_size,
-                        few_shot=self.few_shot, few_shot_ratio=self.few_shot_ratio)
+                        few_shot=self.few_shot, few_shot_ratio=self.few_shot_ratio, isUnbalance=self.unbalance)
 
         train_data_loader = mydata.data_loader(None, mode='train')
         optimizer = torch.optim.Adam(self.model.parameters(), lr=self.lr)

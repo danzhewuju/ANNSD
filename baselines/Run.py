@@ -18,13 +18,15 @@ def run():
                         help='val data path')
     parser.add_argument('-atp', '--attention_path', type=str, default="../preprocess/attention_{}.csv",
                         help='attention data path')
-    parser.add_argument('-p', '--patient', type=str, default="LK", help='patient name')
+    parser.add_argument('-p', '--patient', type=str, default="BDP", help='patient name')
     parser.add_argument('-ban', '--basename', type=str, default='clstm', help='The name of baselines')
     parser.add_argument('-m', '--model', type=str, default="train", help='style of train')
     parser.add_argument('-few', '--few_show_learning', type=bool, default=True, help='keep few shot learning open')
     parser.add_argument('-fr', '--few_show_learning_ratio', type=float, default=0.2, help='few shot learning ratio')
     parser.add_argument('-chp', '--check_point', type=bool, default=False, help='Whether to continue training')
     parser.add_argument('-rec', '--recoding', type=bool, default=False, help='Whether to recoder result for every file')
+    parser.add_argument('-unb', '--unbalance_data', type=int, default=5,
+                        help="The negative sample is x times the positive sample")
 
     args = parser.parse_args()
 
@@ -42,6 +44,7 @@ def run():
     patient = args.patient
     model = args.model
     few_shot_ratio = args.few_show_learning_ratio
+    Unbalance = args.unbalance_data # when is Unbalance == 1 mean balance
     few_show_learning = args.few_show_learning
     check_point = args.check_point
     train_path, test_path, val_path, att_path = train_path.format(patient), test_path.format(patient), val_path.format(
@@ -50,7 +53,7 @@ def run():
     print(args)
     bl = Baselines(patient, epoch, batch_size, dim=dim, lr=lr, gpu=gpu, train_path=train_path, test_path=test_path,
                    val_path=val_path, model=model, basename=basename, few_shot=few_show_learning,
-                   few_show_ratio=few_shot_ratio, check_point=check_point)
+                   few_show_ratio=few_shot_ratio, check_point=check_point, Unbalance=Unbalance)
     if model == 'train':
         bl.train()
     elif model == 'test':
@@ -59,3 +62,5 @@ def run():
 
 if __name__ == '__main__':
     run()
+
+#
