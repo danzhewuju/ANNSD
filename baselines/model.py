@@ -1,14 +1,11 @@
 import torch
 from torch import nn
-import torchvision.datasets as dsets
-import torchvision.transforms as transforms
-import matplotlib.pyplot as plt
+
+
 # import sys
 #
 # sys.path.append('../')
 # from util.util_tool import
-from torch.utils.data import Dataset, DataLoader
-import torch.nn.functional as F
 
 
 class clstm(nn.Module):
@@ -80,3 +77,71 @@ class clstm(nn.Module):
         # choose r_out at the last time step
         out = self.out(r_out[:, -1, :])
         return out
+
+
+class cnnVoting(nn.Module):
+
+    def __init__(self, gpu=0, input_size=32, Resampling=500):
+        super(cnnVoting, self).__init__()
+        self.input_size = input_size
+        self.Resampling = Resampling
+        self.gpu = gpu
+
+        self.layer1 = nn.Sequential(
+            nn.Conv2d(in_channels=1, out_channels=16, kernel_size=5, stride=1, padding=2),
+            nn.BatchNorm2d(16),
+            nn.ReLU(),
+            nn.MaxPool2d(kernel_size=2, stride=2))
+
+        self.layer2 = nn.Sequential(
+            nn.Conv2d(16, 32, kernel_size=5, stride=1, padding=2),
+            nn.BatchNorm2d(32),
+            nn.ReLU(),
+            nn.MaxPool2d(kernel_size=2, stride=2)
+        )
+
+        self.layer3 = nn.Sequential(
+            nn.Conv2d(32, 64, kernel_size=5, stride=1, padding=2),
+            nn.BatchNorm2d(64),
+            nn.ReLU(),
+            nn.MaxPool2d(kernel_size=2, stride=2)
+        )
+
+        self.layer4 = nn.Sequential(
+            nn.Conv2d(64, 32, kernel_size=5, stride=1, padding=2),
+            nn.BatchNorm2d(32),
+            nn.ReLU(),
+            nn.MaxPool2d(kernel_size=2, stride=2)
+        )
+        self.layer5 = nn.Sequential(
+            nn.Linear(6 * 31 * 32, 32),  # x_ y_ 和你输入的矩阵有关系
+            nn.Linear(32, 2)
+        )
+
+    '''
+    需要对于数据进行处理;
+    X=(batch_size, weight, height)
+    '''
+
+    def forward(self, x):
+        batch_size = x.shape[0]
+        if self.gpu >= 0:
+            res = torch.zeros(batch_size, 2).cuda(self.gpu)
+        else:
+            res = torch.zeros(batch_size, 2)
+        for i in range(batch_size):
+            tmp_x = x[i][0]
+            length = tmp_x.shape[-1] // self.Resampling
+            for j in range(length):
+                tmp_split = tmp_x[:, self.Resampling * j:(j + 1) * self.Resampling]
+                tmp_split = torch.reshape(tmp_split, (1, 1, 100, self.Resampling))
+                tmx = self.layer1(tmp_split)
+                tmx = self.layer2(tmx)
+                tmx = self.layer3(tmx)
+                tmx = self.layer4(tmx)
+                tmx = tmx.reshape(1, -1)  # 这里面的-1代表的是自适应的意思。
+                tmx = self.layer5(tmx)
+                tmx = tmx.reshape(-1)
+                res[i] += tmx
+            res[i] /= length
+        return res

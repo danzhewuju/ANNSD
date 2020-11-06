@@ -4,7 +4,7 @@ import sys
 
 import torch
 
-from model import clstm
+from model import clstm, cnnVoting
 
 sys.path.append('../')
 import time
@@ -21,6 +21,13 @@ class BaseModel:  # 主要用于选择各种各样的模型
                 self.model = clstm(gpu, input_size, Resampling).cuda(gpu)
             else:
                 self.model = clstm(gpu, input_size, Resampling)
+        elif basename == 'cnnVoting':  ## 采用CNN Voting 的方法
+            if gpu >= 0:
+                self.model = cnnVoting(gpu, input_size, Resampling).cuda(gpu)
+            else:
+                self.model = cnnVoting(gpu, input_size, Resampling)
+        else:
+            pass
 
     def get_model(self):  # 获取构建的模型
         return self.model
@@ -38,7 +45,7 @@ class Baselines:
         self.train_path = train_path  # 训练的数据集
         self.test_path = test_path  # 测试的训练集
         self.val_path = val_path  # 验证集
-        self.model = model  # 训练集和测试的选择
+        self.m = model  # 训练集和测试的选择
         self.basename = basename  # baseline 选择的方法
         self.gpu = gpu  # gpu选择
         self.few_shot = few_shot  # 微调系数开关
@@ -151,18 +158,19 @@ class Baselines:
     def evaluation(self, probability, y):
         '''
         评价指标的计算
-        :param prey: 预测的结果
         :param y:    实际的结果
         :return:  返回各个指标是的结果
         '''
-        result = {'accuracy': 0, 'precision': 0, 'recall': 0, 'f1score': 0, 'auc': 0}
+        result = {'accuracy': 0, 'precision': 0, 'recall': 0, 'f1score': 0, 'auc': 0, 'far': 0}
         prey = [1 if x > 0.5 else 0 for x in probability]
         cal = IndicatorCalculation(prey, y)
         result['accuracy'] = cal.get_accuracy()
         result['precision'] = cal.get_precision()
         result['recall'] = cal.get_recall()
         result['f1score'] = cal.get_f1score()
+        result['far'] = cal.get_far()
         result['auc'] = cal.get_auc(probability, y)
+
         return result
 
     def test(self):
@@ -201,8 +209,11 @@ class Baselines:
         res = self.evaluation(probability, grand_true)
 
         result = "Baselins: {}|Patient {}|Data size:{}| test loss:{:.6f}| Accuracy:{:.5f} | Precision:" \
-                 "{:.5f}| Recall:{:.5f}| F1score:{:.5f}| AUC:{:.5f}".format(self.basename, self.patient, len(acc),
-                                                                            loss_avg, res['accuracy'],
-                                                                            res['precision'], res['recall'],
-                                                                            res['f1score'], res['auc'])
+                 "{:.5f}| Recall:{:.5f}| F1score:{:.5f}| AUC:{:.5f} | FAR:{:.5f}".format(self.basename, self.patient,
+                                                                                         len(acc),
+                                                                                         loss_avg, res['accuracy'],
+                                                                                         res['precision'],
+                                                                                         res['recall'],
+                                                                                         res['f1score'], res['auc'],
+                                                                                         res['far'])
         self.log_write(result)

@@ -1,4 +1,5 @@
 import argparse
+
 from baseline import Baselines
 
 
@@ -19,7 +20,7 @@ def run():
     parser.add_argument('-atp', '--attention_path', type=str, default="../preprocess/attention_{}.csv",
                         help='attention data path')
     parser.add_argument('-p', '--patient', type=str, default="BDP", help='patient name')
-    parser.add_argument('-ban', '--basename', type=str, default='clstm', help='The name of baselines')
+    parser.add_argument('-ban', '--basename', type=str, default='cnnVoting', help='The name of baselines')
     parser.add_argument('-m', '--model', type=str, default="train", help='style of train')
     parser.add_argument('-few', '--few_show_learning', type=bool, default=True, help='keep few shot learning open')
     parser.add_argument('-fr', '--few_show_learning_ratio', type=float, default=0.2, help='few shot learning ratio')
@@ -44,7 +45,7 @@ def run():
     patient = args.patient
     model = args.model
     few_shot_ratio = args.few_show_learning_ratio
-    Unbalance = args.unbalance_data # when is Unbalance == 1 mean balance
+    Unbalance = args.unbalance_data  # when is Unbalance == 1 mean balance
     few_show_learning = args.few_show_learning
     check_point = args.check_point
     train_path, test_path, val_path, att_path = train_path.format(patient), test_path.format(patient), val_path.format(
