@@ -1,6 +1,8 @@
 import torch
 from torch import nn
 
+from mymodel.Transformer import Transformer
+
 
 # import sys
 #
@@ -9,10 +11,12 @@ from torch import nn
 
 
 class clstm(nn.Module):
-    def __init__(self, gpu=None, input_size=32, Resampling=500):
+    def __init__(self, gpu=0, input_size=32, Resampling=500):
         super(clstm, self).__init__()
         self.input_size = input_size
         self.Resampling = Resampling
+        self.gpu = gpu
+
         self.layer1 = nn.Sequential(
             nn.Conv2d(in_channels=1, out_channels=16, kernel_size=5, stride=1, padding=2),
             nn.BatchNorm2d(16),
@@ -48,14 +52,13 @@ class clstm(nn.Module):
             batch_first=True,  # input & output will has batch size as 1s dimension. e.g. (batch, time_step, input_size)
         )
         self.out = nn.Linear(64, 2)
-        self.gpu = gpu
 
     def forward(self, x):
         # res = []
         # batch_size = x.size(0)
         # 需要对数据进行处理
         bat = x.shape[0]
-        if self.gpu is not None:
+        if self.gpu >= 0:
             res = torch.zeros((bat, 15, 32)).cuda(self.gpu)
         else:
             res = torch.zeros((bat, 15, 32))
@@ -145,3 +148,61 @@ class cnnVoting(nn.Module):
                 res[i] += tmx
             res[i] /= length
         return res
+
+
+class cnnTransformer(nn.Module):
+    def __init__(self, gpu=0, input_size=32, Resampling=500):
+        super(cnnTransformer).__init__()
+        self.input_size = input_size
+        self.Resampling = Resampling
+        self.gpu = gpu  # 指定GPU
+        self.layer1 = nn.Sequential(
+            nn.Conv2d(in_channels=1, out_channels=16, kernel_size=5, stride=1, padding=2),
+            nn.BatchNorm2d(16),
+            nn.ReLU(),
+            nn.MaxPool2d(kernel_size=2, stride=2))
+
+        self.layer2 = nn.Sequential(
+            nn.Conv2d(16, 32, kernel_size=5, stride=1, padding=2),
+            nn.BatchNorm2d(32),
+            nn.ReLU(),
+            nn.MaxPool2d(kernel_size=2, stride=2)
+        )
+
+        self.layer3 = nn.Sequential(
+            nn.Conv2d(32, 64, kernel_size=5, stride=1, padding=2),
+            nn.BatchNorm2d(64),
+            nn.ReLU(),
+            nn.MaxPool2d(kernel_size=2, stride=2)
+        )
+
+        self.layer4 = nn.Sequential(
+            nn.Conv2d(64, 32, kernel_size=5, stride=1, padding=2),
+            nn.BatchNorm2d(32),
+            nn.ReLU(),
+            nn.MaxPool2d(kernel_size=2, stride=2)
+        )
+        self.fc1 = nn.Linear(6 * 31 * 32, self.input_size)  # x_ y_ 和你输入的矩阵有关系,设定输出的维度的大小
+        self.transformer = Transformer(self.gpu)
+
+    def forward(self, x):
+        batchSize = x.shape[0]
+        if self.gpu >= 0:
+            res = torch.zeros((batchSize, 15, 32)).cuda(self.gpu)
+        else:
+            res = torch.zeros((batchSize, 15, 32))
+        for i in range(batchSize):
+            tmp_x = x[i][0]
+            length = tmp_x.shape[-1] // self.Resampling
+            for j in range(length):
+                tmp_split = tmp_x[:, self.Resampling * j:(j + 1) * self.Resampling]
+                tmp_split = torch.reshape(tmp_split, (1, 1, 100, self.Resampling))
+                tmx = self.layer1(tmp_split)
+                tmx = self.layer2(tmx)
+                tmx = self.layer3(tmx)
+                tmx = self.layer4(tmx)
+                tmx = tmx.reshape(1, -1)  # 这里面的-1代表的是自适应的意思。
+                tmx = self.fc1(tmx)
+                res[i][j] = tmx
+        out = self.transformer(res)
+        return out

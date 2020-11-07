@@ -4,7 +4,7 @@ import sys
 
 import torch
 
-from model import clstm, cnnVoting
+from model import clstm, cnnVoting, cnnTransformer
 
 sys.path.append('../')
 import time
@@ -26,7 +26,13 @@ class BaseModel:  # 主要用于选择各种各样的模型
                 self.model = cnnVoting(gpu, input_size, Resampling).cuda(gpu)
             else:
                 self.model = cnnVoting(gpu, input_size, Resampling)
+        elif basename == 'cnnTransformer':
+            if gpu >= 0:
+                self.model = cnnTransformer(gpu, input_size, Resampling).cuda(gpu)
+            else:
+                self.model = cnnTransformer(gpu, input_size, Resampling)
         else:
+
             pass
 
     def get_model(self):  # 获取构建的模型

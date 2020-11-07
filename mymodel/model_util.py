@@ -127,8 +127,9 @@ class DAN(nn.Module):
         self.domain_classifier = nn.LSTM(
             input_size=c_dim,
             hidden_size=64,  # rnn hidden unit
-            num_layers=1,  # number of rnn layer
-            batch_first=True
+            num_layers=2,  # number of rnn layer
+            batch_first=True,
+            bidirectional=True
             # input & output will has batch size as 1s dimension. e.g. (batch, time_step, input_size)
         )
         self.domain_fc = nn.Linear(64, 2)  # 判断病人是否来自于同一个人
@@ -140,7 +141,7 @@ class DAN(nn.Module):
         :return:
         '''
         if self.label_classifier_name == 'transformer':
-            max_length = 15
+            max_length = length[0] // self.resampling
         else:
             max_length = length[0] // self.resampling
         bat = x.shape[0]
