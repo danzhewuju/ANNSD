@@ -1,6 +1,7 @@
+import sys
+
 import torch
 from torch import nn
-import sys
 
 sys.path.append('..')
 
@@ -155,7 +156,7 @@ class cnnVoting(nn.Module):
 
 class cnnTransformer(nn.Module):
     def __init__(self, gpu=0, input_size=32, Resampling=500):
-        super(cnnTransformer).__init__()
+        super(cnnTransformer, self).__init__()
         self.input_size = input_size
         self.Resampling = Resampling
         self.gpu = gpu  # 指定GPU

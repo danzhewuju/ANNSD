@@ -7,9 +7,9 @@ def run():
     parser = argparse.ArgumentParser()
     parser.add_argument('-lr', '--learning_ratio', type=float, default=0.0001, help='learning ratio of model')
     parser.add_argument('-dim', '--output_dim', type=int, default=32, help='number of hidden units in encoder')
-    parser.add_argument('-bs', '--batch_size', type=int, default=8, help='number of bath size')
+    parser.add_argument('-bs', '--batch_size', type=int, default=16, help='number of bath size')
     parser.add_argument('-gpu', '--GPU', type=int, default=0, help='GPU ID')
-    parser.add_argument('-ep', '--epoch', type=int, default=6, help='number of epoch')
+    parser.add_argument('-ep', '--epoch', type=int, default=5, help='number of epoch')
 
     parser.add_argument('-trp', '--train_path', type=str, default="../preprocess/train_{}.csv",
                         help='training data path')
@@ -20,7 +20,7 @@ def run():
     parser.add_argument('-atp', '--attention_path', type=str, default="../preprocess/attention_{}.csv",
                         help='attention data path')
     parser.add_argument('-p', '--patient', type=str, default="BDP", help='patient name')
-    parser.add_argument('-ban', '--basename', type=str, default='cnnVoting',
+    parser.add_argument('-ban', '--basename', type=str, default='cnnTransformer',
                         help='The name of baselines')  # clstm, cnnVoting
     parser.add_argument('-m', '--model', type=str, default="train", help='style of train')
     parser.add_argument('-few', '--few_show_learning', type=bool, default=True, help='keep few shot learning open')

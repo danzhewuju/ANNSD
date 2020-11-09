@@ -58,7 +58,7 @@ class Transformer(nn.Module):
     def __init__(self, gpu):
         super(Transformer, self).__init__()
         self.postion_embedding = Positional_Encoding(embed=32, pad_size=15, dropout=0.5, device=gpu)
-        self.encoder = Encoder(dim_model=32, num_head=5, hidden=512, dropout=0.5)
+        self.encoder = Encoder(dim_model=32, num_head=4, hidden=512, dropout=0.5)
         self.encoders = nn.ModuleList([
             copy.deepcopy(self.encoder)
             # Encoder(config.dim_model, config.num_head, config.hidden, config.dropout)
