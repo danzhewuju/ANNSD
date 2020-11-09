@@ -1,3 +1,12 @@
+'''
+增加一些baselines模型
+
+1. CNNVoting
+2. CNNTransformer
+3. CNNLstm
+
+'''
+
 import sys
 
 import torch
