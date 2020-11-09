@@ -1,7 +1,10 @@
 import torch
 from torch import nn
+import sys
 
-from mymodel.Transformer import Transformer
+sys.path.append('..')
+
+from mymodel.model_util import Transformer
 
 
 # import sys

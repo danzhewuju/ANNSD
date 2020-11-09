@@ -211,3 +211,71 @@ Vote Length:120|Patient:SYF|Baselines:VMAML(voting)|Accuracy:0.778073|std:0.0081
 Vote Length:120|Patient:WSH|Baselines:VMAML(voting)|Accuracy:0.938043|std:0.005707|Recall:0.924063|std:0.015646|Precision:0.953908|std:0.005969|F1score:0.938994|std:0.005992|AUC:0.938114|std:0.010137	2020-07-20 14:31:32
 Vote Length:120|Patient:ZK|Baselines:VMAML(voting)|Accuracy:0.778073|std:0.020022|Recall:0.768883|std:0.016861|Precision:0.790802|std:0.011557|F1score:0.779474|std:0.008965|AUC:0.778153|std:0.005654	2020-07-20 14:31:32
 Vote Length:120|Patient:LK|Baselines:VMAML(voting)|Accuracy:0.837312|std:0.010506|Recall:0.819231|std:0.006864|Precision:0.870417|std:0.015329|F1score:0.844084|std:0.009952|AUC:0.836907|std:0.010786	2020-07-20 14:31:33
+Encoder:cnn|Label classifier transformer|Patient BDP|Data size:73|Real data|Accuracy:0.93151	2020-09-23 15:55:07
+Encoder:cnn|Label classifier transformer|Patient BDP|Data size:73|Real data|Accuracy:0.97260	2020-09-23 15:56:30
+Encoder:cnn|Label classifier transformer|Patient BDP|Data size:41|Real data|Accuracy:0.92683	2020-09-23 15:59:22
+Encoder:cnn|Label classifier transformer|Patient BDP|Data size:41|Real data|Accuracy:1.00000	2020-09-23 16:00:22
+Encoder:cnn|Label classifier transformer|Patient BDP|Data size:41|Real data|Accuracy:0.95122	2020-09-23 16:20:02
+Encoder:cnn|Label classifier transformer|Patient BDP|Data size:41|Real data|Accuracy:0.90244	2020-09-23 16:22:03
+Encoder:cnn|Label classifier transformer|Patient BDP|Data size:41|Real data|Accuracy:0.95122	2020-09-23 16:22:40
+Encoder:cnn|Label classifier transformer|Patient BDP|Data size:41|Real data|Accuracy:0.97561	2020-09-23 16:24:26
+Encoder:cnn|Label classifier transformer|Patient BDP|Data size:41|Real data|Accuracy:0.92683	2020-09-23 16:26:50
+Encoder:cnn|Label classifier transformer|Patient BDP|Data size:41|Real data|Accuracy:0.92683	2020-09-23 16:27:55
+Encoder:cnn|Label classifier transformer|Patient BDP|Data size:490|Real data|Accuracy:0.89388	2020-09-23 16:36:48
+Encoder:cnn|Label classifier transformer|Patient BDP|Data size:238|Real data|Accuracy:0.82353	2020-09-23 16:43:36
+Patient:BDP|DataSize:769|Acuracy:0.873862|Precision:0.818182|Recall:0.838710|F1score:0.828319	2020-09-23 19:14:36
+Patient:BDP|DataSize:769|Acuracy:0.873862|Precision:0.818182|Recall:0.838710|F1score:0.828319	2020-09-23 19:15:43
+Encoder:cnn|Label classifier transformer|Patient BDP|Data size:6000| test loss:0.269684| Accuracy:0.88717 | Precision:0.90260| Recall:0.86800| F1score:0.88496| AUC:0.95884	2020-09-23 19:23:15
+Patient:BDP|DataSize:769|Acuracy:0.873862|Precision:0.818182|Recall:0.838710|F1score:0.828319| AUC:0.866294	2020-09-23 19:33:53
+Encoder:cnn|Label classifier transformer|Patient SYF|Data size:170|Real data|Accuracy:0.99412	2020-09-23 19:49:04
+Encoder:cnn|Label classifier transformer|Patient SYF|Data size:178|Real data|Accuracy:0.84831	2020-09-23 19:51:56
+Encoder:cnn|Label classifier transformer|Patient SYF|Data size:216|Real data|Accuracy:1.00000	2020-09-23 19:55:30
+Encoder:cnn|Label classifier transformer|Patient BDP|Data size:6000| test loss:0.269603| Accuracy:0.88900 | Precision:0.90719| Recall:0.86667| F1score:0.88646| AUC:0.95944	2020-09-23 20:01:55
+Encoder:cnn|Label classifier transformer|Patient SYF|Data size:959|Real data|Accuracy:0.98853	2020-09-23 20:09:14
+Patient:SYF|DataSize:1523|Acuracy:0.974393|Precision:0.979890|Recall:0.950355|F1score:0.964896| AUC:0.969442	2020-09-23 20:37:12
+Encoder:cnn|Label classifier transformer|Patient SYF|Data size:6000| test loss:0.196869| Accuracy:0.93900 | Precision:0.96406| Recall:0.91200| F1score:0.93731| AUC:0.98643	2020-09-23 20:45:03
+Encoder:cnn|Label classifier transformer|Patient LK|Data size:34|Real data|Accuracy:1.00000	2020-09-23 20:54:26
+Encoder:cnn|Label classifier transformer|Patient LK|Data size:35|Real data|Accuracy:0.94286	2020-09-23 20:55:21
+Encoder:cnn|Label classifier transformer|Patient LK|Data size:46|Real data|Accuracy:0.95652	2020-09-23 20:55:33
+Encoder:cnn|Label classifier transformer|Patient LK|Data size:64|Real data|Accuracy:1.00000	2020-09-23 20:58:14
+Encoder:cnn|Label classifier transformer|Patient LK|Data size:100|Real data|Accuracy:1.00000	2020-09-23 20:59:14
+Encoder:cnn|Label classifier transformer|Patient LK|Data size:44|Real data|Accuracy:1.00000	2020-09-23 21:02:57
+Encoder:cnn|Label classifier transformer|Patient LK|Data size:137|Real data|Accuracy:0.98540	2020-09-23 21:04:29
+Encoder:cnn|Label classifier transformer|Patient LK|Data size:102|Real data|Accuracy:0.99020	2020-09-23 21:06:22
+Encoder:cnn|Label classifier transformer|Patient LK|Data size:137|Real data|Accuracy:0.98540	2020-09-23 21:07:56
+Encoder:cnn|Label classifier transformer|Patient LK|Data size:137|Real data|Accuracy:1.00000	2020-09-23 21:08:47
+Encoder:cnn|Label classifier transformer|Patient LK|Data size:137|Real data|Accuracy:1.00000	2020-09-23 21:09:43
+Encoder:cnn|Label classifier transformer|Patient LK|Data size:102|Real data|Accuracy:0.99020	2020-09-23 21:11:18
+Encoder:cnn|Label classifier transformer|Patient LK|Data size:102|Real data|Accuracy:1.00000	2020-09-23 21:11:47
+Encoder:cnn|Label classifier transformer|Patient LK|Data size:102|Real data|Accuracy:1.00000	2020-09-23 21:11:53
+Patient:LK|DataSize:1279|Acuracy:0.992181|Precision:0.981538|Recall:0.987616|F1score:0.984568| AUC:0.990670	2020-09-23 21:12:48
+Encoder:cnn|Label classifier transformer|Patient LK|Data size:170|Real data|Accuracy:0.98824	2020-09-23 21:19:18
+Encoder:cnn|Label classifier transformer|Patient ZK|Data size:46|Real data|Accuracy:0.89130	2020-09-23 21:22:39
+Encoder:cnn|Label classifier transformer|Patient ZK|Data size:44|Real data|Accuracy:1.00000	2020-09-23 21:24:36
+Encoder:cnn|Label classifier transformer|Patient ZK|Data size:111|Real data|Accuracy:0.89189	2020-09-23 21:25:21
+Encoder:cnn|Label classifier transformer|Patient ZK|Data size:111|Real data|Accuracy:0.87387	2020-09-23 21:29:22
+Encoder:cnn|Label classifier transformer|Patient ZK|Data size:111|Real data|Accuracy:0.81982	2020-09-23 21:31:40
+Encoder:cnn|Label classifier transformer|Patient ZK|Data size:111|Real data|Accuracy:0.95495	2020-09-23 21:34:05
+Encoder:cnn|Label classifier transformer|Patient ZK|Data size:111|Real data|Accuracy:1.00000	2020-09-23 21:34:32
+Encoder:cnn|Label classifier transformer|Patient ZK|Data size:111|Real data|Accuracy:1.00000	2020-09-23 21:34:51
+Encoder:cnn|Label classifier transformer|Patient ZK|Data size:111|Real data|Accuracy:1.00000	2020-09-23 21:34:57
+Encoder:cnn|Label classifier transformer|Patient ZK|Data size:111|Real data|Accuracy:1.00000	2020-09-23 21:35:05
+Encoder:cnn|Label classifier transformer|Patient ZK|Data size:66|Real data|Accuracy:1.00000	2020-09-23 21:36:14
+Patient:ZK|DataSize:1044|Acuracy:0.946360|Precision:0.625000|Recall:0.944444|F1score:0.752212| AUC:0.945493	2020-09-23 21:37:04
+Encoder:cnn|Label classifier transformer|Patient WSH|Data size:94|Real data|Accuracy:0.00000	2020-09-23 21:42:16
+Encoder:cnn|Label classifier transformer|Patient WSH|Data size:94|Real data|Accuracy:0.00000	2020-09-23 21:46:20
+Encoder:cnn|Label classifier transformer|Patient WSH|Data size:6000| test loss:0.035369| Accuracy:0.98733 | Precision:0.99898| Recall:0.97567| F1score:0.98718| AUC:0.99958	2020-09-24 09:05:28
+Encoder:cnn|Label classifier transformer|Patient WSH|Data size:6000| test loss:0.035771| Accuracy:0.98733 | Precision:0.99864| Recall:0.97600| F1score:0.98719| AUC:0.99964	2020-09-24 09:22:22
+Encoder:cnn|Label classifier transformer|Patient BDP|Data size:3600| test loss:0.375249| Accuracy:0.85722 | Precision:0.73889| Recall:0.22167| F1score:0.34103| AUC:0.84249	2020-09-27 18:54:16
+Encoder:cnn|Label classifier transformer|Patient BDP|Data size:3600| test loss:0.357017| Accuracy:0.87417 | Precision:0.79051| Recall:0.33333| F1score:0.46893| AUC:0.88861| FAR:0.01767	2020-09-28 09:53:36
+Encoder:cnn|Label classifier transformer|Patient ZK|Data size:3597| test loss:0.110663| Accuracy:0.95969 | Precision:0.94175| Recall:0.80833| F1score:0.86996| AUC:0.99069| FAR:0.01001	2020-09-28 15:45:01
+Encoder:cnn|Label classifier transformer|Patient ZK|Data size:3597| test loss:0.090764| Accuracy:0.96692 | Precision:0.96161| Recall:0.83500| F1score:0.89384| AUC:0.99309| FAR:0.00667	2020-09-28 15:48:18
+Encoder:cnn|Label classifier transformer|Patient BDP|Data size:3600| test loss:0.309782| Accuracy:0.87639 | Precision:0.58698| Recall:0.87167| F1score:0.70154| AUC:0.94596| FAR:0.12267	2020-09-28 21:39:09
+Encoder:cnn|Label classifier transformer|Patient LK|Data size:3600| test loss:0.065869| Accuracy:0.97722 | Precision:0.90093| Recall:0.97000| F1score:0.93419| AUC:0.99737| FAR:0.02133	2020-09-28 21:41:37
+Encoder:cnn|Label classifier transformer|Patient BDP|Data size:3600| test loss:0.313814| Accuracy:0.87750 | Precision:0.58785| Recall:0.88667| F1score:0.70698| AUC:0.95172| FAR:0.12433	2020-09-29 14:08:14
+Encoder:cnn|Label classifier transformer|Patient WSH|Data size:3600| test loss:0.712811| Accuracy:0.56056 | Precision:0.15568| Recall:0.37000| F1score:0.21915| AUC:0.46682| FAR:0.40133	2020-09-29 14:14:32
+Encoder:cnn|Label classifier transformer|Patient SYF|Data size:3600| test loss:0.096175| Accuracy:0.97417 | Precision:0.98656| Recall:0.85667| F1score:0.91704| AUC:0.98635| FAR:0.00233	2020-09-29 14:17:46
+Encoder:cnn|Label classifier transformer|Patient LK|Data size:3600| test loss:0.046625| Accuracy:0.98806 | Precision:0.95432| Recall:0.97500| F1score:0.96455| AUC:0.99785| FAR:0.00933	2020-09-29 14:17:56
+Encoder:cnn|Label classifier transformer|Patient ZK|Data size:3597| test loss:0.144468| Accuracy:0.95079 | Precision:0.93971| Recall:0.75333| F1score:0.83626| AUC:0.98246| FAR:0.00968	2020-09-29 14:18:02
+Encoder:cnn|Label classifier transformer|Patient WSH|Data size:3600| test loss:0.725654| Accuracy:0.54139 | Precision:0.13784| Recall:0.33333| F1score:0.19503| AUC:0.43786| FAR:0.41700	2020-09-29 14:32:03
+Encoder:cnn|Label classifier transformer|Patient WSH|Data size:3600| test loss:0.724141| Accuracy:0.54111 | Precision:0.13370| Recall:0.32000| F1score:0.18861| AUC:0.43253| FAR:0.41467	2020-09-29 18:53:02
