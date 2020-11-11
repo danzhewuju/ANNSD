@@ -267,31 +267,31 @@ class Dan:
                             last_test_f1 = f1_tmp
                     pbar.update(1)
 
-        if self.encoder_name == 'vae':
-            info = {'loss_l': loss_prediction_vi, 'loss_d': loss_domain_discrimination_vi, 'loss_t': loss_vi,
-                    'acc': acc_vi,
-                    'loss_vae': loss_vae_vi,
-                    'save_path': './draw/train_loss_{}.png'.format(self.encoder_name),
-                    'model_info': "training information", 'show': False}
-            self.draw_loss_plt(**info)
-            info = {'loss_l': test_loss_prediction_vi, 'loss_d': test_loss_domain_discriminator_vi,
-                    'loss_t': test_loss_vi,
-                    'acc': test_acc_vi, 'loss_vae': test_loss_vae_vi,
-                    'save_path': './draw/test_loss_{}.png'.format(self.encoder_name),
-                    'model_info': "validation information", 'show': False}
-            self.draw_loss_plt(**info)
-        else:
-            info = {'loss_l': loss_prediction_vi, 'loss_d': loss_domain_discrimination_vi, 'loss_t': loss_vi,
-                    'acc': acc_vi,
-                    'save_path': './draw/train_loss_{}.png'.format(self.encoder_name),
-                    'model_info': "training information", 'show': False}
-            self.draw_loss_plt(**info)
-            info = {'loss_l': test_loss_prediction_vi, 'loss_d': test_loss_domain_discriminator_vi,
-                    'loss_t': test_loss_vi,
-                    'acc': test_acc_vi,
-                    'save_path': './draw/test_loss_{}.png'.format(self.encoder_name),
-                    'model_info': "validation information", 'show': False}
-            self.draw_loss_plt(**info)
+        # if self.encoder_name == 'vae':
+        #     info = {'loss_l': loss_prediction_vi, 'loss_d': loss_domain_discrimination_vi, 'loss_t': loss_vi,
+        #             'acc': acc_vi,
+        #             'loss_vae': loss_vae_vi,
+        #             'save_path': './draw/train_loss_{}.png'.format(self.encoder_name),
+        #             'model_info': "training information", 'show': False}
+        #     self.draw_loss_plt(**info)
+        #     info = {'loss_l': test_loss_prediction_vi, 'loss_d': test_loss_domain_discriminator_vi,
+        #             'loss_t': test_loss_vi,
+        #             'acc': test_acc_vi, 'loss_vae': test_loss_vae_vi,
+        #             'save_path': './draw/test_loss_{}.png'.format(self.encoder_name),
+        #             'model_info': "validation information", 'show': False}
+        #     self.draw_loss_plt(**info)
+        # else:
+        #     info = {'loss_l': loss_prediction_vi, 'loss_d': loss_domain_discrimination_vi, 'loss_t': loss_vi,
+        #             'acc': acc_vi,
+        #             'save_path': './draw/train_loss_{}.png'.format(self.encoder_name),
+        #             'model_info': "training information", 'show': False}
+        #     self.draw_loss_plt(**info)
+        #     info = {'loss_l': test_loss_prediction_vi, 'loss_d': test_loss_domain_discriminator_vi,
+        #             'loss_t': test_loss_vi,
+        #             'acc': test_acc_vi,
+        #             'save_path': './draw/test_loss_{}.png'.format(self.encoder_name),
+        #             'model_info': "validation information", 'show': False}
+        #     self.draw_loss_plt(**info)
 
     def segment_statistic(self, prey, y, length):
         '''

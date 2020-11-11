@@ -6,7 +6,7 @@ import torch.nn as nn
 import torch.nn.functional as F
 from torch.autograd import Function
 
-from .Transformer import Transformer, TransformerAttention
+from Transformer import Transformer, TransformerAttention
 
 sys.path.append('../')
 
@@ -108,7 +108,7 @@ class DAN(nn.Module):
             self.label_classifier = nn.LSTM(
                 input_size=c_dim,
                 hidden_size=64,  # rnn hidden unit
-                num_layers=1,  # number of rnn layer
+                num_layers=2,  # number of rnn layer
                 batch_first=True,
                 bidirectional=True
                 # input & output will has batch size as 1s dimension. e.g. (batch, time_step, input_size)
@@ -127,9 +127,7 @@ class DAN(nn.Module):
         self.domain_classifier = nn.LSTM(
             input_size=c_dim,
             hidden_size=64,  # rnn hidden unit
-            num_layers=2,  # number of rnn layer
-            batch_first=True,
-            bidirectional=True
+            num_layers=2  # number of rnn layer
             # input & output will has batch size as 1s dimension. e.g. (batch, time_step, input_size)
         )
         self.domain_fc = nn.Linear(64, 2)  # 判断病人是否来自于同一个人
@@ -141,7 +139,7 @@ class DAN(nn.Module):
         :return:
         '''
         if self.label_classifier_name == 'transformer':
-            max_length = length[0] // self.resampling
+            max_length = 15  ## 设置的长度为15
         else:
             max_length = length[0] // self.resampling
         bat = x.shape[0]

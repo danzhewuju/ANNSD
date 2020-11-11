@@ -21,7 +21,7 @@ def run():
                         help='attention data path')
     parser.add_argument('-p', '--patient', type=str, default="BDP", help='patient name')
     parser.add_argument('-ban', '--basename', type=str, default='cnnTransformer',
-                        help='The name of baselines')  # clstm, cnnVoting
+                        help='The name of baselines')  # cnnLstm, cnnVoting, cnnTransformer
     parser.add_argument('-m', '--model', type=str, default="train", help='style of train')
     parser.add_argument('-few', '--few_show_learning', type=bool, default=True, help='keep few shot learning open')
     parser.add_argument('-fr', '--few_show_learning_ratio', type=float, default=0.2, help='few shot learning ratio')

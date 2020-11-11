@@ -279,3 +279,40 @@ Encoder:cnn|Label classifier transformer|Patient LK|Data size:3600| test loss:0.
 Encoder:cnn|Label classifier transformer|Patient ZK|Data size:3597| test loss:0.144468| Accuracy:0.95079 | Precision:0.93971| Recall:0.75333| F1score:0.83626| AUC:0.98246| FAR:0.00968	2020-09-29 14:18:02
 Encoder:cnn|Label classifier transformer|Patient WSH|Data size:3600| test loss:0.725654| Accuracy:0.54139 | Precision:0.13784| Recall:0.33333| F1score:0.19503| AUC:0.43786| FAR:0.41700	2020-09-29 14:32:03
 Encoder:cnn|Label classifier transformer|Patient WSH|Data size:3600| test loss:0.724141| Accuracy:0.54111 | Precision:0.13370| Recall:0.32000| F1score:0.18861| AUC:0.43253| FAR:0.41467	2020-09-29 18:53:02
+Encoder:cnn|Label classifier transformer|Patient WSH|Data size:3600| test loss:0.667306| Accuracy:0.60694 | Precision:0.16680| Recall:0.34000| F1score:0.22381| AUC:0.51000| FAR:0.33967	2020-09-30 09:28:40
+Encoder:cnn|Label classifier transformer|Patient BDP|Data size:7200| test loss:0.281796| Accuracy:0.88486 | Precision:0.66372| Recall:0.62667| F1score:0.64466| AUC:0.90215| FAR:0.06350	2020-10-14 20:42:17
+Encoder:cnn|Label classifier transformer|Patient WSH|Data size:7200| test loss:0.451655| Accuracy:0.83333 | Precision:0.00000| Recall:0.00000| F1score:0.00000| AUC:0.49026| FAR:0.00000	2020-10-14 20:49:29
+Encoder:cnn|Label classifier transformer|Patient SYF|Data size:7200| test loss:0.513060| Accuracy:0.79347 | Precision:0.16550| Recall:0.05917| F1score:0.08717| AUC:0.51380| FAR:0.05967	2020-10-14 20:55:07
+Encoder:cnn|Label classifier transformer|Patient LK|Data size:7200| test loss:0.082714| Accuracy:0.97236 | Precision:0.96472| Recall:0.86583| F1score:0.91260| AUC:0.99052| FAR:0.00633	2020-10-14 21:05:46
+Encoder:cnn|Label classifier transformer|Patient ZK|Data size:7194| test loss:0.170775| Accuracy:0.93119 | Precision:0.90564| Recall:0.65583| F1score:0.76075| AUC:0.97384| FAR:0.01368	2020-10-14 21:06:26
+Encoder:cnn|Label classifier transformer|Patient BDP|Data size:7200| test loss:0.255904| Accuracy:0.89708 | Precision:0.65209| Recall:0.82000| F1score:0.72647| AUC:0.94538| FAR:0.08750	2020-10-28 19:30:10
+Encoder:cnn|Label classifier transformer|Patient WSH|Data size:7200| test loss:0.046502| Accuracy:0.98264 | Precision:0.90627| Recall:0.99917| F1score:0.95046| AUC:0.99971| FAR:0.02067	2020-10-28 19:45:22
+Encoder:cnn|Label classifier transformer|Patient SYF|Data size:7200| test loss:0.117916| Accuracy:0.96028 | Precision:0.82878| Recall:0.96000| F1score:0.88958| AUC:0.98768| FAR:0.03967	2020-10-28 19:47:00
+Encoder:cnn|Label classifier transformer|Patient LK|Data size:7200| test loss:0.203105| Accuracy:0.93319 | Precision:0.71748| Recall:0.98833| F1score:0.83141| AUC:0.99258| FAR:0.07783	2020-10-28 19:47:52
+Encoder:cnn|Label classifier transformer|Patient ZK|Data size:7194| test loss:0.152698| Accuracy:0.93870 | Precision:0.85701| Recall:0.75917| F1score:0.80513| AUC:0.97606| FAR:0.02536	2020-10-28 19:48:07
+Baselins: clstm|Patient WSH|Data size:7200| test loss:0.038004| Accuracy:0.98583 | Precision:0.93228| Recall:0.98667| F1score:0.95870| AUC:0.99932	2020-11-04 09:11:09
+Baselins: clstm|Patient SYF|Data size:7200| test loss:0.128245| Accuracy:0.95028 | Precision:0.79523| Recall:0.94500| F1score:0.86367| AUC:0.98950	2020-11-04 09:11:18
+Baselins: clstm|Patient LK|Data size:7200| test loss:0.099549| Accuracy:0.96472 | Precision:0.85617| Recall:0.94750| F1score:0.89953| AUC:0.99238	2020-11-04 09:13:12
+Baselins: clstm|Patient ZK|Data size:7194| test loss:0.454882| Accuracy:0.80108 | Precision:0.45100| Recall:0.88583| F1score:0.59769| AUC:0.91484	2020-11-04 09:13:24
+Baselins: clstm|Patient BDP|Data size:7200| test loss:0.604507| Accuracy:0.67069 | Precision:0.30346| Recall:0.75333| F1score:0.43264| AUC:0.79851	2020-11-04 09:15:14
+Encoder:cnn|Label classifier lstm|Patient ZK|Data size:7194| test loss:0.439323| Accuracy:0.81568 | Precision:0.47392| Recall:0.95417| F1score:0.63330| AUC:0.95844| FAR:0.21205	2020-11-04 18:32:24
+Encoder:cnn|Label classifier lstm|Patient WSH|Data size:7200| test loss:0.033210| Accuracy:0.99153 | Precision:0.99912| Recall:0.95000| F1score:0.97394| AUC:0.99970| FAR:0.00017	2020-11-04 18:32:40
+Encoder:cnn|Label classifier lstm|Patient SYF|Data size:7200| test loss:0.072559| Accuracy:0.97931 | Precision:0.94346| Recall:0.93167| F1score:0.93753| AUC:0.99050| FAR:0.01117	2020-11-04 18:33:29
+Encoder:cnn|Label classifier lstm|Patient LK|Data size:7200| test loss:0.114476| Accuracy:0.96667 | Precision:0.84433| Recall:0.98083| F1score:0.90748| AUC:0.99488| FAR:0.03617	2020-11-04 18:34:52
+Encoder:cnn|Label classifier lstm|Patient BDP|Data size:7200| test loss:0.225472| Accuracy:0.91028 | Precision:0.77264| Recall:0.65417| F1score:0.70848| AUC:0.93603| FAR:0.03850	2020-11-04 18:35:29
+Baselins: clstm|Patient BDP|Data size:7200| test loss:0.607353| Accuracy:0.67028 | Precision:0.30156| Recall:0.74333| F1score:0.42905| AUC:0.79030 | FAR:0.34433	2020-11-04 18:53:59
+Baselins: clstm|Patient LK|Data size:7200| test loss:0.091630| Accuracy:0.96625 | Precision:0.86499| Recall:0.94500| F1score:0.90323| AUC:0.99300 | FAR:0.02950	2020-11-04 18:54:09
+Baselins: clstm|Patient WSH|Data size:7200| test loss:0.037516| Accuracy:0.98569 | Precision:0.93155| Recall:0.98667| F1score:0.95832| AUC:0.99936 | FAR:0.01450	2020-11-04 18:55:03
+Baselins: clstm|Patient SYF|Data size:7200| test loss:0.124133| Accuracy:0.95194 | Precision:0.79944| Recall:0.95000| F1score:0.86824| AUC:0.99017 | FAR:0.04767	2020-11-04 18:55:24
+Baselins: clstm|Patient ZK|Data size:7194| test loss:0.454533| Accuracy:0.79552 | Precision:0.44314| Recall:0.88000| F1score:0.58945| AUC:0.91167 | FAR:0.22139	2020-11-04 18:55:38
+Baselins: cnnVoting|Patient BDP|Data size:7200| test loss:0.313040| Accuracy:0.88083 | Precision:0.68230| Recall:0.53333| F1score:0.59869| AUC:0.87237 | FAR:0.04967	2020-11-09 21:10:56
+Baselins: cnnVoting|Patient WSH|Data size:7200| test loss:0.027207| Accuracy:0.99347 | Precision:0.98650| Recall:0.97417| F1score:0.98029| AUC:0.99861 | FAR:0.00267	2020-11-09 21:29:21
+Baselins: cnnVoting|Patient SYF|Data size:7200| test loss:0.219995| Accuracy:0.90708 | Precision:0.64758| Recall:0.97083| F1score:0.77693| AUC:0.98565 | FAR:0.10567	2020-11-09 21:30:12
+Baselins: cnnVoting|Patient LK|Data size:7200| test loss:0.219265| Accuracy:0.93569 | Precision:0.72705| Recall:0.98333| F1score:0.83599| AUC:0.98889 | FAR:0.07383	2020-11-09 21:32:01
+Baselins: cnnVoting|Patient ZK|Data size:7194| test loss:0.209140| Accuracy:0.90701 | Precision:0.70439| Recall:0.76250| F1score:0.73229| AUC:0.95423 | FAR:0.06406	2020-11-09 21:32:19
+Baselins: cnnTransformer|Patient WSH|Data size:7200| test loss:0.046785| Accuracy:0.98514 | Precision:0.92136| Recall:0.99583| F1score:0.95715| AUC:0.99953 | FAR:0.01700	2020-11-10 21:25:11
+Baselins: cnnVoting|Patient WSH|Data size:7200| test loss:0.037065| Accuracy:0.99403 | Precision:0.98901| Recall:0.97500| F1score:0.98196| AUC:0.99952 | FAR:0.00217	2020-11-10 21:25:18
+Baselins: cnnTransformer|Patient SYF|Data size:7200| test loss:0.091998| Accuracy:0.96917 | Precision:0.92448| Recall:0.88750| F1score:0.90561| AUC:0.98435 | FAR:0.01450	2020-11-10 21:32:24
+Baselins: cnnTransformer|Patient LK|Data size:7200| test loss:0.104860| Accuracy:0.96764 | Precision:0.85113| Recall:0.97667| F1score:0.90958| AUC:0.99333 | FAR:0.03417	2020-11-10 21:33:45
+Baselins: cnnTransformer|Patient ZK|Data size:7194| test loss:0.305331| Accuracy:0.85794 | Precision:0.54770| Recall:0.85167| F1score:0.66667| AUC:0.93311 | FAR:0.14081	2020-11-10 21:34:13
+Baselins: cnnTransformer|Patient BDP|Data size:7200| test loss:0.543951| Accuracy:0.71306 | Precision:0.31448| Recall:0.61167| F1score:0.41539| AUC:0.73953 | FAR:0.26667	2020-11-10 21:34:37

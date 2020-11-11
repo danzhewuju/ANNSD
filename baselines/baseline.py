@@ -16,7 +16,7 @@ from util.util_file import IndicatorCalculation
 
 class BaseModel:  # 主要用于选择各种各样的模型
     def __init__(self, gpu, basename, input_size=32, Resampling=500):
-        if basename == 'clstm':
+        if basename == 'cnnLstm':
             if gpu >= 0:
                 self.model = clstm(gpu, input_size, Resampling).cuda(gpu)
             else:
@@ -42,7 +42,7 @@ class BaseModel:  # 主要用于选择各种各样的模型
 class Baselines:
     def __init__(self, patient, epoch=10, bath_size=16, dim=32, lr=0.001, gpu=0, train_path=None, test_path=None,
                  val_path=None,
-                 model='train', basename='clstm', few_shot=True, few_show_ratio=0.2, check_point=False, Unbalance=1):
+                 model='train', basename='cnnLstm', few_shot=True, few_show_ratio=0.2, check_point=False, Unbalance=1):
         self.patient = patient  # 患者信息
         self.epoch = epoch  # 迭代次数
         self.batch_size = bath_size  # 批次的大小
