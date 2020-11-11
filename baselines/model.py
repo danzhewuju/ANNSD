@@ -12,9 +12,9 @@ import sys
 import torch
 from torch import nn
 
-sys.path.append('..')
+sys.path.append('../')
 
-from mymodel.model_util import Transformer
+from mymodel.Transformer_model import Transformer
 
 
 # import sys

@@ -6,9 +6,7 @@ import torch.nn as nn
 import torch.nn.functional as F
 from torch.autograd import Function
 
-from Transformer import Transformer, TransformerAttention
-
-sys.path.append('../')
+from Transformer_model import Transformer, TransformerAttention
 
 
 class VAE(nn.Module):
