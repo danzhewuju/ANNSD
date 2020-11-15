@@ -233,7 +233,7 @@ class Baselines:
                 grand_true += [int(x) for x in y]
                 prediction += [int(x) for x in prey]
                 probability += [float(x) for x in
-                                torch.softmax(label_output, dim=1)[:, 1]] if self.basename != 'cnnSvm' else prediction
+                                torch.softmax(label_output, dim=1)[:, 1]] if self.basename != 'cnnSvm' else [int(x) for x in prey]
         loss_avg = sum(loss) / len(loss)
         res = self.evaluation(probability, grand_true)
 

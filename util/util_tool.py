@@ -129,7 +129,6 @@ class MyDataset(Dataset):  # 重写dateset的相关类
         result = matrix_normalization(data, (100, 500))
         result = result.astype('float32')
         result = result[np.newaxis, :]
-        # result = trans_data(vae_model, result)
         return result, label
 
     def __len__(self):
