@@ -258,25 +258,25 @@ class cnnSvm(nn.Module):
             nn.Linear(32, 1)
         )
 
-        def forward(self, x):
-            batch_size = x.shape[0]
-            if self.gpu >= 0:
-                res = torch.zeros(batch_size, 2).cuda(self.gpu)
-            else:
-                res = torch.zeros(batch_size, 2)
-            for i in range(batch_size):
-                tmp_x = x[i][0]
-                length = tmp_x.shape[-1] // self.Resampling
-                for j in range(length):
-                    tmp_split = tmp_x[:, self.Resampling * j:(j + 1) * self.Resampling]
-                    tmp_split = torch.reshape(tmp_split, (1, 1, 100, self.Resampling))
-                    tmx = self.layer1(tmp_split)
-                    tmx = self.layer2(tmx)
-                    tmx = self.layer3(tmx)
-                    tmx = self.layer4(tmx)
-                    tmx = tmx.reshape(1, -1)  # 这里面的-1代表的是自适应的意思。
-                    tmx = self.layer5(tmx)
-                    tmx = tmx.reshape(-1)
-                    res[i] += tmx
-                res[i] /= length
-            return res
+    def forward(self, x):
+        batch_size = x.shape[0]
+        if self.gpu >= 0:
+            res = torch.zeros(batch_size, 1).cuda(self.gpu)
+        else:
+            res = torch.zeros(batch_size, 1)
+        for i in range(batch_size):
+            tmp_x = x[i][0]
+            length = tmp_x.shape[-1] // self.Resampling
+            for j in range(length):
+                tmp_split = tmp_x[:, self.Resampling * j:(j + 1) * self.Resampling]
+                tmp_split = torch.reshape(tmp_split, (1, 1, 100, self.Resampling))
+                tmx = self.layer1(tmp_split)
+                tmx = self.layer2(tmx)
+                tmx = self.layer3(tmx)
+                tmx = self.layer4(tmx)
+                tmx = tmx.reshape(1, -1)  # 这里面的-1代表的是自适应的意思。
+                tmx = self.layer5(tmx)
+                tmx = tmx.reshape(-1)
+                res[i] += tmx
+            res[i] /= length
+        return res
