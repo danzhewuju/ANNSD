@@ -4,7 +4,7 @@ import sys
 
 import torch
 
-from model import clstm, cnnVoting, cnnTransformer
+from model import clstm, cnnVoting, cnnTransformer, cnnSvm
 
 sys.path.append('../')
 import time
@@ -31,8 +31,12 @@ class BaseModel:  # 主要用于选择各种各样的模型
                 self.model = cnnTransformer(gpu, input_size, Resampling).cuda(gpu)
             else:
                 self.model = cnnTransformer(gpu, input_size, Resampling)
+        elif basename == 'cnnSvm':
+            if gpu >= 0:
+                self.model = cnnSvm(gpu, input_size, Resampling).cuda(gpu)
+            else:
+                self.model = cnnSvm(gpu, input_size, Resampling)
         else:
-
             pass
 
     def get_model(self):  # 获取构建的模型
@@ -97,6 +101,9 @@ class Baselines:
         f.close()
         print("Generating log!")
 
+    def svmloss(self, output, y):
+        return torch.mean(torch.clamp(1 - output.t() * y, min=0))  # hinge loss
+
     def train(self):
         mydata = MyData(path_train=self.train_path, path_test=self.test_path, path_val=self.val_path,
                         batch_size=self.batch_size,
@@ -104,7 +111,7 @@ class Baselines:
 
         train_data_loader = mydata.data_loader(None, mode='train')
         optimizer = torch.optim.Adam(self.model.parameters(), lr=self.lr)
-        loss_func = nn.CrossEntropyLoss()
+        loss_func = nn.CrossEntropyLoss()if self.basename != 'cnnSvm' else self.svmloss
 
         acc_train, loss_train = [], []
         last_test_accuracy = 0
