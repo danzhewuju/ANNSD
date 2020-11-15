@@ -21,7 +21,7 @@ class BaseModel:  # 主要用于选择各种各样的模型
                 self.model = clstm(gpu, input_size, Resampling).cuda(gpu)
             else:
                 self.model = clstm(gpu, input_size, Resampling)
-        elif basename == 'cnnVoting':  ## 采用CNN Voting 的方法
+        elif basename == 'cnnVoting':  # 采用CNN Voting 的方法
             if gpu >= 0:
                 self.model = cnnVoting(gpu, input_size, Resampling).cuda(gpu)
             else:
@@ -86,7 +86,8 @@ class Baselines:
             exit()
         return
 
-    def log_write(self, result, path='../log/log.txt'):
+    @staticmethod
+    def log_write(result, path='../log/log.txt'):
         time_stamp = time.strftime("%Y-%m-%d %H:%M:%S", time.localtime())
         dir_name = os.path.dirname(path)
         if not os.path.exists(dir_name):
@@ -100,9 +101,24 @@ class Baselines:
         f.write(result_log)
         f.close()
         print("Generating log!")
+        return
 
-    def svmloss(self, output, y):
-        return torch.mean(torch.clamp(1 - output.t() * y, min=0))  # hinge loss
+    '''
+    为了编码的方便，需要对最后的神经元进行处理，主要是其他的输出和SVM的不同的处理
+    
+    '''
+
+    def cal_probability(self, output):
+        if self.basename == 'cnnSvm':
+            pred_y = [1 if d > 0 else 0 for d in output.data]
+        else:
+            pred_y = torch.max(output, 1)[1].data
+            pred_y = pred_y.cpu()
+        return pred_y
+
+    @staticmethod
+    def loss_svm(output, y):
+        return torch.mean(torch.clamp(1 - output.t() * y, min=0))
 
     def train(self):
         mydata = MyData(path_train=self.train_path, path_test=self.test_path, path_val=self.val_path,
@@ -111,7 +127,7 @@ class Baselines:
 
         train_data_loader = mydata.data_loader(None, mode='train')
         optimizer = torch.optim.Adam(self.model.parameters(), lr=self.lr)
-        loss_func = nn.CrossEntropyLoss()if self.basename != 'cnnSvm' else self.svmloss
+        loss_func = nn.CrossEntropyLoss() if self.basename != 'cnnSvm' else Baselines.loss_svm
 
         acc_train, loss_train = [], []
         last_test_accuracy = 0
@@ -121,16 +137,15 @@ class Baselines:
                 for step, (b_x, b_y, _, length, _) in enumerate(tqdm(train_data_loader)):  # gives batch data
                     b_x_g = b_x.cuda(self.gpu)
                     b_y_g = b_y.cuda(self.gpu)
-                    # b_x = b_x.view(-1, 100, 1000)  # reshape x to (batch, time_step, input_size)
                     output = self.model(b_x_g)  #
                     loss = loss_func(output, b_y_g)  # cross entropy loss
 
                     optimizer.zero_grad()  # clear gradients for this training step
                     loss.backward()  # backpropagation, compute gradients
                     optimizer.step()  # apply gradients
+                    # SVM的计算方式不同需要更改计算的方式
+                    pred_y = self.cal_probability(output)
 
-                    pred_y = torch.max(output, 1)[1].data
-                    pred_y = pred_y.cpu()
                     res_tmp = [1 if pred_y[i] == b_y[i] else 0 for i in range(len(b_y))]
                     acc_train += res_tmp
                     loss_train.append(loss.data.cpu())
@@ -146,7 +161,7 @@ class Baselines:
                             with torch.no_grad():
                                 label_output_test = self.model(x_test)
                                 loss_label = loss_func(label_output_test, label_test)
-                                pre_y_test = torch.max(label_output_test, 1)[1].data
+                                pre_y_test = self.cal_probability(label_output_test)
                                 acc_test += [1 if pre_y_test[i] == label_test[i] else 0 for i in range(len(label_test))]
                                 loss_test.append(loss_label.data.cpu())
                         acc_train_avg = sum(acc_train) / len(acc_train)
@@ -198,7 +213,7 @@ class Baselines:
         prediction = []
         probability = []
 
-        loss_func = nn.CrossEntropyLoss()
+        loss_func = nn.CrossEntropyLoss() if self.basename != 'cnnSvm' else Baselines.loss_svm
         for step, (x, label, domain, length, ids) in enumerate(tqdm(test_data_loader)):
             if self.gpu >= 0:
                 x, label, domain, length = x.cuda(self.gpu), label.cuda(self.gpu), domain.cuda(
@@ -206,9 +221,9 @@ class Baselines:
                     self.gpu)
             with torch.no_grad():
                 label_output = self.model(x)
-                loss_label = loss_func(label_output, label)
-                loss_total = loss_label
-                prey = torch.max(label_output, 1)[1].data.cpu()
+                loss_test = loss_func(label_output, label)
+                loss_total = loss_test
+                prey = self.cal_probability(label_output)
 
                 y = label.cpu()
                 acc += [1 if prey[i] == y[i] else 0 for i in range(len(y))]
@@ -217,7 +232,8 @@ class Baselines:
                 # ids_list += ids
                 grand_true += [int(x) for x in y]
                 prediction += [int(x) for x in prey]
-                probability += [float(x) for x in torch.softmax(label_output, dim=1)[:, 1]]
+                probability += [float(x) for x in
+                                torch.softmax(label_output, dim=1)[:, 1]] if self.basename != 'cnnSvm' else prediction
         loss_avg = sum(loss) / len(loss)
         res = self.evaluation(probability, grand_true)
 

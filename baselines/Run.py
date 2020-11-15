@@ -9,7 +9,7 @@ def run():
     parser.add_argument('-dim', '--output_dim', type=int, default=32, help='number of hidden units in encoder')
     parser.add_argument('-bs', '--batch_size', type=int, default=16, help='number of bath size')
     parser.add_argument('-gpu', '--GPU', type=int, default=0, help='GPU ID')
-    parser.add_argument('-ep', '--epoch', type=int, default=5, help='number of epoch')
+    parser.add_argument('-ep', '--epoch', type=int, default=1, help='number of epoch')
 
     parser.add_argument('-trp', '--train_path', type=str, default="../preprocess/train_{}.csv",
                         help='training data path')
@@ -24,7 +24,7 @@ def run():
                         help='The name of baselines')  # cnnLstm, cnnVoting, cnnTransformer
     parser.add_argument('-m', '--model', type=str, default="train", help='style of train')
     parser.add_argument('-few', '--few_show_learning', type=bool, default=True, help='keep few shot learning open')
-    parser.add_argument('-fr', '--few_show_learning_ratio', type=float, default=0.2, help='few shot learning ratio')
+    parser.add_argument('-fr', '--few_show_learning_ratio', type=float, default=0.1, help='few shot learning ratio')
     parser.add_argument('-chp', '--check_point', type=bool, default=False, help='Whether to continue training')
     parser.add_argument('-rec', '--recoding', type=bool, default=False, help='Whether to recoder result for every file')
     parser.add_argument('-unb', '--unbalance_data', type=int, default=5,
