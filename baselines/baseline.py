@@ -4,7 +4,7 @@ import sys
 
 import torch
 
-from model import clstm, cnnVoting, cnnTransformer, cnnSvm
+from model import clstm, cnnVoting, cnnTransformer, cnnSvm, VDCNN
 
 sys.path.append('../')
 import time
@@ -36,7 +36,13 @@ class BaseModel:  # 主要用于选择各种各样的模型
                 self.model = cnnSvm(gpu, input_size, Resampling).cuda(gpu)
             else:
                 self.model = cnnSvm(gpu, input_size, Resampling)
+        elif basename == 'vdCnn':
+            if gpu >= 0:
+                self.model = VDCNN(gpu, input_size, Resampling).cuda(gpu)
+            else:
+                self.model = VDCNN(gpu, input_size, Resampling)
         else:
+
             pass
 
     def get_model(self):  # 获取构建的模型
@@ -113,7 +119,7 @@ class Baselines:
             pred_y = [1 if d > 0 else 0 for d in output.data]
         else:
             pred_y = torch.max(output, 1)[1].data
-            pred_y = pred_y.cpu()
+            # pred_y = pred_y.cpu()
         return pred_y
 
     @staticmethod
@@ -241,9 +247,11 @@ class Baselines:
                                                                                                              x in prey]
         loss_avg = sum(loss) / len(loss)
         res = self.evaluation(probability, grand_true)
+        message = "Unbalance" if self.unbalance > 1 else "balance"
 
-        result = "Baselins: {}|Patient {}|Data size:{}| test loss:{:.6f}| Accuracy:{:.5f} | Precision:" \
-                 "{:.5f}| Recall:{:.5f}| F1score:{:.5f}| AUC:{:.5f} | FAR:{:.5f}".format(self.basename, self.patient,
+        result = "{} |Baselins: {}|Patient {}|Data size:{}| test loss:{:.6f}| Accuracy:{:.5f} | Precision:" \
+                 "{:.5f}| Recall:{:.5f}| F1score:{:.5f}| AUC:{:.5f} | FAR:{:.5f}".format(message, self.basename,
+                                                                                         self.patient,
                                                                                          len(acc),
                                                                                          loss_avg, res['accuracy'],
                                                                                          res['precision'],

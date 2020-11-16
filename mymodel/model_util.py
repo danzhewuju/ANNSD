@@ -1,5 +1,4 @@
 import random
-import sys
 
 import torch
 import torch.nn as nn
@@ -137,7 +136,7 @@ class DAN(nn.Module):
         :return:
         '''
         if self.label_classifier_name == 'transformer':
-            max_length = 15  ## 设置的长度为15
+            max_length = 15  # 设置的长度为15
         else:
             max_length = length[0] // self.resampling
         bat = x.shape[0]

@@ -405,10 +405,17 @@ class Dan:
         loss_avg = sum(loss) / len(loss)
         res = self.evaluation(probability, grand_true)
 
-        result = "Encoder:{}|Label classifier {}|Patient {}|Data size:{}| test loss:{:.6f}| Accuracy:{:.5f} | Precision:" \
-                 "{:.5f}| Recall:{:.5f}| F1score:{:.5f}| AUC:{:.5f}| FAR:{:.5f}".format(
-            self.encoder_name, self.label_classifier_name, self.patient, len(acc), loss_avg, res['accuracy'],
-            res['precision'], res['recall'], res['f1score'], res['auc'], res['far'])
+        message = "Unbalance" if self.isUnbalance > 1 else "balance"
+
+        result = "{} |Encoder:{}|Label classifier {}|Patient {}|Data size:{}| test loss:{:.6f}| Accuracy:{:.5f} | Precision:" \
+                 "{:.5f}| Recall:{:.5f}| F1score:{:.5f}| AUC:{:.5f}| FAR:{:.5f}".format(message,
+                                                                                        self.encoder_name,
+                                                                                        self.label_classifier_name,
+                                                                                        self.patient, len(acc),
+                                                                                        loss_avg, res['accuracy'],
+                                                                                        res['precision'], res['recall'],
+                                                                                        res['f1score'], res['auc'],
+                                                                                        res['far'])
         self.log_write(result)
         if recoding:  # 如果开启了记录模式，模型会记录所有的文件的预测结果
             self.save_all_input_prediction_result(ids_list, grand_true, prediction)
