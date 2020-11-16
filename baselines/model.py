@@ -18,11 +18,15 @@ import torch.nn.functional as F
 from mymodel.Transformer_model import Transformer
 from torch.nn.init import kaiming_normal_
 
-
 # import sys
 #
 # sys.path.append('../')
 # from util.util_tool import
+
+'''
+a new baseline : Recurrent Convolutional Neural Networks for Text Classification
+paper link: http://zhengyima.com/my/pdfs/Textrcnn.pdf
+'''
 
 
 class clstm(nn.Module):
@@ -97,6 +101,12 @@ class clstm(nn.Module):
         return out
 
 
+'''
+a new baseline : An automated system for epilepsy detection using EEG brain signals based on deep learning approach
+paper link: https://www.sciencedirect.com/science/article/pii/S0957417418302513
+'''
+
+
 class cnnVoting(nn.Module):
 
     def __init__(self, gpu=0, input_size=32, Resampling=500):
@@ -165,6 +175,13 @@ class cnnVoting(nn.Module):
         return res
 
 
+'''
+a new baseline : Learning to Exploit Invariances in Clinical Time-Series Data using Sequence Transformer Networks
+paper link: https://arxiv.org/abs/1808.06725
+
+'''
+
+
 class cnnTransformer(nn.Module):
     def __init__(self, gpu=0, input_size=32, Resampling=500):
         super(cnnTransformer, self).__init__()
@@ -221,6 +238,13 @@ class cnnTransformer(nn.Module):
                 res[i][j] = tmx
         out = self.transformer(res)
         return out
+
+
+'''
+a new baseline:Epileptic Seizure Prediction over EEG Data using Hybrid CNN-SVM Model with Edge Computing Services
+paper link: https://www.matec-conferences.org/articles/matecconf/abs/2018/69/matecconf_cscc2018_03016/matecconf_cscc2018_03016.html
+
+'''
 
 
 class cnnSvm(nn.Module):
