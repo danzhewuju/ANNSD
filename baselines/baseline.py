@@ -136,6 +136,10 @@ class Baselines:
             for epoch in tqdm(range(self.epoch)):
                 for step, (b_x, b_y, _, length, _) in enumerate(tqdm(train_data_loader)):  # gives batch data
                     b_x_g = b_x.cuda(self.gpu)
+
+                    # 如果是SVM需要更改标签 将0/1 标签转化为-1/1的标签
+                    if self.basename == 'cnnSvm':
+                        b_y = torch.Tensor([1 if d == 1 else -1 for d in b_y])
                     b_y_g = b_y.cuda(self.gpu)
                     output = self.model(b_x_g)  #
                     loss = loss_func(output, b_y_g)  # cross entropy loss
@@ -233,7 +237,8 @@ class Baselines:
                 grand_true += [int(x) for x in y]
                 prediction += [int(x) for x in prey]
                 probability += [float(x) for x in
-                                torch.softmax(label_output, dim=1)[:, 1]] if self.basename != 'cnnSvm' else [int(x) for x in prey]
+                                torch.softmax(label_output, dim=1)[:, 1]] if self.basename != 'cnnSvm' else [int(x) for
+                                                                                                             x in prey]
         loss_avg = sum(loss) / len(loss)
         res = self.evaluation(probability, grand_true)
 
