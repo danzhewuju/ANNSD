@@ -13,6 +13,7 @@ import torch
 from torch import nn
 
 sys.path.append('../')
+import torch.nn.functional as F
 
 from mymodel.Transformer_model import Transformer
 from torch.nn.init import kaiming_normal_
@@ -284,7 +285,7 @@ class cnnSvm(nn.Module):
 
 
 '''
-Add a method Very-deep-CNN(VDCNN)
+Add a baseline： Very-deep-CNN(VDCNN)
 paper link: https://link.zhihu.com/?target=https%3A//arxiv.org/pdf/1606.01781.pdf
 github link : https://github.com/uvipen/Very-deep-cnn-pytorch/blob/master/train.py
 '''
@@ -331,7 +332,6 @@ class VDCNN(nn.Module):
         n_classes = 2
         depth = 9
         n_fc_neurons = 2048
-        num_embedding = 69
         shortcut = False
         embedding_dim = input_size
         self.gpu = gpu
@@ -462,3 +462,131 @@ class VDCNN(nn.Module):
         output = self.fc_layers(output)
 
         return output
+
+
+'''''
+add a new baseline: Deep Pyramid Convolutional Neural Networks for Text Categorization
+paper link: https://www.aclweb.org/anthology/P17-1052.pdf
+github link :https://github.com/Cheneng/DPCNN 
+'''''
+
+
+class BasicModule(nn.Module):
+    def __init__(self):
+        super(BasicModule, self).__init__()
+        self.model_name = str(type(self))
+
+    def load(self, path):
+        self.load_state_dict(torch.load(path))
+
+    def save(self, path):
+        torch.save(self.state_dict(), path)
+
+
+class DPCNN(BasicModule):
+    """
+    DPCNN for sentences classification.
+    """
+
+    def __init__(self, gpu, input_size, Resampling):
+        super(DPCNN, self).__init__()
+        self.gpu = gpu
+        self.Resampling = Resampling
+        self.input_size = input_size
+
+        # self.config = config
+        self.channel_size = 15
+        self.embedding = nn.Sequential(
+            nn.Conv2d(in_channels=1, out_channels=16, kernel_size=5, stride=1, padding=2),
+            nn.BatchNorm2d(16),
+            nn.ReLU(),
+            nn.MaxPool2d(kernel_size=2, stride=2),
+            nn.Conv2d(16, 32, kernel_size=5, stride=1, padding=2),
+            nn.BatchNorm2d(32),
+            nn.ReLU(),
+            nn.MaxPool2d(kernel_size=2, stride=2),
+            nn.Conv2d(32, 64, kernel_size=5, stride=1, padding=2),
+            nn.BatchNorm2d(64),
+            nn.ReLU(),
+            nn.MaxPool2d(kernel_size=2, stride=2),
+            nn.Conv2d(64, 32, kernel_size=5, stride=1, padding=2),
+            nn.BatchNorm2d(32),
+            nn.ReLU(),
+            nn.MaxPool2d(kernel_size=2, stride=2),
+
+        )
+        self.fc = nn.Linear(6 * 31 * 32, 32)  # x_ y_ 和你输入的矩阵有关系
+
+        self.conv_region_embedding = nn.Conv2d(1, self.channel_size, (3, input_size), stride=1)
+        self.conv3 = nn.Conv2d(self.channel_size, self.channel_size, (3, 1), stride=1)
+        self.pooling = nn.MaxPool2d(kernel_size=(3, 1), stride=2)
+        self.padding_conv = nn.ZeroPad2d((0, 0, 1, 1))
+        self.padding_pool = nn.ZeroPad2d((0, 0, 0, 1))
+        self.act_fun = nn.ReLU()
+        self.linear_out = nn.Linear(2 * self.channel_size, 2)
+
+    def forward(self, x):
+        batch_size = x.shape[0]
+
+        if self.gpu >= 0:
+            res = torch.zeros(batch_size, 15, self.input_size).cuda(self.gpu)
+        else:
+            res = torch.zeros(batch_size, 15, self.input_size)
+        for i in range(batch_size):
+            tmp_x = x[i][0]
+            length = tmp_x.shape[-1] // self.Resampling
+            for j in range(length):
+                tmp_split = tmp_x[:, self.Resampling * j:(j + 1) * self.Resampling]
+                tmp_split = torch.reshape(tmp_split, (1, 1, 100, self.Resampling))
+                tmx = self.embedding(tmp_split)
+                tmx = tmx.reshape(-1)
+                tmx = self.fc(tmx)
+                tmx = tmx.reshape(-1)
+                res[i][j] = tmx
+
+        # Region embedding
+        # x = self.embedding(res)
+        # x = self.conv_region_embedding(x)  # [batch_size, channel_size, length, 1]
+        # 修改此处的embedding
+        res = torch.unsqueeze(res, len(res.shape))
+
+        res = self.padding_conv(res)  # pad保证等长卷积，先通过激活函数再卷积
+        res = self.act_fun(res)
+        res = self.conv3(res)
+        res = self.padding_conv(res)
+        res = self.act_fun(res)
+        res = self.conv3(res)
+
+        while res.size()[-2] > 2:
+            res = self._block(res)
+
+        res = res.view(batch_size, 2 * self.channel_size)
+        res = self.linear_out(res)
+
+        return res
+
+    def _block(self, x):
+        # Pooling
+        x = self.padding_pool(x)
+        px = self.pooling(x)
+
+        # Convolution
+        x = self.padding_conv(px)
+        x = F.relu(x)
+        x = self.conv3(x)
+
+        x = self.padding_conv(x)
+        x = F.relu(x)
+        x = self.conv3(x)
+
+        # Short Cut
+        x = x + px
+
+        return x
+
+    # def predict(self, x):
+    #     self.eval()
+    #     out = self.forward(x)
+    #     predict_labels = torch.max(out, 1)[1]
+    #     self.train(mode=True)
+    #     return predict_labels
