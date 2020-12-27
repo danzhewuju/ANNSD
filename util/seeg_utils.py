@@ -3,13 +3,23 @@
 import os
 import uuid
 
+import matplotlib.pyplot as plt
 import mne
 import numpy as np
 import pandas as pd
 import pyedflib
 import scipy.io as sio
 from mne.time_frequency import *
-import matplotlib.pyplot as plt
+
+
+def read_annotations(data):
+    info = {}
+    annotations = data.annotations
+    info['description'] = annotations.description
+    info['duration'] = annotations.duration
+    info['onset'] = annotations.onset
+    info['orig_time'] = annotations.orig_time
+    return info
 
 
 def read_raw(path):

@@ -1,20 +1,8 @@
-class A:
-    def __init__(self):
-        pass
+from util.seeg_utils import read_edf_raw, read_annotations
 
-    def add(self, x, y):
-        return x + y
-
-
-class B(A):
-    def __init__(self):
-        pass
-
-    def add(self, x, y):
-        res = super(B, self).add(x, y)
-        return res
-
-
-a = A()
-b = B()
-print(b.add(1, 2))
+print("Hello")
+path = "/home/yh/yh/dataset/positiveDataAvailable/BDP/BDP{}.edf"
+for i in range(1, 6):
+    new_path = path.format(i)
+    data = read_edf_raw(new_path)
+    print(read_annotations(data))
