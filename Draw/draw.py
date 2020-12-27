@@ -30,7 +30,7 @@ class Draw:
             data = np.load(path)
         elif fix == "fif":
             data = read_raw(path)
-        elif fix == ".edf":
+        elif fix == "edf":
             data = read_edf_raw(path)
         else:
             pass
@@ -50,8 +50,8 @@ class Draw:
                 assert "The length of segment is too long. "
             data = self.data[channel][start_time * resampling:end_time * resampling]
         else:
-            resampling = get_sampling_hz(self.data)
-            data, _ = self.data[channel, start_time * resampling:end_time * resampling]
+            sampling = get_sampling_hz(self.data)
+            data, _ = self.data[channel, start_time * sampling:end_time * sampling]
         return data
 
     def draw_signal_wave(self, channel, start_time, end_time, save_path):
@@ -60,8 +60,11 @@ class Draw:
             os.makedirs(base_dir)
             print("Dir is not existed, Creating a dir for your save path.")
         data = self.read_channel_duration_data(channel, start_time, end_time)
-        plt.figure(figsize=(2, 1))
+        data = data.flatten()
+        plt.figure(figsize=(int((end_time-start_time)*1.5), 1))
         plt.plot(range(len(data)), data)
+        plt.yticks([])
+        plt.xticks([])
         plt.savefig(save_path)
         plt.show()
         return
@@ -72,4 +75,5 @@ class Draw:
 
 
 if __name__ == '__main__':
-    draw = Draw(path="")
+    draw = Draw(path="/home/yh/yh/dataset/raw_data/BDP/BDP_Pre_seizure/BDP_SZ1_pre_seizure_raw.fif")
+    draw.draw_signal_wave(58, 15, 19, save_path="./plot/signal_1.jpeg")
