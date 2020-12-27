@@ -61,7 +61,7 @@ class Draw:
             print("Dir is not existed, Creating a dir for your save path.")
         data = self.read_channel_duration_data(channel, start_time, end_time)
         data = data.flatten()
-        plt.figure(figsize=(int((end_time-start_time)*1.5), 1))
+        plt.figure(figsize=(int((end_time - start_time) * 1.5), max(1, int((end_time - start_time) / 5))))
         plt.plot(range(len(data)), data)
         plt.yticks([])
         plt.xticks([])
@@ -75,5 +75,11 @@ class Draw:
 
 
 if __name__ == '__main__':
+    # 1. 癫痫发作前
     draw = Draw(path="/home/yh/yh/dataset/raw_data/BDP/BDP_Pre_seizure/BDP_SZ1_pre_seizure_raw.fif")
-    draw.draw_signal_wave(58, 15, 19, save_path="./plot/signal_1.jpeg")
+    draw.draw_signal_wave(58, 25, 45, save_path="./plot/signal_25-45.pdf")
+
+    # 2. 正常睡眠
+
+    draw = Draw(path="/home/yh/yh/dataset/raw_data/BDP/BDP_SLEEP/BDP_Sleep_raw.fif")
+    draw.draw_signal_wave(58, 20, 40, save_path="./plot/sleep_20-40.pdf")
