@@ -100,27 +100,31 @@ class Draw:
         selection = selection.pick_channels(channel_names_str_list)
 
         sl = selection[:, :]  # 抽取为array格式
-        offset = np.arange(0, 10 * 0.002, 0.002)
+        offset = np.arange(0, len(channels) * 0.001, 0.001)
         x = sl[1]  # x轴数据
         y = sl[0].T + offset  # y轴数据
 
         # ylabel = ['$G2$', '$G3$', '$G4$', '$G5$', '$G6$', '$G7$', '$G8$', '$G9$', '$H1$', '$H3$']  # y轴刻度的名称
-        fig = plt.figure()
+        fig = plt.figure(figsize=(int((end_time - start_time) * 1.5), max(1, int((end_time - start_time) / 5))))
+
         ax = axisartist.Subplot(fig, 111)
+        ax.set_xlim(0, )
         fig.add_axes(ax)
-        ax.axis["left"].set_axisline_style("->", size=1.5)  # 设置y轴样式为->箭头
-        ax.axis["bottom"].set_axisline_style("->", size=1.5)  # 设置x轴样式为->箭头
-        ax.axis["top"].set_visible(False)  # 隐藏上面的轴
-        ax.axis["right"].set_visible(False)  # 隐藏右侧的轴
-        x_major_locator = MultipleLocator(1)  # 设置刻度间距为1
-        ax.xaxis.set_major_locator(x_major_locator)
+        # ax.axis["left"].set_axisline_style("->", size=1.5)  # 设置y轴样式为->箭头
+        # ax.axis["bottom"].set_axisline_style("->", size=1.5)  # 设置x轴样式为->箭头
+        # ax.axis["top"].set_visible(False)  # 隐藏上面的轴
+        # ax.axis["right"].set_visible(False)  # 隐藏右侧的轴
+        # x_major_locator = MultipleLocator(1)  # 设置刻度间距为1
+        plt.yticks([])
+        plt.xticks([])
+        # ax.xaxis.set_major_locator(x_major_locator)
         # plt.yticks(offset.tolist(), ylabel)  # 修改y轴刻度的名称
-        plt.xlabel("Time(s)")
-        plt.ylabel("Channels")
+        # plt.xlabel("Time(s)")
+        # plt.ylabel("Channels")
         # plt.axvline(5, linestyle="dotted", color='k')  # 在x=5的地方画垂直点状线
         # plt.text(5.17, 0.02, "Seizure")  # 在x=5.17,y=0.02处写上Seizure字样
         plt.plot(x, y, '-k', linewidth=0.5)  # 设置线条颜色、宽度
-
+        plt.savefig(save_path)
         plt.show()
 
     def __init__(self, path):
@@ -139,5 +143,12 @@ if __name__ == '__main__':
     # draw.draw_signal_wave(58, 20, 40, save_path="./plot/sleep_20-40.pdf")
 
     # 3. 将多条脑电信号保存在一幅图中
-    draw = Draw(path="/home/yh/yh/dataset/raw_data/BDP/BDP_Pre_seizure/BDP_SZ1_pre_seizure_raw.fif")
-    draw.draw_multi_wave([0, 1, 2, 3, 4], 15, 25, "./plot/mutil_wave_preseizure.png")
+    # draw = Draw(path="/home/yh/yh/dataset/raw_data/BDP/BDP_Pre_seizure/BDP_SZ1_pre_seizure_raw.fif")
+    # for s in range(12, 36, 2):
+    #     draw.draw_multi_wave([2, 3, 4, 5, 6, 7, 8, 9, 10, 11], s, s + 2,
+    #                          "./plot/mutil_wave_preseizure-{}{}.pdf".format(s, s + 2))
+
+    draw = Draw(path="/home/yh/yh/dataset/raw_data/BDP/BDP_SLEEP/BDP_Sleep_raw.fif")
+    for s in range(100, 120, 2):
+        draw.draw_multi_wave([2, 3, 4, 5, 6, 7, 8, 9, 10, 11], s, s + 2,
+                             "./plot/mutil_wave_nonpreseizure-{}{}.pdf".format(s, s + 2))
