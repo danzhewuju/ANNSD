@@ -139,5 +139,5 @@ if __name__ == '__main__':
     # draw.draw_signal_wave(58, 20, 40, save_path="./plot/sleep_20-40.pdf")
 
     # 3. 将多条脑电信号保存在一幅图中
-    draw = Draw(path="/home/yh/yh/dataset/raw_data/BDP/BDP_SLEEP/BDP_Sleep_raw.fif")
+    draw = Draw(path="/home/yh/yh/dataset/raw_data/BDP/BDP_Pre_seizure/BDP_SZ1_pre_seizure_raw.fif")
     draw.draw_multi_wave([0, 1, 2, 3, 4], 15, 25, "./plot/mutil_wave_preseizure.png")
