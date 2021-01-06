@@ -456,8 +456,8 @@ class Dan:
             if self.gpu >= 0:
                 x, y = x.cuda(self.gpu), y.cuda(self.gpu)
             with torch.no_grad():
-                inputlength = [data_length * resampling] * len(x)
-                label_output = self.model(x, y, None, inputlength)
+                inputLength = [data_length * resampling] * len(x)
+                label_output = self.model(x, y, None, inputLength)
                 prey = torch.max(label_output, 1)[1].data.cpu()
 
                 ids_list += ["{}_{}_{}_{}".format(os.path.basename(file_path), self.patient, label, t // resampling) for

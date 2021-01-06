@@ -150,5 +150,5 @@ if __name__ == '__main__':
 
     draw = Draw(path="/home/yh/yh/dataset/raw_data/BDP/BDP_SLEEP/BDP_Sleep_raw.fif")
     for s in range(100, 120, 2):
-        draw.draw_multi_wave([2, 3, 4, 5, 6, 7, 8, 9, 10, 11], s, s + 2,
+        draw.draw_multi_wave([2, 3, 4, 5, 6, 7, 38, 39, 40, 41], s, s + 2,
                              "./plot/mutil_wave_nonpreseizure-{}{}.pdf".format(s, s + 2))

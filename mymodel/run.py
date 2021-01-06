@@ -20,7 +20,7 @@ def run():
     parser.add_argument('-atp', '--attention_path', type=str, default="../preprocess/attention_{}.csv",
                         help='attention data path')
     parser.add_argument('-p', '--patient', type=str, default="BDP", help='patient name')
-    parser.add_argument('-m', '--model', type=str, default="train", help='style of train')
+    parser.add_argument('-m', '--model', type=str, default="prediction", help='style of train')
     parser.add_argument('-few', '--few_show_learning', type=bool, default=True, help='keep few shot learning open')
     parser.add_argument('-fr', '--few_show_learning_ratio', type=float, default=0.2, help='few shot learning ratio')
     parser.add_argument('-em', '--embedding', type=str, default="cnn", help='method of embedding')
@@ -64,7 +64,7 @@ def run():
     check_point = args.check_point
     att = args.attention_matrix
     rec = args.recoding
-    isUnbalance = args.unbalance_data # when is Unbalance == 1 mean balance
+    isUnbalance = args.unbalance_data  # when is Unbalance == 1 mean balance
     train_path, test_path, val_path, att_path = train_path.format(patient), test_path.format(patient), val_path.format(
         patient), att_path.format(patient)
 
@@ -81,6 +81,7 @@ def run():
         dan_train.test(recoding=rec)
     elif model == 'attention':  # 需要计算attention的值
         dan_train.test_attention()
+    #  运行脚本：python ./run.py -m prediction -lac transformer -p BDP -gpu 1
     elif model == 'prediction':  # 单个样本的预测模型
 
         file_path, label, save_file, data_length, config_path = args.file_path, args.test_seizure, args.save_file, args.data_length, args.config_path

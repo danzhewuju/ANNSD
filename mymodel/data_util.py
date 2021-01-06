@@ -47,7 +47,7 @@ class SingleDataset(Dataset):
         result = matrix_normalization(data, (100, -1))
         result = result.astype('float32')
         result = result[np.newaxis, :]
-        return result, self.time_info[item], self.label
+        return result, self.label, self.time_info[item]
 
     def __len__(self):
         """
