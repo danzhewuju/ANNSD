@@ -15,7 +15,7 @@ from tqdm import tqdm
 
 from data_util import MyData, SingleDataInfo, SingleDataset
 from model_util import DAN, ContrastiveLoss
-from util.seeg_utils import read_raw, re_sampling, select_channel_data_mne
+from util.seeg_utils import read_raw, re_sampling, read_edf_raw, read_annotations
 from util.util_file import trans_numpy_cv2, IndicatorCalculation
 
 
@@ -420,6 +420,37 @@ class Dan:
         if recoding:  # 如果开启了记录模式，模型会记录所有的文件的预测结果
             self.save_all_input_prediction_result(ids_list, grand_true, prediction)
 
+    @staticmethod
+    def read_data(path):
+        """
+        :param path:
+        :param start_time:
+        :param end_time:
+        :return:
+        """
+        fix = path.split('.')[-1]  # 后缀
+        if fix == "npy":
+            data = np.load(path)
+        elif fix == "fif":
+            data = read_raw(path)
+        elif fix == "edf":
+            # 这里对应着原始文件，需要选取特定范围的数据，流程上希望自动完成对数据的截取操作
+            data = read_edf_raw(path)
+            annotation = read_annotations(data)
+            onset = annotation['onset']
+            if len(onset) > 3:
+                # 读取onset的时间
+                end_time = int(onset[3]) - 30
+                # 如果预留的时间小于30s无法执行 此时要留一个30s的gap;
+                if end_time <= 0:
+                    data = None
+                data = data.crop(0, end_time)
+            else:
+                data = None
+        else:
+            pass
+        return data
+
     def prediction_real_data(self, file_path, label, save_file, data_length, config_path):
         """
         :function 在实际的情况下的模型的准确率,单个文件的预测结果
@@ -435,13 +466,24 @@ class Dan:
         label_dict = {'pre_seizure': 1, 'non_seizure': 0}
         with open(config_path, 'r') as f:
             config = json.load(f)
-        data = read_raw(file_path)
+        data = Dan.read_data(file_path)
+        # read_raw(file_path)
+        # 数据读取失败
+        if data == None:
+            assert "data loading filed!"
+            print("data loading filed!")
+            exit()
+
         data = re_sampling(data, fz=500)  # 对于数据进行重采样
-        key = "{}_data_path".format(self.patient)
-        channel_path = config[key]["data_channel_path"]  # 获取相关的保存位置信息
-        channel_name = pd.read_csv(channel_path)
-        channels_name = list(channel_name['chan_name'])
-        data = select_channel_data_mne(data, channels_name)
+
+        """
+         # 研究信道排序对于模型的影响，去掉该模块基本没影响
+         key = "{}_data_path".format(self.patient)
+         channel_path = config[key]["data_channel_path"]  # 获取相关的保存位置信息
+         channel_name = pd.read_csv(channel_path)
+         channels_name = list(channel_name['chan_name'])
+         data = select_channel_data_mne(data, channels_name)
+        """
 
         new_data, _ = data[:, :]  # 获取原始数据的形式
         single_data_info = SingleDataInfo(new_data, label, data_length=data_length)
