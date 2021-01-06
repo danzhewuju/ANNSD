@@ -32,8 +32,11 @@ def run():
     parser.add_argument('-unb', '--unbalance_data', type=int, default=5,
                         help="The negative sample is x times the positive sample")
     # -------------------------------------------单文件测试模块----------------------------------------------------------
+    # parser.add_argument('-fp', '--file_path', type=str,
+    #                     default="/data/yh/dataset/raw_data/BDP/BDP_Pre_seizure/BDP_SZ1_pre_seizure_raw.fif",
+    #                     help='Testing file path')
     parser.add_argument('-fp', '--file_path', type=str,
-                        default="/data/yh/dataset/raw_data/BDP/BDP_Pre_seizure/BDP_SZ1_pre_seizure_raw.fif",
+                        default="/home/yh/yh/dataset/positiveDataAvailable/CYS/CYS4.edf",
                         help='Testing file path')
     parser.add_argument('-ts', '--test_seizure', type=str, default='pre_seizure',
                         help='Seizure status, Please input: pre_seizure or non_seizure')

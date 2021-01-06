@@ -428,6 +428,7 @@ class Dan:
         :param end_time:
         :return:
         """
+        MAX_LENGTH = 15
         fix = path.split('.')[-1]  # 后缀
         if fix == "npy":
             data = np.load(path)
@@ -440,11 +441,13 @@ class Dan:
             onset = annotation['onset']
             if len(onset) > 3:
                 # 读取onset的时间
-                end_time = int(onset[3]) - 30
+                end_time = int(onset[3]) - MAX_LENGTH
                 # 如果预留的时间小于30s无法执行 此时要留一个30s的gap;
                 if end_time <= 0:
                     data = None
-                data = data.crop(0, end_time)
+                    print("长度不足{}s".format(MAX_LENGTH))
+                else:
+                    data = data.crop(0, end_time)
             else:
                 data = None
         else:
