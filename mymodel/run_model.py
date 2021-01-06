@@ -38,6 +38,7 @@ class Dan:
         self.check_point = check_point
         self.att = att  # 是否用于计算attention机制
         self.isUnbalance = isUnbalance
+        self.patientsList = ["BDP", "SYF", "LK", "ZK", "WSH"]  # 在训练中的病人列表
         if gpu >= 0:
             self.model = DAN(gpu=gpu, model=model, encoder_name=encoder_name,
                              label_classifier_name=label_classifier_name, att=att, isUnbalance=isUnbalance).cuda(
@@ -60,7 +61,13 @@ class Dan:
         return
 
     def load_model(self, model_path='../save_model/DAN_encoder_{}_{}_{}.pkl'):
-        model_path = model_path.format(self.encoder_name, self.label_classifier_name, self.patient)
+        STATIC_PATIENT = self.patientsList[0]
+
+        if self.patient not in self.patientsList:
+            model_path = model_path.format(self.encoder_name, self.label_classifier_name, STATIC_PATIENT)
+        else:
+            model_path = model_path.format(self.encoder_name, self.label_classifier_name, self.patient)
+
         if os.path.exists(model_path):
             self.model.load_state_dict(torch.load(model_path))
             print("Loading Mode DAN from {}".format(model_path))
@@ -464,7 +471,7 @@ class Dan:
         :param config_path: 相关的配置文件的目录
         :return:
         """
-        self.load_model()  # 加载模型 加载模型
+        self.load_model()  # 加载模型 加载模型, 这里需要直接手动的指定模型
         resampling = 500
         label_dict = {'pre_seizure': 1, 'non_seizure': 0}
         with open(config_path, 'r') as f:
