@@ -148,10 +148,11 @@ class Information:
                 seizure_time = int(annotations['onset'][-1]) if len(annotations['onset']) > 3 else -1
                 DataFrame['patient'].append(n)
                 DataFrame['File'].append(fname)
-                DataFrame['Duration(s)'].append(get_recorder_time(data))
-                DataFrame['Seizure(s)'].append(seizure_time)
-                DataFrame['Pre_Seizure(s)'].append(max(seizure_time - 30, 0))
                 DataFrame['Path'].append(full_path)
+                DataFrame['All Duration(s)'].append(int(get_recorder_time(data)))
+                DataFrame['Seizure(s)'].append(seizure_time)
+                DataFrame['Pre_Seizure Duration(s)'].append(max(seizure_time - 30, 0))
+
         dataFrame = pd.DataFrame(DataFrame)
         try:
             dataFrame.to_csv(save_file, index=False)
