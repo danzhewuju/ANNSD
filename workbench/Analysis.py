@@ -94,7 +94,7 @@ class Information:
     @staticmethod
     def calculation_index(file_path, log_file, patient):
         """
-        # 用于计算指定指定文件预测的各种指标
+        # 用于计算指定指定文件预测的各种指标，该文件是预测后的文件
         :param file_path 文件的路径，分析病人的指标
         """
         data = pd.read_csv(file_path)
@@ -105,13 +105,7 @@ class Information:
         cal = IndicatorCalculation(prediction, ground_true)
         Accuracy, Precision, Recall, F1score, AUC = cal.get_accuracy(), cal.get_precision(), cal.get_recall(), cal.get_f1score(), cal.get_auc()
         result = "Patient:{}|DataSize:{}|Acuracy:{:.6f}|Precision:{:.6f}|Recall:{:.6f}|F1score:{:.6f}| AUC:{:.6f}".format(
-            patient,
-            len(
-                id_list),
-            Accuracy,
-            Precision,
-            Recall,
-            F1score, AUC)
+            patient, len(id_list), Accuracy, Precision, Recall, F1score, AUC)
         LogRecord.write_log(result, log_file)
         return
 
@@ -132,13 +126,21 @@ def menu():
     model = args.model
 
     if model == 'analysis':
+        """
+        日志分析模块，分析给定预测结果的日志文件，再重新计算相关的指标
+        """
         file_path = args.file_path
         log_file = args.log_file
         patient = args.patient
         Information.calculation_index(file_path, log_file, patient)
     else:
+        """
+        attention 分析计算模块
+        主要是分析模型的attention相关信息；
+        流程： 1 -> 选择符合时间段的数据片段； 2 -> 计算相关的attention值;  3 -> 计算最后的预测结果；    
+        """
         if cac:
-            info.create_attention_csv()  # 选出符合条件范围的测试用例
+            info.create_attention_csv()  # 选出符合条件范围的测试用例,选出指定时间段的模型的准确率
         if cai:
             print(info.calculate_attention_info())  # 计算attention的信息
         if cp:

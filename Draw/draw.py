@@ -17,20 +17,18 @@
 import os
 
 import matplotlib.pyplot as plt
+import mpl_toolkits.axisartist as axisartist
 import numpy as np
 
 from util.seeg_utils import read_edf_raw, read_raw, get_sampling_hz, get_channels_names
-import mne
-import numpy as np
-import matplotlib.pyplot as plt
-import mpl_toolkits.axisartist as axisartist
-from matplotlib.ticker import MultipleLocator
 
 
 class Draw:
 
-    def read_raw_data(self, path):
+    @staticmethod
+    def read_raw_data(path):
         fix = path.split('.')[-1]  # 后缀
+        data = None
         if fix == "npy":
             data = np.load(path)
         elif fix == "fif":
@@ -92,7 +90,7 @@ class Draw:
         :return:
         """
         # 从edf文件读取脑电数据
-        raw = self.read_raw_data(self.path)
+        raw = Draw.read_raw_data(self.path)
         channel_names = get_channels_names(raw)
         channel_names_str_list = [channel_names[t] for t in channels]
         # chans = ["POL G9", "POL G5", "POL G4", "POL G2", "POL G3", "POL H3", "POL G7", "POL G8", "POL G6", "POL H1"]
@@ -128,7 +126,7 @@ class Draw:
         plt.show()
 
     def __init__(self, path):
-        self.data = self.read_raw_data(path)  # Read data.
+        self.data = Draw.read_raw_data(path)  # Read data.
         self.path = path
 
 
