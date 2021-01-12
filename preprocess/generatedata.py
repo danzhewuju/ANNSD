@@ -140,6 +140,7 @@ def get_data_info(path_dir="../data/", unbalance=False, ratio=0.2):
 if __name__ == '__main__':
     # process_data()  # 数据的生成, 主要是用与生成时序数据
     # get_data_info(unbalance=True)  # 生成数据的划分文件· 生成 data_info 文件
-    patients = ['BDP', 'LK', 'SYF', 'WSH', 'ZK']
-    for p in patients:
-        train_data_split(p)  # 病人训练数据集的划分  {'BDP': 0, 'LK': 1, 'SYF': 2, 'WSH': 3, 'ZK': 4}
+    # patients = ['BDP', 'LK', 'SYF', 'WSH', 'ZK']
+    # for p in patients:
+    p = "ALL"
+    train_data_split(p)  # 病人训练数据集的划分  {'BDP': 0, 'LK': 1, 'SYF': 2, 'WSH': 3, 'ZK': 4}

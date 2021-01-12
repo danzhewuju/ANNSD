@@ -141,6 +141,7 @@ class MyData:
         self.few_shot_ratio = few_shot_ratio
         self.isUnbalance = isUnbalance
 
+
     def collate_fn(self, data):  #
         """
         用于自己构造时序数据，包含数据对齐以及数据长度

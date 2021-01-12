@@ -6,15 +6,14 @@
 # @File    : util_tool.py
 # @Software: PyCharm
 
-import os
-import pandas as pd
-import numpy as np
-import json
 import random
-from torch.utils.data import Dataset
-from util.util_file import matrix_normalization
+
+import numpy as np
+import pandas as pd
 import torch
-import torch.nn.utils.rnn as rnn_utils
+from torch.utils.data import Dataset
+
+from util.util_file import matrix_normalization
 
 
 def train_data_split(patient_name="BDP", data_info_path="../preprocess/data_info.csv"):
@@ -26,19 +25,21 @@ def train_data_split(patient_name="BDP", data_info_path="../preprocess/data_info
     '''
 
     data = pd.read_csv(data_info_path, sep=',')
-    ratio = 0.8
+    train_ratio, test_ratio = 0.8, 0.9
     test = {'path': [], 'label': [], 'patient': []}
     paths = data['path']
     label = data['label']
     patient = data['patient']
-    for i in range(len(paths)):
-        if patient[i] == patient_name:
-            test['path'] += [paths[i]]
-            paths.pop(i)
-            test['label'] += [label[i]]
-            label.pop(i)
-            test['patient'] += [patient[i]]
-            patient.pop(i)
+
+    if patient_name != "ALL":
+        for i in range(len(paths)):
+            if patient[i] == patient_name:
+                test['path'] += [paths[i]]
+                paths.pop(i)
+                test['label'] += [label[i]]
+                label.pop(i)
+                test['patient'] += [patient[i]]
+                patient.pop(i)
     # 对于数据需要进行乱序的处理
     paths = paths.tolist()
     label = label.tolist()
@@ -50,9 +51,18 @@ def train_data_split(patient_name="BDP", data_info_path="../preprocess/data_info
     random.shuffle(label)
     random.seed(time_seed)
     random.shuffle(patient)
-    train_num = int(ratio * len(paths))
+    train_num = int(train_ratio * len(paths))
+
+    # 考虑整体训练时候的数据集的划分
+
     train_data = {'path': paths[:train_num], 'label': label[:train_num], 'patient': patient[:train_num]}
-    val_data = {'path': paths[train_num:], 'label': label[train_num:], 'patient': patient[train_num:]}
+    if patient_name == "ALL":
+        test_num = int(test_ratio * len(paths))
+        val_data = {'path': paths[train_num:test_num], 'label': label[train_num:test_num],
+                    'patient': patient[train_num:test_num]}
+        test = {'path': paths[test_num:], 'label': label[test_num:], 'patient': patient[test_num:]}
+    else:
+        val_data = {'path': paths[train_num:], 'label': label[train_num:], 'patient': patient[train_num:]}
     train_data = pd.DataFrame(train_data)
     val_data = pd.DataFrame(val_data)
     test_data = pd.DataFrame(test)

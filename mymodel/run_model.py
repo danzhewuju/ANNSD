@@ -38,7 +38,7 @@ class Dan:
         self.check_point = check_point
         self.att = att  # 是否用于计算attention机制
         self.isUnbalance = isUnbalance
-        self.patientsList = ["BDP", "SYF", "LK", "ZK", "WSH"]  # 在训练中的病人列表
+
         if gpu >= 0:
             self.model = DAN(gpu=gpu, model=model, encoder_name=encoder_name,
                              label_classifier_name=label_classifier_name, att=att, isUnbalance=isUnbalance).cuda(
@@ -61,12 +61,8 @@ class Dan:
         return
 
     def load_model(self, model_path='../save_model/DAN_encoder_{}_{}_{}.pkl'):
-        STATIC_PATIENT = self.patientsList[0]
 
-        if self.patient not in self.patientsList:
-            model_path = model_path.format(self.encoder_name, self.label_classifier_name, STATIC_PATIENT)
-        else:
-            model_path = model_path.format(self.encoder_name, self.label_classifier_name, self.patient)
+        model_path = model_path.format(self.encoder_name, self.label_classifier_name, self.patient)
 
         if os.path.exists(model_path):
             self.model.load_state_dict(torch.load(model_path))
