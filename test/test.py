@@ -16,33 +16,33 @@ data = read_edf_raw(new_path)
 ano = read_annotations(data)
 print(ano)
 print(ano['onset'])
-
-i = 3
-new_path = path.format(i)
-data = read_edf_raw(new_path)
-ano = read_annotations(data)
-print(ano)
-print(ano['onset'])
-
-i = 4
-new_path = path.format(i)
-data = read_edf_raw(new_path)
-ano = read_annotations(data)
-print(ano)
-print(ano['onset'])
-
-i = 5
-new_path = path.format(i)
-data = read_edf_raw(new_path)
-ano = read_annotations(data)
-print(ano)
-print(ano['onset'])
-
-i = 6
-new_path = path.format(i)
-data = read_edf_raw(new_path)
-ano = read_annotations(data)
-print(ano)
-print(ano['onset'])
+#
+# i = 3
+# new_path = path.format(i)
+# data = read_edf_raw(new_path)
+# ano = read_annotations(data)
+# print(ano)
+# print(ano['onset'])
+#
+# i = 4
+# new_path = path.format(i)
+# data = read_edf_raw(new_path)
+# ano = read_annotations(data)
+# print(ano)
+# print(ano['onset'])
+#
+# i = 5
+# new_path = path.format(i)
+# data = read_edf_raw(new_path)
+# ano = read_annotations(data)
+# print(ano)
+# print(ano['onset'])
+#
+# i = 6
+# new_path = path.format(i)
+# data = read_edf_raw(new_path)
+# ano = read_annotations(data)
+# print(ano)
+# print(ano['onset'])
 
 

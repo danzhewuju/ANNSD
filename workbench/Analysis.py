@@ -8,19 +8,34 @@ sys.path.append('../')
 import numpy as np
 import pandas as pd
 from matplotlib import pyplot as plt
-
+from util.seeg_utils import read_edf_raw, read_annotations, get_recorder_time, read_raw
 from util.util_file import IndicatorCalculation, LogRecord
 
 
 class Information:
+
+    @staticmethod
+    def read_raw_data(path):
+        fix = path.split('.')[-1]  # 后缀
+        data = None
+        if fix == "npy":
+            data = np.load(path)
+        elif fix == "fif":
+            data = read_raw(path)
+        elif fix == "edf":
+            data = read_edf_raw(path)
+        else:
+            pass
+        return data
+
     def draw_plt_bar(self, data, x_laebl, y_label):
-        '''
+        """
 
         :param data:  字典特征的数据
         :param x_laebl: 横坐标
         :param y_label:  纵坐标
         :return:
-        '''
+        """
         data = dict(sorted(data.items(), key=lambda x: x[0]))
         x, y = list(data.keys()), list(data.values())
         plt.figure()
@@ -95,6 +110,8 @@ class Information:
     def calculation_index(file_path, log_file, patient):
         """
         # 用于计算指定指定文件预测的各种指标，该文件是预测后的文件
+        :param patient: 病人信息
+        :param log_file: 日志文件
         :param file_path 文件的路径，分析病人的指标
         """
         data = pd.read_csv(file_path)
@@ -109,13 +126,46 @@ class Information:
         LogRecord.write_log(result, log_file)
         return
 
+    @staticmethod
+    def raw_data_info(dir_path="/home/yh/yh/dataset/positiveDataAvailable", save_file="../log/raw_data_info.csv"):
+        """
+        原始数据统计模块，主要是统计数据中是否存在医生标注的癫痫发作信息
+        :param dir_path: 数据解压的文件夹
+        :param save_file 存储的文件信息
+        :return:
+        """
+        DataFrame = collections.defaultdict(list)
+        name_list = os.listdir(dir_path)
+        for n in name_list:
+            tmp_dir = os.path.join(dir_path, n)
+            file_name_list = os.listdir(tmp_dir)
+            for fname in file_name_list:
+                full_path = os.path.join(tmp_dir, fname)
+                data = Information.read_raw_data(full_path)
+                if not data:
+                    continue
+                annotations = read_annotations(data)
+                seizure_time = int(annotations['onset'][-1]) if len(annotations['onset']) > 3 else -1
+                DataFrame['patient'].append(n)
+                DataFrame['File'].append(fname)
+                DataFrame['Duration(s)'].append(get_recorder_time(data))
+                DataFrame['Seizure(s)'].append(seizure_time)
+                DataFrame['Pre_Seizure(s)'].append(max(seizure_time - 30, 0))
+                DataFrame['Path'].append(full_path)
+        dataFrame = pd.DataFrame(DataFrame)
+        try:
+            dataFrame.to_csv(save_file, index=False)
+        except IOError:
+            print("File error!")
+        return
+
 
 def menu():
     parse = argparse.ArgumentParser()
     parse.add_argument('-cac', '--create_attention_csv', type=bool, default=False)
     parse.add_argument('-cai', '--calculate_attention_info', type=bool, default=True)
     parse.add_argument('-cp', '--calculation_prediction', type=bool, default=True)
-    parse.add_argument('-m', '--model', type=str, default='analysis', help="Analysis data information ")
+    parse.add_argument('-m', '--model', type=str, default='rawInfo', help="Analysis data information ")
     parse.add_argument('-fp', '--file_path', type=str, help="Analysis file path")
     parse.add_argument('-p', '--patient', type=str, help="Patient name")
     parse.add_argument('-lf', '--log_file', type=str, help="Log file", default='../log/log.txt')
@@ -133,7 +183,7 @@ def menu():
         log_file = args.log_file
         patient = args.patient
         Information.calculation_index(file_path, log_file, patient)
-    else:
+    elif model == "attention":
         """
         attention 分析计算模块
         主要是分析模型的attention相关信息；
@@ -145,6 +195,20 @@ def menu():
             print(info.calculate_attention_info())  # 计算attention的信息
         if cp:
             print(info.calculation_prediction())  # 计算预测的结果
+    elif model == "rawInfo":
+        """
+        原始数据统计模块，主要是统计数据中是否存在医生标注的癫痫发作信息
+        """
+
+        parse.add_argument('-dp', '--dir_path', type=str, help="dir path",
+                           default="/home/yh/yh/dataset/positiveDataAvailable")
+        parse.add_argument('-sp', '--save_file', type=str, help="Save file", default="../log/raw_data_info.csv")
+        args = parse.parse_args()
+        dir_path, save_path = args.dir_path, args.save_file
+
+        Information.raw_data_info(dir_path, save_path)
+    else:
+        pass
 
 
 if __name__ == '__main__':
