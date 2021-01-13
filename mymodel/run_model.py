@@ -15,7 +15,7 @@ from tqdm import tqdm
 
 from data_util import MyData, SingleDataInfo, SingleDataset
 from model_util import DAN, ContrastiveLoss
-from util.seeg_utils import read_raw, re_sampling, read_edf_raw, read_annotations
+from util.seeg_utils import read_raw, re_sampling, read_edf_raw, read_annotations, select_channel_data_mne
 from util.util_file import trans_numpy_cv2, IndicatorCalculation
 
 
@@ -66,7 +66,8 @@ class Dan:
 
         if os.path.exists(model_path):
             self.model.load_state_dict(torch.load(model_path))
-            print("Loading Mode DAN from {}".format(model_path))
+            print(model_path)
+            print("Loading Mode DAN from {}".format(self.patient))
         else:
             print("Model is not exist in {}".format(model_path))
         return
@@ -457,7 +458,13 @@ class Dan:
             pass
         return data
 
-    def prediction_real_data(self, file_path, label, save_file, data_length, config_path):
+    def prediction_batch_real_data(self):
+        """
+
+        :return:
+        """
+
+    def prediction_real_data(self, file_path, label, save_file, data_length, config_path=None):
         """
         :function 在实际的情况下的模型的准确率,单个文件的预测结果
         :param file_path: 原始数据的文件路径
@@ -470,8 +477,10 @@ class Dan:
         self.load_model()  # 加载模型 加载模型, 这里需要直接手动的指定模型
         resampling = 500
         label_dict = {'pre_seizure': 1, 'non_seizure': 0}
-        with open(config_path, 'r') as f:
-            config = json.load(f)
+        """
+        暂时不需要该模块，如果需要对信道进行重新排序可能需要相关模块
+        """
+
         data = Dan.read_data(file_path)
         # read_raw(file_path)
         # 数据读取失败
@@ -481,15 +490,18 @@ class Dan:
             exit()
 
         data = re_sampling(data, fz=500)  # 对于数据进行重采样
+        # -------------------------------------------------------------------------------------------------------------
 
-        """
-         # 研究信道排序对于模型的影响，去掉该模块基本没影响
-         key = "{}_data_path".format(self.patient)
-         channel_path = config[key]["data_channel_path"]  # 获取相关的保存位置信息
-         channel_name = pd.read_csv(channel_path)
-         channels_name = list(channel_name['chan_name'])
-         data = select_channel_data_mne(data, channels_name)
-        """
+        # 研究信道排序对于模型的影响，去掉该模块基本没影响， 最新的实验表面该模块对于模型依然有较大的影响
+        with open(config_path, 'r') as f:
+            config = json.load(f)
+        key = "{}_data_path".format(self.patient)
+        channel_path = config[key]["data_channel_path"]  # 获取相关的保存位置信息
+        channel_name = pd.read_csv(channel_path)
+        channels_name = list(channel_name['chan_name'])
+        data = select_channel_data_mne(data, channels_name)
+
+        # -------------------------------------------------------------------------------------------------------------
 
         new_data, _ = data[:, :]  # 获取原始数据的形式
         single_data_info = SingleDataInfo(new_data, label, data_length=data_length)

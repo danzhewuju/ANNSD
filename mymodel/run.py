@@ -35,8 +35,9 @@ def run():
     # parser.add_argument('-fp', '--file_path', type=str,
     #                     default="/data/yh/dataset/raw_data/BDP/BDP_Pre_seizure/BDP_SZ1_pre_seizure_raw.fif",
     #                     help='Testing file path')
+    # /home/yh/yh/dataset/raw_data/SYF/SYF_Pre_seizure/SYF_SZ1_pre_seizure_raw-1.fif
     parser.add_argument('-fp', '--file_path', type=str,
-                        default="/home/yh/yh/dataset/raw_data/SYF/SYF_Pre_seizure/SYF_SZ1_pre_seizure_raw.fif",
+                        default="/home/yh/yh/dataset/raw_data/SYF/SYF_Pre_seizure/SYF_SZ1_pre_seizure_raw-1.fif",
                         help='Testing file path')
     parser.add_argument('-ts', '--test_seizure', type=str, default='pre_seizure',
                         help='Seizure status, Please input: pre_seizure or non_seizure')
@@ -88,7 +89,7 @@ def run():
     elif model == 'prediction':  # 单个样本的预测模型
 
         file_path, label, save_file, data_length, config_path = args.file_path, args.test_seizure, args.save_file, args.data_length, args.config_path
-        patient = "ALL"
+        # patient = "SYF"
         save_file = save_file.format(patient)
         dan_train.prediction_real_data(file_path, label, save_file, data_length, config_path)
 
