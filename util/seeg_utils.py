@@ -460,13 +460,13 @@ def least_traversal(elec_pos):
     return min_cost, min_path
 
 
-def retrieve_chs_from_mat(patient_name):
+def retrieve_chs_from_mat(path_file):
     '''
     提取.mat文件中的信道名和坐标信息
     :param patient_name:   目标病人名（须保证文件名为patient_name.mat）
     :return:  elec_pos：   含有信道名以及坐标的字典
     '''
-    pos_info = sio.loadmat(patient_name + ".mat")
+    pos_info = sio.loadmat(path_file)
     elec_pos = list()
     for i in range(pos_info['elec_Info_Final'][0][0][1][0].size):  # name为字符串,pos为ndarray格式
         elec_pos.append({'name': pos_info['elec_Info_Final'][0][0][0][0][i][0],

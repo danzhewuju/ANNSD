@@ -92,6 +92,8 @@ def run():
         # patient = "SYF"
         save_file = save_file.format(patient)
         dan_train.prediction_real_data(file_path, label, save_file, data_length, config_path)
+    else:
+        print("Your choice does not exist!")
 
     return
 

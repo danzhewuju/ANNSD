@@ -15,7 +15,7 @@ from tqdm import tqdm
 
 from data_util import MyData, SingleDataInfo, SingleDataset
 from model_util import DAN, ContrastiveLoss
-from util.seeg_utils import read_raw, re_sampling, read_edf_raw, read_annotations, select_channel_data_mne
+from util.seeg_utils import re_sampling, select_channel_data_mne, read_raw, read_annotations, read_edf_raw
 from util.util_file import trans_numpy_cv2, IndicatorCalculation
 
 
@@ -424,47 +424,32 @@ class Dan:
         if recoding:  # 如果开启了记录模式，模型会记录所有的文件的预测结果
             self.save_all_input_prediction_result(ids_list, grand_true, prediction)
 
-    @staticmethod
-    def read_data(path):
+    def prediction_batch_real_data(self, file_path_list, label, data_length, config_path=None):
         """
-        :param path:
-        :param start_time:
-        :param end_time:
-        :return:
-        """
-        MAX_LENGTH = 15
-        fix = path.split('.')[-1]  # 后缀
-        if fix == "npy":
-            data = np.load(path)
-        elif fix == "fif":
-            data = read_raw(path)
-        elif fix == "edf":
-            # 这里对应着原始文件，需要选取特定范围的数据，流程上希望自动完成对数据的截取操作
-            data = read_edf_raw(path)
-            annotation = read_annotations(data)
-            onset = annotation['onset']
-            if len(onset) > 3:
-                # 读取onset的时间
-                end_time = int(onset[3]) - MAX_LENGTH
-                # 如果预留的时间小于30s无法执行 此时要留一个30s的gap;
-                if end_time <= 0:
-                    data = None
-                    print("长度不足{}s".format(MAX_LENGTH))
-                else:
-                    data = data.crop(0, end_time)
-            else:
-                data = None
-        else:
-            pass
-        return data
+        方法的功能是对批量的数据进行检测
 
-    def prediction_batch_real_data(self):
+        :param file_path_list: 文件的路径列表
+        :param label:  所属的标签
+        :param data_length: 数据的窗口的长度
+        :param config_path: 信道等信息的存储位置
+        :return: None
         """
+        # 需要设定最低的时间，本次实验设定的还是60s
+        MIN_DURATION = 60
+        data_info = pd.read_csv(file_path_list)
+        for index, row in data_info.iterrows():
+            file_path = row['Path']
+            pre_seizure_duration = row['Pre_Seizure Duration(s)']
+            ACC = 0
+            if pre_seizure_duration >= MIN_DURATION:
+                # 这里必须要关闭日志记录，否则会和手动保存的日志冲突
+                ACC = self.prediction_real_data(file_path, label, None, data_length, config_path=config_path,
+                                                log_flag=False)
+            data_info[index, 'Accuracy'] = ACC
+        print("All test finished!")
+        return
 
-        :return:
-        """
-
-    def prediction_real_data(self, file_path, label, save_file, data_length, config_path=None):
+    def prediction_real_data(self, file_path, label, save_file, data_length, config_path=None, log_flag=True):
         """
         :function 在实际的情况下的模型的准确率,单个文件的预测结果
         :param file_path: 原始数据的文件路径
@@ -474,6 +459,39 @@ class Dan:
         :param config_path: 相关的配置文件的目录
         :return:
         """
+
+        def read_data(path):
+            """
+            本模块是专门用来读取癫痫发作前睡眠的数据
+            :param path: 文件路径
+            :return:
+            """
+            MAX_LENGTH = 15
+            fix = path.split('.')[-1]  # 后缀
+            if fix == "npy":
+                data = np.load(path)
+            elif fix == "fif":
+                data = read_raw(path)
+            elif fix == "edf":
+                # 这里对应着原始文件，需要选取特定范围的数据，流程上希望自动完成对数据的截取操作
+                data = read_edf_raw(path)
+                annotation = read_annotations(data)
+                onset = annotation['onset']
+                if len(onset) > 3:
+                    # 读取onset的时间
+                    end_time = int(onset[3]) - MAX_LENGTH
+                    # 如果预留的时间小于30s无法执行 此时要留一个30s的gap;
+                    if end_time <= 0:
+                        data = None
+                        print("长度不足{}s".format(MAX_LENGTH))
+                    else:
+                        data = data.crop(0, end_time)
+                else:
+                    data = None
+            else:
+                pass
+            return data
+
         self.load_model()  # 加载模型 加载模型, 这里需要直接手动的指定模型
         resampling = 500
         label_dict = {'pre_seizure': 1, 'non_seizure': 0}
@@ -481,7 +499,7 @@ class Dan:
         暂时不需要该模块，如果需要对信道进行重新排序可能需要相关模块
         """
 
-        data = Dan.read_data(file_path)
+        data = read_data(file_path)
         # read_raw(file_path)
         # 数据读取失败
         if data == None:
@@ -525,17 +543,18 @@ class Dan:
                 prediction += [int(x) for x in prey]
         probability += [1 if t == label_int else 0 for t in prediction]
         accuracy = sum(probability) / len(probability)
-        log = "Encoder:{}|Label classifier {}|Patient {}|Data size:{}|Real data|Accuracy:{:.5f}".format(
-            self.encoder_name, self.label_classifier_name, self.patient, len(probability), accuracy)
-        self.log_write(log)
-        # 文件日志的写入
-        result = {'id': ids_list, 'ground truth': [label_int] * len(prediction), 'prediction': prediction}
-        dataframe = pd.DataFrame(result)
-        header = True if not os.path.exists(save_file) else False  # 判断文件在不在
-        dataframe.to_csv(save_file, index=False, mode='a', header=header)
+        if log_flag:
+            log = "Encoder:{}|Label classifier {}|Patient {}|Data size:{}|Real data|Accuracy:{:.5f}".format(
+                self.encoder_name, self.label_classifier_name, self.patient, len(probability), accuracy)
+            self.log_write(log)
+            # 文件日志的写入
+            result = {'id': ids_list, 'ground truth': [label_int] * len(prediction), 'prediction': prediction}
+            dataframe = pd.DataFrame(result)
+            header = True if not os.path.exists(save_file) else False  # 判断文件在不在
+            dataframe.to_csv(save_file, index=False, mode='a', header=header)
 
-        print("All information has been save in {}".format(save_file))
-        return None
+            print("All information has been save in {}".format(save_file))
+        return accuracy
 
     def save_attention_matrix(self, attention_matrix, ids, result, save_dir='../log/attention'):
         '''
