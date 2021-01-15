@@ -95,5 +95,68 @@
       "save_dir": "../data/ZK/pre_seizure"
     },
     "data_channel_path": "/data/yh/dataset/channels_info/ZK_seq.csv"
+  },
+  "XDF_data_path": {
+    "data_channel_path": "/data/yh/dataset/channels_positive/channel_sorted/XDF_seq.csv"
+  },
+  "ZXQ_data_path": {
+    "data_channel_path": "/data/yh/dataset/channels_positive/channel_sorted/ZXQ_seq.csv"
+  },
+  "LYX_data_path": {
+    "data_channel_path": "/data/yh/dataset/channels_positive/channel_sorted/LYX_seq.csv"
+  },
+  "DJ_data_path": {
+    "data_channel_path": "/data/yh/dataset/channels_positive/channel_sorted/DJ_seq.csv"
+  },
+  "CL_data_path": {
+    "data_channel_path": "/data/yh/dataset/channels_positive/channel_sorted/CL_seq.csv"
+  },
+  "SGH_data_path": {
+    "data_channel_path": "/data/yh/dataset/channels_positive/channel_sorted/SGH_seq.csv"
+  },
+  "WCY_data_path": {
+    "data_channel_path": "/data/yh/dataset/channels_positive/channel_sorted/WCY_seq.csv"
+  },
+  "SQH_data_path": {
+    "data_channel_path": "/data/yh/dataset/channels_positive/channel_sorted/SQH_seq.csv"
+  },
+  "LXL_data_path": {
+    "data_channel_path": "/data/yh/dataset/channels_positive/channel_sorted/LXL_seq.csv"
+  },
+  "ZD_data_path": {
+    "data_channel_path": "/data/yh/dataset/channels_positive/channel_sorted/ZD_seq.csv"
+  },
+  "JWJ_data_path": {
+    "data_channel_path": "/data/yh/dataset/channels_positive/channel_sorted/JWJ_seq.csv"
+  },
+  "WJ_data_path": {
+    "data_channel_path": "/data/yh/dataset/channels_positive/channel_sorted/WJ_seq.csv"
+  },
+  "TBY_data_path": {
+    "data_channel_path": "/data/yh/dataset/channels_positive/channel_sorted/TBY_seq.csv"
+  },
+  "CYS_data_path": {
+    "data_channel_path": "/data/yh/dataset/channels_positive/channel_sorted/CYS_seq.csv"
+  },
+  "ZTT_data_path": {
+    "data_channel_path": "/data/yh/dataset/channels_positive/channel_sorted/ZTT_seq.csv"
+  },
+  "DHM_data_path": {
+    "data_channel_path": "/data/yh/dataset/channels_positive/channel_sorted/DHM_seq.csv"
+  },
+  "ZXJ_data_path": {
+    "data_channel_path": "/data/yh/dataset/channels_positive/channel_sorted/ZXJ_seq.csv"
+  },
+  "JDL_data_path": {
+    "data_channel_path": "/data/yh/dataset/channels_positive/channel_sorted/JDL_seq.csv"
+  },
+  "TJJ_data_path": {
+    "data_channel_path": "/data/yh/dataset/channels_positive/channel_sorted/TJJ_seq.csv"
+  },
+  "LGQ_data_path": {
+    "data_channel_path": "/data/yh/dataset/channels_positive/channel_sorted/LGQ_seq.csv"
+  },
+  "CYW_data_path": {
+    "data_channel_path": "/data/yh/dataset/channels_positive/channel_sorted/CYW_seq.csv"
   }
 }
