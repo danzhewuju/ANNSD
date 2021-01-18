@@ -15,7 +15,7 @@ from tqdm import tqdm
 
 from data_util import MyData, SingleDataInfo, SingleDataset
 from model_util import DAN, ContrastiveLoss
-from util.seeg_utils import re_sampling, select_channel_data_mne, read_raw, read_annotations, read_edf_raw
+from util.seeg_utils import re_sampling, select_channel_data_mne, read_raw, read_annotations, read_edf_raw, filter_hz
 from util.util_file import trans_numpy_cv2, IndicatorCalculation
 
 
@@ -513,7 +513,11 @@ class Dan:
             print("data loading filed!")
             return -1
 
+        # 是否考虑加滤波处理
+        data = filter_hz(data, 0, 250)
+
         data = re_sampling(data, fz=500)  # 对于数据进行重采样
+
         # -------------------------------------------------------------------------------------------------------------
 
         # 研究信道排序对于模型的影响，去掉该模块基本没影响， 最新的实验表面该模块对于模型依然有较大的影响
