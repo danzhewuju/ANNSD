@@ -47,6 +47,11 @@ def run():
     parser.add_argument('-sf', '--save_file', type=str, default='../log/{}_prediction_result.csv',
                         help='save file path')
     # ---------------------------------------------------------------------------------------------------------------
+    # 批量参数模块
+    parser.add_argument('-fpl', '--file_path_list', type=str,
+                        default="/data/yh/Python/SEEG-Timing/log/raw_data_info.csv",
+                        help='Testing file path')
+    # ---------------------------------------------------------------------------------------------------------------
 
     args = parser.parse_args()
 
@@ -92,6 +97,9 @@ def run():
         # patient = "SYF"
         save_file = save_file.format(patient)
         dan_train.prediction_real_data(file_path, label, save_file, data_length, config_path)
+    elif model == "prediction_batch":
+        file_path_list, label, save_file, data_length, config_path = args.file_path_list, args.test_seizure, args.save_file, args.data_length, args.config_path
+        dan_train.prediction_batch_real_data(file_path_list, label, data_length, config_path)
     else:
         print("Your choice does not exist!")
 
