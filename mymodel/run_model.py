@@ -437,19 +437,25 @@ class Dan:
         # 需要设定最低的时间，本次实验设定的还是60s
         MIN_DURATION = 60
         data_info = pd.read_csv(file_path_list)
+        accuracy = []
         for index, row in data_info.iterrows():
             file_path = row['Path']
+            channel_key = row['patient']
             pre_seizure_duration = row['Pre_Seizure Duration(s)']
-            ACC = 0
+            ACC = -1
             if pre_seizure_duration >= MIN_DURATION:
                 # 这里必须要关闭日志记录，否则会和手动保存的日志冲突
-                ACC = self.prediction_real_data(file_path, label, None, data_length, config_path=config_path,
-                                                log_flag=False)
-            data_info[index, 'Accuracy'] = ACC
+                ACC = self.prediction_real_data(file_path, label, None, data_length, channel_key=channel_key,
+                                                config_path=config_path, log_flag=False)
+            accuracy.append(ACC)
+        data_info['Accuracy'] = accuracy
+        # 写回到原始文件
+        data_info.to_csv(file_path_list, index=False)
         print("All test finished!")
         return
 
-    def prediction_real_data(self, file_path, label, save_file, data_length, config_path=None, log_flag=True):
+    def prediction_real_data(self, file_path, label, save_file, data_length, channel_key=None, config_path=None,
+                             log_flag=True):
         """
         :function 在实际的情况下的模型的准确率,单个文件的预测结果
         :param file_path: 原始数据的文件路径
@@ -495,9 +501,6 @@ class Dan:
         self.load_model()  # 加载模型 加载模型, 这里需要直接手动的指定模型
         resampling = 500
         label_dict = {'pre_seizure': 1, 'non_seizure': 0}
-        """
-        暂时不需要该模块，如果需要对信道进行重新排序可能需要相关模块
-        """
 
         data = read_data(file_path)
         # read_raw(file_path)
@@ -505,19 +508,25 @@ class Dan:
         if data == None:
             assert "data loading filed!"
             print("data loading filed!")
-            exit()
+            return -1
 
         data = re_sampling(data, fz=500)  # 对于数据进行重采样
         # -------------------------------------------------------------------------------------------------------------
 
         # 研究信道排序对于模型的影响，去掉该模块基本没影响， 最新的实验表面该模块对于模型依然有较大的影响
-        with open(config_path, 'r') as f:
-            config = json.load(f)
-        key = "{}_data_path".format(self.patient)
-        channel_path = config[key]["data_channel_path"]  # 获取相关的保存位置信息
-        channel_name = pd.read_csv(channel_path)
-        channels_name = list(channel_name['chan_name'])
-        data = select_channel_data_mne(data, channels_name)
+        # 需要进行信道排序
+
+        if channel_key is not None:
+            with open(config_path, 'r') as f:
+                config = json.load(f)
+            key = "{}_data_path".format(channel_key)
+            # 如果在config文件日志不存在该病人的日志信息
+            if key not in config.keys():
+                return -1
+            channel_path = config[key]["data_channel_path"]  # 获取相关的保存位置信息
+            channel_name = pd.read_csv(channel_path)
+            channels_name = list(channel_name['chan_name'])
+            data = select_channel_data_mne(data, channels_name)
 
         # -------------------------------------------------------------------------------------------------------------
 
@@ -542,7 +551,10 @@ class Dan:
                              t in time_[0]]
                 prediction += [int(x) for x in prey]
         probability += [1 if t == label_int else 0 for t in prediction]
-        accuracy = sum(probability) / len(probability)
+        try:
+            accuracy = sum(probability) / len(probability)
+        except ZeroDivisionError:
+            accuracy = -1
         if log_flag:
             log = "Encoder:{}|Label classifier {}|Patient {}|Data size:{}|Real data|Accuracy:{:.5f}".format(
                 self.encoder_name, self.label_classifier_name, self.patient, len(probability), accuracy)

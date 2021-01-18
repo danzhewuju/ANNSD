@@ -1,6 +1,6 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <project version="4">
-  <component name="PublishConfigData" autoUpload="Always" serverName="lab6" preserveTimestamps="false" remoteFilesAllowedToDisappearOnAutoupload="false">
+  <component name="PublishConfigData" autoUpload="Always" serverName="lab6-SEEG-Timing" preserveTimestamps="false" remoteFilesAllowedToDisappearOnAutoupload="false">
     <serverData>
       <paths name="lab2">
         <serverdata>
@@ -16,7 +16,7 @@
           </mappings>
         </serverdata>
       </paths>
-      <paths name="lab6">
+      <paths name="lab6-SEEG-Timing">
         <serverdata>
           <mappings>
             <mapping deploy="/SEEG-Timing" local="$PROJECT_DIR$" web="/" />

@@ -19,8 +19,8 @@ def run():
                         help='val data path')
     parser.add_argument('-atp', '--attention_path', type=str, default="../preprocess/attention_{}.csv",
                         help='attention data path')
-    parser.add_argument('-p', '--patient', type=str, default="BDP", help='patient name')
-    parser.add_argument('-m', '--model', type=str, default="prediction", help='style of train')
+    parser.add_argument('-p', '--patient', type=str, default="ALL", help='patient name')
+    parser.add_argument('-m', '--model', type=str, default="prediction_batch", help='style of train')
     parser.add_argument('-few', '--few_show_learning', type=bool, default=True, help='keep few shot learning open')
     parser.add_argument('-fr', '--few_show_learning_ratio', type=float, default=0.2, help='few shot learning ratio')
     parser.add_argument('-em', '--embedding', type=str, default="cnn", help='method of embedding')

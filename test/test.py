@@ -59,9 +59,15 @@
 # print(get_channels_names(data))
 # print(len(get_channels_names(data)))
 
-import json
+import pandas as pd
 
-path = "/data/yh/Python/SEEG-Timing/preprocess/config/config_back.json"
-with open(path, '') as f:
-    data = json.load(f)
-print(data['BDP_data_path'])
+a = {'a': [1, 2, 3], 'b': [2, 3, 4]}
+data = pd.DataFrame(a)
+# data['ACC'] = 1
+
+for index, row in data.iterrows():
+    row[''] = 1
+
+
+
+print(data)
