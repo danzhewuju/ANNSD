@@ -457,7 +457,10 @@ class Dan:
     def prediction_real_data(self, file_path, label, save_file, data_length, channel_key=None, config_path=None,
                              log_flag=True):
         """
+
         :function 在实际的情况下的模型的准确率,单个文件的预测结果
+        :param log_flag:  日志开关,是否会将结果写到主日志文件中
+        :param channel_key: 根据排序后的信道列表来完成信道的排序
         :param file_path: 原始数据的文件路径
         :param label: 文件的实际标签
         :param save_file: 保存结果的文件路径
