@@ -57,8 +57,8 @@ def read_data(new_data_positive="./new_data_positive.csv", wins=(2, 16), config_
             dur = np.random.randint(wins[0], wins[1])
             end = min(start + dur, ent_time)
             gen_time.append((start, end))
-        if not os.path.exists(save_dir):
-            os.makedirs(save_dir)  # 递归的构建文件夹
+        if not os.path.exists(save_dir_patient):
+            os.makedirs(save_dir_patient)  # 递归的构建文件夹
         fz = get_sampling_hz(data)  # 获得该数据的采样率
         for s, e in tqdm(gen_time):
             name = str(uuid.uuid1()) + "{}-{}_{}.npy".format(file_name, s, e)
