@@ -19,8 +19,8 @@ def run():
                         help='val data path')
     parser.add_argument('-atp', '--attention_path', type=str, default="../preprocess/attention_{}.csv",
                         help='attention data path')
-    parser.add_argument('-p', '--patient', type=str, default="ALL", help='patient name')
-    parser.add_argument('-m', '--model', type=str, default="prediction_batch", help='style of train')
+    parser.add_argument('-p', '--patient', type=str, default="BDP", help='patient name')
+    parser.add_argument('-m', '--model', type=str, default="test", help='style of train')
     parser.add_argument('-few', '--few_show_learning', type=bool, default=True, help='keep few shot learning open')
     parser.add_argument('-fr', '--few_show_learning_ratio', type=float, default=0.2, help='few shot learning ratio')
     parser.add_argument('-em', '--embedding', type=str, default="cnn", help='method of embedding')
@@ -28,7 +28,7 @@ def run():
                         help='choosing label classifier')
     parser.add_argument('-chp', '--check_point', type=bool, default=False, help='Whether to continue training')
     parser.add_argument('-att', '--attention_matrix', type=bool, default=False, help='Whether to get attention matrix')
-    parser.add_argument('-rec', '--recoding', type=bool, default=False, help='Whether to recode result for every file')
+    parser.add_argument('-rec', '--recoding', type=bool, default=True, help='Whether to recode result for every file')
     parser.add_argument('-unb', '--unbalance_data', type=int, default=5,
                         help="The negative sample is x times the positive sample")
     # -------------------------------------------单文件测试模块----------------------------------------------------------
@@ -98,6 +98,7 @@ def run():
         save_file = save_file.format(patient)
         dan_train.prediction_real_data(file_path, label, save_file, data_length, config_path)
     elif model == "prediction_batch":
+        # 批量文件的预测
         file_path_list, label, save_file, data_length, config_path = args.file_path_list, args.test_seizure, args.save_file, args.data_length, args.config_path
         dan_train.prediction_batch_real_data(file_path_list, label, data_length, config_path)
     else:

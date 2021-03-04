@@ -4,6 +4,8 @@ import os
 import re
 import sys
 
+import pandas
+
 sys.path.append('../')
 import numpy as np
 import pandas as pd
@@ -160,6 +162,39 @@ class Information:
             print("File error!")
         return
 
+    @staticmethod
+    def window_accuracy(file_path, save_path):
+        """
+        :function 研究窗口大小对于准确率的影响
+        :param file_path: 文件路径
+        :return:
+        """
+        data = pandas.read_csv(file_path)
+        windows_count = {}
+        for index, row in data.iterrows():
+            id_str = row['id']
+            tmp_str = id_str.split('-')[-1].split('_')
+            start_time, end_time = int(tmp_str[0]), int(tmp_str[1])
+            windows_size = end_time - start_time
+            ground_truth, prediction = row['grand true'], row['prediction']
+            if windows_size not in windows_count.keys():
+                tmp = [0, 0]
+                if ground_truth == prediction:
+                    tmp[0] += 1
+                tmp[1] += 1
+                windows_count[windows_size] = tmp
+            else:
+                if ground_truth == prediction:
+                    windows_count[windows_size][0] += 1
+                windows_count[windows_size][1] += 1
+        data_frame = {}
+        for w, (count, all) in windows_count.items():
+            data_frame[w] = "{:.5f}".format(count / all)
+        DataFrame = pandas.DataFrame(data_frame)
+        DataFrame.to_csv(save_path, index=False)
+        print("Result has been saved!")
+        return
+
 
 def menu():
     parse = argparse.ArgumentParser()
@@ -184,6 +219,16 @@ def menu():
         log_file = args.log_file
         patient = args.patient
         Information.calculation_index(file_path, log_file, patient)
+    elif model == 'windows_accuracy':
+        """
+        研究窗口的大小和准确率的关系
+        """
+        parse.add_argument('-sp', '--save_path', type=str, help="Log file", default='../log/all_windows_accuracy.csv')
+        args = parse.parse_args()
+        save_path = args.save_path
+        file_path = args.file_path
+        Information.window_accuracy(file_path, save_path)
+
     elif model == "attention":
         """
         attention 分析计算模块

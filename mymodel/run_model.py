@@ -345,7 +345,12 @@ class Dan:
         """
         data = {'id': ids_list, 'grand true': grand_true, 'prediction': prediction}
         dataframe = pd.DataFrame(data)
-        dataframe.to_csv(save_path)
+        if os.path.exists(save_path):
+            old_data = pd.read_csv(save_path)
+            old_data = old_data.append(dataframe)
+            old_data.to_csv(save_path)
+        else:
+            dataframe.to_csv(save_path)
         print('Saving success!')
         return
 
