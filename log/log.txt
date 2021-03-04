@@ -393,3 +393,34 @@ Encoder:cnn|Label classifier transformer|Patient BDP|Data size:11|Real data|Accu
 Encoder:cnn|Label classifier transformer|Patient BDP|Data size:4|Real data|Accuracy:0.00000	2021-01-06 20:05:44
 Encoder:cnn|Label classifier transformer|Patient BDP|Data size:6|Real data|Accuracy:0.00000	2021-01-06 20:06:28
 Encoder:cnn|Label classifier transformer|Patient ZTT|Data size:6|Real data|Accuracy:0.00000	2021-01-06 20:18:28
+Unbalance |Baselins: vdCnn|Patient BDP|Data size:7200| test loss:3.477259| Accuracy:0.42250 | Precision:0.20109| Recall:0.82917| F1score:0.32368| AUC:0.66028 | FAR:0.65883	2021-01-12 10:38:51
+Unbalance |Baselins: vdCnn|Patient BDP|Data size:7200| test loss:2.597992| Accuracy:0.40472 | Precision:0.21750| Recall:0.99000| F1score:0.35665| AUC:0.88547 | FAR:0.71233	2021-01-12 19:28:30
+Unbalance |Baselins: dpCnn|Patient BDP|Data size:7200| test loss:0.244965| Accuracy:0.88125 | Precision:0.61616| Recall:0.76250| F1score:0.68156| AUC:0.92908 | FAR:0.09500	2021-01-12 19:36:05
+Encoder:cnn|Label classifier transformer|Patient BDP|Data size:91|Real data|Accuracy:0.02198	2021-01-12 20:02:08
+Encoder:cnn|Label classifier transformer|Patient BDP|Data size:41|Real data|Accuracy:0.97561	2021-01-12 20:08:53
+Encoder:cnn|Label classifier transformer|Patient BDP|Data size:490|Real data|Accuracy:0.95102	2021-01-12 20:16:06
+Encoder:cnn|Label classifier transformer|Patient BDP|Data size:170|Real data|Accuracy:0.10000	2021-01-12 20:20:28
+Encoder:cnn|Label classifier transformer|Patient SYF|Data size:170|Real data|Accuracy:0.38235	2021-01-12 20:24:43
+Encoder:cnn|Label classifier transformer|Patient SYF|Data size:170|Real data|Accuracy:0.41765	2021-01-12 20:32:18
+Encoder:cnn|Label classifier transformer|Patient ALL|Data size:170|Real data|Accuracy:0.15882	2021-01-13 15:29:37
+Encoder:cnn|Label classifier transformer|Patient ALL|Data size:41|Real data|Accuracy:0.97561	2021-01-13 15:34:18
+Encoder:cnn|Label classifier transformer|Patient ALL|Data size:238|Real data|Accuracy:0.94958	2021-01-13 15:36:39
+Encoder:cnn|Label classifier transformer|Patient SYF|Data size:8|Real data|Accuracy:1.00000	2021-01-13 16:45:01
+Encoder:cnn|Label classifier transformer|Patient SYF|Data size:8|Real data|Accuracy:0.75000	2021-01-13 16:46:11
+Encoder:cnn|Label classifier transformer|Patient SYF|Data size:8|Real data|Accuracy:0.62500	2021-01-13 16:46:54
+Encoder:cnn|Label classifier transformer|Patient SYF|Data size:8|Real data|Accuracy:0.50000	2021-01-13 16:47:13
+Encoder:cnn|Label classifier transformer|Patient ALL|Data size:8|Real data|Accuracy:0.25000	2021-01-13 16:47:34
+Encoder:cnn|Label classifier transformer|Patient ALL|Data size:8|Real data|Accuracy:0.00000	2021-01-13 16:47:49
+Encoder:cnn|Label classifier transformer|Patient ALL|Data size:8|Real data|Accuracy:0.12500	2021-01-13 16:48:05
+Encoder:cnn|Label classifier transformer|Patient SYF|Data size:8|Real data|Accuracy:0.75000	2021-01-13 16:48:31
+Encoder:cnn|Label classifier transformer|Patient SYF|Data size:8|Real data|Accuracy:1.00000	2021-01-13 16:49:28
+Encoder:cnn|Label classifier transformer|Patient SYF|Data size:8|Real data|Accuracy:1.00000	2021-01-13 16:50:58
+Encoder:cnn|Label classifier transformer|Patient SYF|Data size:8|Real data|Accuracy:1.00000	2021-01-13 16:51:22
+Encoder:cnn|Label classifier transformer|Patient SYF|Data size:8|Real data|Accuracy:1.00000	2021-01-13 16:52:16
+Encoder:cnn|Label classifier transformer|Patient SYF|Data size:8|Real data|Accuracy:1.00000	2021-01-13 16:52:44
+Encoder:cnn|Label classifier transformer|Patient SYF|Data size:8|Real data|Accuracy:1.00000	2021-01-13 16:53:24
+Encoder:cnn|Label classifier transformer|Patient BDP|Data size:8|Real data|Accuracy:1.00000	2021-01-13 16:54:23
+Unbalance |Baselins: dpCnn|Patient BDP|Data size:7200| test loss:0.243576| Accuracy:0.88042 | Precision:0.61323| Recall:0.76500| F1score:0.68076| AUC:0.93047 | FAR:0.09650	2021-01-13 20:04:40
+Unbalance |Baselins: vdCnn|Patient BDP|Data size:7200| test loss:0.690533| Accuracy:0.83819 | Precision:0.50817| Recall:0.90750| F1score:0.65151| AUC:0.94028 | FAR:0.17567	2021-01-13 20:10:34
+Unbalance |Encoder:cnn|Label classifier transformer|Patient BDP|Data size:7200| test loss:0.150563| Accuracy:0.94514 | Precision:0.80702| Recall:0.88167| F1score:0.84269| AUC:0.97835| FAR:0.04217	2021-01-20 20:52:17
+Unbalance |Encoder:cnn|Label classifier lstm|Patient BDP|Data size:7200| test loss:0.336488| Accuracy:0.84972 | Precision:0.53217| Recall:0.81333| F1score:0.64338| AUC:0.91531| FAR:0.14300	2021-01-20 21:11:53

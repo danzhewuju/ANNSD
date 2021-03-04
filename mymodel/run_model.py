@@ -514,7 +514,7 @@ class Dan:
             return -1
 
         # 是否考虑加滤波处理
-        data = filter_hz(data, 0, 250)
+        data = filter_hz(data, 0, 200)
 
         data = re_sampling(data, fz=500)  # 对于数据进行重采样
 

@@ -59,7 +59,7 @@
 # print(get_channels_names(data))
 # print(len(get_channels_names(data)))
 
-import pandas as pd
+from util.seeg_utils import *
 
 a = {'a': [1, 2, 3], 'b': [2, 3, 4]}
 data = pd.DataFrame(a)
@@ -68,6 +68,4 @@ data = pd.DataFrame(a)
 for index, row in data.iterrows():
     row[''] = 1
 
-
-
-print(data)
+print(get_sampling_hz(read_edf_raw("/home/yh/yh/dataset/positiveDataAvailable/KLJ/KLJ2.2.edf")))
