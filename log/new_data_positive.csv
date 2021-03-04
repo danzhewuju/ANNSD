@@ -1,0 +1,26 @@
+patient,File,Path,All Duration(s),Seizure(s),Pre_Seizure Duration(s),Accuracy
+LXL,LXL1.edf,/home/yh/yh/dataset/positiveDataAvailable/LXL/LXL1.edf,332,161,131,1
+CL,CL1.1.edf,/home/yh/yh/dataset/positiveDataAvailable/CL/CL1.1.edf,605,126,96,1
+CL,CL2.1.edf,/home/yh/yh/dataset/positiveDataAvailable/CL/CL2.1.edf,731,307,277,0.947368421
+ZXJ,ZXJ2.1.edf,/home/yh/yh/dataset/positiveDataAvailable/ZXJ/ZXJ2.1.edf,479,105,75,0.833333333
+JWJ,JWJ1.edf,/home/yh/yh/dataset/positiveDataAvailable/JWJ/JWJ1.edf,671,348,318,0.772727273
+CYW,CYW1.edf,/home/yh/yh/dataset/positiveDataAvailable/CYW/CYW1.edf,565,312,282,0.75
+WCY,WCY3.edf,/home/yh/yh/dataset/positiveDataAvailable/WCY/WCY3.edf,567,145,115,0.75
+CYW,CYW4.edf,/home/yh/yh/dataset/positiveDataAvailable/CYW/CYW4.edf,3155,1418,1388,0.67032967
+WCY,WCY4.edf,/home/yh/yh/dataset/positiveDataAvailable/WCY/WCY4.edf,843,146,116,0.625
+CYW,CYW3.edf,/home/yh/yh/dataset/positiveDataAvailable/CYW/CYW3.edf,2316,1034,1004,0.567164179
+CL,CL2.2.edf,/home/yh/yh/dataset/positiveDataAvailable/CL/CL2.2.edf,488,351,321,0.5
+WJ,WJ2.edf,/home/yh/yh/dataset/positiveDataAvailable/WJ/WJ2.edf,499,254,224,0.5
+WCY,WCY1.edf,/home/yh/yh/dataset/positiveDataAvailable/WCY/WCY1.edf,545,182,152,0.454545455
+CYS,CYS2.edf,/home/yh/yh/dataset/positiveDataAvailable/CYS/CYS2.edf,1068,229,199,0.285714286
+TBY,TBY3.edf,/home/yh/yh/dataset/positiveDataAvailable/TBY/TBY3.edf,463,139,109,0.25
+CYW,CYW2.edf,/home/yh/yh/dataset/positiveDataAvailable/CYW/CYW2.edf,1011,403,373,0.24
+TBY,TBY5.edf,/home/yh/yh/dataset/positiveDataAvailable/TBY/TBY5.edf,288,111,81,0.2
+LGQ,LGQ4.edf,/home/yh/yh/dataset/positiveDataAvailable/LGQ/LGQ4.edf,246,117,87,0.166666667
+ZD,ZD3.edf,/home/yh/yh/dataset/positiveDataAvailable/ZD/ZD3.edf,768,398,368,0.166666667
+ZD,ZD2.edf,/home/yh/yh/dataset/positiveDataAvailable/ZD/ZD2.edf,583,115,85,0.166666667
+TBY,TBY2.edf,/home/yh/yh/dataset/positiveDataAvailable/TBY/TBY2.edf,467,151,121,0.142857143
+LYX,LYX2.edf,/home/yh/yh/dataset/positiveDataAvailable/LYX/LYX2.edf,343,187,157,0.142857143
+ZD,ZD4.edf,/home/yh/yh/dataset/positiveDataAvailable/ZD/ZD4.edf,382,127,97,0.142857143
+LGQ,LGQ3.edf,/home/yh/yh/dataset/positiveDataAvailable/LGQ/LGQ3.edf,423,102,72,0
+LYX,LYX1.edf,/home/yh/yh/dataset/positiveDataAvailable/LYX/LYX1.edf,393,112,82,0
