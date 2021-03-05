@@ -347,10 +347,10 @@ class Dan:
         dataframe = pd.DataFrame(data)
         if os.path.exists(save_path):
             old_data = pd.read_csv(save_path)
-            old_data = old_data.append(dataframe)
-            old_data.to_csv(save_path)
+            old_data = old_data.append(dataframe,ignore_index=True)
+            old_data.to_csv(save_path, index=False)
         else:
-            dataframe.to_csv(save_path)
+            dataframe.to_csv(save_path, index=False)
         print('Saving success!')
         return
 

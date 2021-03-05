@@ -187,9 +187,11 @@ class Information:
                 if ground_truth == prediction:
                     windows_count[windows_size][0] += 1
                 windows_count[windows_size][1] += 1
-        data_frame = {}
+        data_frame = collections.defaultdict(list)
         for w, (count, all) in windows_count.items():
-            data_frame[w] = "{:.5f}".format(count / all)
+            data_frame['window'].append(w)
+            accuracy = format(count / all, '.5f')
+            data_frame['accuracy'].append(accuracy)
         DataFrame = pandas.DataFrame(data_frame)
         DataFrame.to_csv(save_path, index=False)
         print("Result has been saved!")

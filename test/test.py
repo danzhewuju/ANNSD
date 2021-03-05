@@ -58,14 +58,22 @@
 # data = read_edf_raw(path)
 # print(get_channels_names(data))
 # print(len(get_channels_names(data)))
+import pandas
 
 from util.seeg_utils import *
 
-a = {'a': [1, 2, 3], 'b': [2, 3, 4]}
-data = pd.DataFrame(a)
-# data['ACC'] = 1
+# a = {'a': [1, 2, 3], 'b': [2, 3, 4]}
+# data = pd.DataFrame(a)
+# # data['ACC'] = 1
+#
+# for index, row in data.iterrows():
+#     row[''] = 1
+#
+# print(get_sampling_hz(read_edf_raw("/home/yh/yh/dataset/positiveDataAvailable/KLJ/KLJ2.2.edf")))
 
-for index, row in data.iterrows():
-    row[''] = 1
-
-print(get_sampling_hz(read_edf_raw("/home/yh/yh/dataset/positiveDataAvailable/KLJ/KLJ2.2.edf")))
+a = {"a": [1]}
+data = pandas.DataFrame(a)
+b = {'a': [2]}
+data_b = pandas.DataFrame(b)
+data = data.append(data_b, ignore_index=True)
+print(data)
