@@ -245,10 +245,13 @@ def menu():
         """
         原始数据统计模块，主要是统计数据中是否存在医生标注的癫痫发作信息
         """
-
+        # 直接从存储的文件夹中读取文件，依赖文件生成可以使用过的片段
         parse.add_argument('-dp', '--dir_path', type=str, help="dir path",
                            default="/home/yh/yh/dataset/positiveDataAvailable")
+        #  raw_data_info.csv 文件中包含了所有原始信号的相关信息
+
         parse.add_argument('-sp', '--save_file', type=str, help="Save file", default="../log/raw_data_info.csv")
+
         args = parse.parse_args()
         dir_path, save_path = args.dir_path, args.save_file
 
