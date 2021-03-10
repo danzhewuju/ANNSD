@@ -114,7 +114,10 @@ def get_data_info(path_dir="../data/", unbalance=False, ratio=0.2):
             data_label_dir = os.path.join(path_tmp_dir, l)
             data_ids = os.listdir(data_label_dir)
             data_paths = [os.path.join(data_label_dir, x) for x in data_ids]
-            if unbalance and l == 'pre_seizure':
+
+            if unbalance and l == 'pre_seizure' and len(labels) == 2:
+                # 三个判定条件，1.需要进行非平衡处理。 2.处在癫痫发作前的数据 3. 需要有多个标签才有意义进行非平衡处理
+
                 nums = int(len(data_paths) * ratio)
                 data_paths, data_ids = data_paths[:nums], data_ids[:nums]
                 print("unbalance sampling for positive sata! unbalance size:{}".format(nums))
@@ -142,5 +145,5 @@ if __name__ == '__main__':
     # get_data_info(unbalance=True)  # 生成数据的划分文件· 生成 data_info 文件
     # patients = ['BDP', 'LK', 'SYF', 'WSH', 'ZK']
     # for p in patients:
-    p = "ALL"
-    train_data_split(p)  # 病人训练数据集的划分  {'BDP': 0, 'LK': 1, 'SYF': 2, 'WSH': 3, 'ZK': 4}
+    #     train_data_split(p)  # 病人训练数据集的划分  {'BDP': 0, 'LK': 1, 'SYF': 2, 'WSH': 3, 'ZK': 4}
+    train_data_split("ALL")

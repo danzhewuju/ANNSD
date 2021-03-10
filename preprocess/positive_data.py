@@ -8,6 +8,7 @@
 
 """
 对于一些只有阳性批次的脑电信号进行处理，值得注意的是处理前需要进行手动的切分；
+本文件代码专门用于处理部分的阳线的数据
 处理步骤：1. 读取文件
          2. 文件切分
          3. 信道排序
@@ -19,6 +20,8 @@ import json
 
 import pandas
 from tqdm import tqdm
+import sys
+sys.path.append('../')
 
 from util.seeg_utils import *
 
@@ -41,7 +44,7 @@ def sampling_raw_data(new_data_positive="./new_data_positive.csv", window=(2, 16
         raw_data_path = row['Path']
         file_name = row['File'].split('.')[0]
         patient = row['patient']
-        save_dir_patient = os.path.join(save_dir, "{}/non_seizure".format(patient))
+        save_dir_patient = os.path.join(save_dir, "{}/pre _seizure".format(patient))
         data = read_edf_raw(raw_data_path)  # 读取文件
         data_cut = get_duration_raw_data(data, 0, int(ent_time))  # 数据被切分为一个片段，这是一个有效的片段
         channel_path = config_data["{}_data_path".format(patient)]['data_channel_path']
@@ -53,8 +56,9 @@ def sampling_raw_data(new_data_positive="./new_data_positive.csv", window=(2, 16
         data = select_channel_data_mne(data, channels_name)
         # 开始进行数据数据切分
         gen_time = []
+        count = int((int(ent_time)*2*k)/(window[0]+window[1]))
 
-        for i in range(k):
+        for i in range(count):
             start = np.random.randint(0, ent_time)  # 计算起始时间
             dur = np.random.randint(window[0], window[1])
             end = min(start + dur, ent_time)  # 如果超过了最大的时间，就取最小
@@ -63,7 +67,7 @@ def sampling_raw_data(new_data_positive="./new_data_positive.csv", window=(2, 16
             os.makedirs(save_dir_patient)  # 递归的构建文件夹
         fz = get_sampling_hz(data)  # 获得该数据的采样率
         for s, e in tqdm(gen_time):
-            name = str(uuid.uuid1()) + "{}-{}_{}.npy".format(file_name, s, e)
+            name = str(uuid.uuid1()) + "-{}-{}_{}.npy".format(file_name, s, e)
             path = os.path.join(save_dir_patient, name)
             s = int(s * fz)
             e = int(e * fz)
