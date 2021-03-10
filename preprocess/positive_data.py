@@ -24,7 +24,7 @@ from util.seeg_utils import *
 
 
 def sampling_raw_data(new_data_positive="./new_data_positive.csv", window=(2, 16), config_path="./config/config.json",
-                      save_dir="../data", k=3):
+                      save_dir="../data", k=5):
     """
 
     :param new_data_positive: 需要处理的csv文件路径
