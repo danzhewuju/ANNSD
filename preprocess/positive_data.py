@@ -23,13 +23,15 @@ from tqdm import tqdm
 from util.seeg_utils import *
 
 
-def read_data(new_data_positive="./new_data_positive.csv", wins=(2, 16), config_path="./config/config.json",
-              save_dir="../data", k=50):
+def sampling_raw_data(new_data_positive="./new_data_positive.csv", window=(2, 16), config_path="./config/config.json",
+                      save_dir="../data", k=3):
     """
 
     :param new_data_positive: 需要处理的csv文件路径
     :param config_path: 信道文件信息的存放路径
-    :param k: 需要采样的个数
+    :param k: 平均采样倍率的计算，实际的采样的个数计算如下：
+                                  count = (duration time)*2*k/(average length)
+                                  这样计算的好处是为了使得采样的个数和数据长度相关
     :return:
     """
     data_path = pandas.read_csv(new_data_positive, sep=',')
@@ -40,8 +42,8 @@ def read_data(new_data_positive="./new_data_positive.csv", wins=(2, 16), config_
         file_name = row['File'].split('.')[0]
         patient = row['patient']
         save_dir_patient = os.path.join(save_dir, "{}/non_seizure".format(patient))
-        data = read_edf_raw(raw_data_path)
-        data_cut = get_duration_raw_data(data, 0, int(ent_time))  # 数据被切分为一个片段
+        data = read_edf_raw(raw_data_path)  # 读取文件
+        data_cut = get_duration_raw_data(data, 0, int(ent_time))  # 数据被切分为一个片段，这是一个有效的片段
         channel_path = config_data["{}_data_path".format(patient)]['data_channel_path']
         # 开始进行数据预处理
 
@@ -54,8 +56,8 @@ def read_data(new_data_positive="./new_data_positive.csv", wins=(2, 16), config_
 
         for i in range(k):
             start = np.random.randint(0, ent_time)  # 计算起始时间
-            dur = np.random.randint(wins[0], wins[1])
-            end = min(start + dur, ent_time)
+            dur = np.random.randint(window[0], window[1])
+            end = min(start + dur, ent_time)  # 如果超过了最大的时间，就取最小
             gen_time.append((start, end))
         if not os.path.exists(save_dir_patient):
             os.makedirs(save_dir_patient)  # 递归的构建文件夹
@@ -71,4 +73,4 @@ def read_data(new_data_positive="./new_data_positive.csv", wins=(2, 16), config_
 
 
 if __name__ == '__main__':
-    read_data()
+    sampling_raw_data()
