@@ -63,8 +63,16 @@ class DataInfo:
     """
 
     def __init__(self, path_data):
+        DATA_DIR = "../data"
         self.dict_label = {"pre_seizure": 1, "non_seizure": 0}
-        self.dict_domain = {'BDP': 0, 'LK': 1, 'SYF': 2, 'WSH': 3, 'ZK': 4}
+
+        # 需要动态改变domain的字典映射，可以通过自动读取文件夹来进行映射
+        if not os.path.exists(DATA_DIR):
+            print("相关的文件存在，请检查文件夹{}".format(DATA_DIR))
+            exit(0)
+        self.dict_domain = dict(zip(os.listdir(DATA_DIR), range(len(os.listdir(DATA_DIR)))))
+
+        # self.dict_domain = {'BDP': 0, 'LK': 1, 'SYF': 2, 'WSH': 3, 'ZK': 4}
         data = pd.read_csv(path_data)
         data_path = data['path'].tolist()
         label = data['label'].tolist()

@@ -44,7 +44,7 @@ def sampling_raw_data(new_data_positive="./new_data_positive.csv", window=(2, 16
         raw_data_path = row['Path']
         file_name = row['File'].split('.')[0]
         patient = row['patient']
-        save_dir_patient = os.path.join(save_dir, "{}/pre _seizure".format(patient))
+        save_dir_patient = os.path.join(save_dir, "{}/pre_seizure".format(patient))
         data = read_edf_raw(raw_data_path)  # 读取文件
         data_cut = get_duration_raw_data(data, 0, int(ent_time))  # 数据被切分为一个片段，这是一个有效的片段
         channel_path = config_data["{}_data_path".format(patient)]['data_channel_path']
