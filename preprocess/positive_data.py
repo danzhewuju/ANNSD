@@ -15,6 +15,7 @@
          4. 滤波重采样
          5. 随机切片
          6. 存储生成路径信息
+         7. 文件写回
 """
 import json
 
@@ -30,7 +31,7 @@ def sampling_raw_data(new_data_positive="./new_data_positive.csv", window=(2, 16
                       save_dir="../data", k=5):
     """
 
-    :param new_data_positive: 需要处理的csv文件路径
+    :param new_data_positive: 需要处理的csv文件路径,需要手动指定生成
     :param config_path: 信道文件信息的存放路径
     :param k: 平均采样倍率的计算，实际的采样的个数计算如下：
                                   count = (duration time)*2*k/(average length)
