@@ -22,6 +22,7 @@ import json
 import pandas
 from tqdm import tqdm
 import sys
+
 sys.path.append('../')
 
 from util.seeg_utils import *
@@ -57,7 +58,7 @@ def sampling_raw_data(new_data_positive="./new_data_positive.csv", window=(2, 16
         data = select_channel_data_mne(data, channels_name)
         # 开始进行数据数据切分
         gen_time = []
-        count = int((int(ent_time)*2*k)/(window[0]+window[1]))
+        count = int((int(ent_time) * 2 * k) / (window[0] + window[1]))
 
         for i in range(count):
             start = np.random.randint(0, ent_time)  # 计算起始时间

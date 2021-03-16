@@ -158,5 +158,11 @@
   },
   "CYW_data_path": {
     "data_channel_path": "/data/yh/dataset/channels_positive/channel_sorted/CYW_seq.csv"
+  },
+  "KLJ_data_path": {
+    "data_channel_path": "/data/yh/dataset/channels_positive/channel_sorted/KLJ_seq.csv"
+  },
+  "SJ_data_path": {
+    "data_channel_path": "/data/yh/dataset/channels_positive/channel_sorted/SJ_seq.csv"
   }
 }

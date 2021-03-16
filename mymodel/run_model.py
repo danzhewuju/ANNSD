@@ -447,7 +447,8 @@ class Dan:
             file_path = row['Path']
             channel_key = row['patient']
             pre_seizure_duration = row['Pre_Seizure Duration(s)']
-            ACC = -1
+            # ACC = -1 表示文件不够长或者是文件库中没有对应的信道坐标
+            ACC = "文件记录时长太短"
             if pre_seizure_duration >= MIN_DURATION:
                 # 这里必须要关闭日志记录，否则会和手动保存的日志冲突
                 ACC = self.prediction_real_data(file_path, label, None, data_length, channel_key=channel_key,
@@ -516,7 +517,7 @@ class Dan:
         if data == None:
             assert "data loading filed!"
             print("data loading filed!")
-            return -1
+            return "文件读取失败"
 
         # 是否考虑加滤波处理
         data = filter_hz(data, 0, 200)
@@ -534,7 +535,7 @@ class Dan:
             key = "{}_data_path".format(channel_key)
             # 如果在config文件日志不存在该病人的日志信息
             if key not in config.keys():
-                return -1
+                return "No channels location"
             channel_path = config[key]["data_channel_path"]  # 获取相关的保存位置信息
             channel_name = pd.read_csv(channel_path)
             channels_name = list(channel_name['chan_name'])
@@ -566,7 +567,7 @@ class Dan:
         try:
             accuracy = sum(probability) / len(probability)
         except ZeroDivisionError:
-            accuracy = -1
+            accuracy = "calculation error"
         if log_flag:
             log = "Encoder:{}|Label classifier {}|Patient {}|Data size:{}|Real data|Accuracy:{:.5f}".format(
                 self.encoder_name, self.label_classifier_name, self.patient, len(probability), accuracy)

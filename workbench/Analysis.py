@@ -147,6 +147,7 @@ class Information:
                 if not data:
                     continue
                 annotations = read_annotations(data)
+                # 如果 seizure_time=-1表示文件中没有明确的标注癫痫信息
                 seizure_time = int(annotations['onset'][-1]) if len(annotations['onset']) > 3 else -1
                 DataFrame['patient'].append(n)
                 DataFrame['File'].append(fname)
