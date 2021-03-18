@@ -448,7 +448,7 @@ class Dan:
             channel_key = row['patient']
             pre_seizure_duration = row['Pre_Seizure Duration(s)']
             # ACC = -1 表示文件不够长或者是文件库中没有对应的信道坐标
-            ACC = "文件记录时长太短"
+            ACC = "error（No label）"
             if pre_seizure_duration >= MIN_DURATION:
                 # 这里必须要关闭日志记录，否则会和手动保存的日志冲突
                 ACC = self.prediction_real_data(file_path, label, None, data_length, channel_key=channel_key,
