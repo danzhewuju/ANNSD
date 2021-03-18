@@ -1,0 +1,163 @@
+
+{
+  "BDP_data_path": {
+    "non_seizure": {
+      "raw_data_path": [
+        "/data/yh/dataset/raw_data/BDP/BDP_SLEEP/BDP_Sleep_raw.fif",
+        "/data/yh/dataset/raw_data/BDP/BDP_SLEEP/BDP_SZ2_SLEEP_raw.fif"
+      ],
+      "save_dir": "../data/BDP/non_seizure"
+    },
+    "pre_seizure": {
+      "raw_data_path": [
+        "/data/yh/dataset/raw_data/BDP/BDP_Pre_seizure/BDP_SZ1_pre_seizure_raw.fif",
+        "/data/yh/dataset/raw_data/BDP/BDP_Pre_seizure/BDP_SZ2_pre_seizure_raw.fif"
+      ],
+      "save_dir": "../data/BDP/pre_seizure"
+    },
+    "data_channel_path": "/data/yh/dataset/channels_info/BDP_seq.csv"
+  },
+  "LK_data_path": {
+    "non_seizure": {
+      "raw_data_path": [
+        "/data/yh/dataset/raw_data/LK/LK_SLEEP/LK_Sleep_raw-0.fif",
+        "/data/yh/dataset/raw_data/LK/LK_SLEEP/LK_Sleep_raw-1.fif",
+        "/data/yh/dataset/raw_data/LK/LK_SLEEP/LK_Sleep_raw-2-0.fif",
+        "/data/yh/dataset/raw_data/LK/LK_SLEEP/LK_Sleep_raw-4-0.fif",
+        "/data/yh/dataset/raw_data/LK/LK_SLEEP/LK_Sleep_raw-6-0.fif"
+      ],
+      "save_dir": "../data/LK/non_seizure"
+    },
+    "pre_seizure": {
+      "raw_data_path": [
+        "/data/yh/dataset/raw_data/LK/LK_Pre_seizure/LK_SZ1_pre_seizure_raw.fif",
+        "/data/yh/dataset/raw_data/LK/LK_Pre_seizure/LK_SZ2_pre_seizure_raw.fif",
+        "/data/yh/dataset/raw_data/LK/LK_Pre_seizure/LK_SZ3_pre_seizure_raw.fif",
+        "/data/yh/dataset/raw_data/LK/LK_Pre_seizure/LK_SZ4_pre_seizure_raw.fif",
+        "/data/yh/dataset/raw_data/LK/LK_Pre_seizure/LK_SZ5_pre_seizure_raw.fif",
+        "/data/yh/dataset/raw_data/LK/LK_Pre_seizure/LK_SZ6_pre_seizure_raw.fif"
+      ],
+      "save_dir": "../data/LK/pre_seizure"
+    },
+    "data_channel_path": "/data/yh/dataset/channels_info/LK_seq.csv"
+  },
+  "SYF_data_path": {
+    "non_seizure": {
+      "raw_data_path": [
+        "/data/yh/dataset/raw_data/SYF/SYF_SLEEP/SYF_Sleep_raw.fif"
+      ],
+      "save_dir": "../data/SYF/non_seizure"
+    },
+    "pre_seizure": {
+      "raw_data_path": [
+        "/data/yh/dataset/raw_data/SYF/SYF_Pre_seizure/SYF_SZ1_pre_seizure_raw.fif",
+        "/data/yh/dataset/raw_data/SYF/SYF_Pre_seizure/SYF_SZ2_pre_seizure_raw.fif",
+        "/data/yh/dataset/raw_data/SYF/SYF_Pre_seizure/SYF_SZ3_pre_seizure_raw.fif"
+      ],
+      "save_dir": "../data/SYF/pre_seizure"
+    },
+    "data_channel_path": "/data/yh/dataset/channels_info/SYF_seq.csv"
+  },
+  "WSH_data_path": {
+    "non_seizure": {
+      "raw_data_path": [
+        "/data/yh/dataset/raw_data/WSH/WSH_Pre_seizure/WSH_SZ1_pre_seizure_raw.fif"
+      ],
+      "save_dir": "../data/WSH/non_seizure"
+    },
+    "pre_seizure": {
+      "raw_data_path": [
+        "/data/yh/dataset/raw_data/WSH/WSH_SLEEP/WSH_Sleep_raw.fif"
+      ],
+      "save_dir": "../data/WSH/pre_seizure"
+    },
+    "data_channel_path": "/data/yh/dataset/channels_info/WSH_seq.csv"
+  },
+  "ZK_data_path": {
+    "non_seizure": {
+      "raw_data_path": [
+        "/data/yh/dataset/raw_data/ZK/ZK_SLEEP/ZK_Sleep_raw.fif",
+        "/data/yh/dataset/raw_data/ZK/ZK_SLEEP/ZK_Sleep_raw-1.fif",
+        "/data/yh/dataset/raw_data/ZK/ZK_SLEEP/ZK_Sleep_raw-2.fif",
+        "/data/yh/dataset/raw_data/ZK/ZK_SLEEP/ZK_Sleep_raw-3.fif",
+        "/data/yh/dataset/raw_data/ZK/ZK_SLEEP/ZK_Sleep_raw-4.fif",
+        "/data/yh/dataset/raw_data/ZK/ZK_SLEEP/ZK_Sleep_raw-5.fif",
+        "/data/yh/dataset/raw_data/ZK/ZK_SLEEP/ZK_Sleep_raw-6.fif",
+        "/data/yh/dataset/raw_data/ZK/ZK_SLEEP/ZK_Sleep_raw-7.fif",
+        "/data/yh/dataset/raw_data/ZK/ZK_SLEEP/ZK_Sleep_raw-8.fif"
+      ],
+      "save_dir": "../data/ZK/non_seizure"
+    },
+    "pre_seizure": {
+      "raw_data_path": [
+        "/data/yh/dataset/raw_data/ZK/ZK_Pre_seizure/ZK_SZ1_pre_seizure_raw.fif",
+        "/data/yh/dataset/raw_data/ZK/ZK_Pre_seizure/ZK_SZ2_pre_seizure_raw.fif"
+      ],
+      "save_dir": "../data/ZK/pre_seizure"
+    },
+    "data_channel_path": "/data/yh/dataset/channels_info/ZK_seq.csv"
+  },
+  "XDF_data_path": {
+    "data_channel_path": "/data/yh/dataset/channels_positive/channel_sorted/XDF_seq.csv"
+  },
+  "ZXQ_data_path": {
+    "data_channel_path": "/data/yh/dataset/channels_positive/channel_sorted/ZXQ_seq.csv"
+  },
+  "LYX_data_path": {
+    "data_channel_path": "/data/yh/dataset/channels_positive/channel_sorted/LYX_seq.csv"
+  },
+  "DJ_data_path": {
+    "data_channel_path": "/data/yh/dataset/channels_positive/channel_sorted/DJ_seq.csv"
+  },
+  "CL_data_path": {
+    "data_channel_path": "/data/yh/dataset/channels_positive/channel_sorted/CL_seq.csv"
+  },
+  "SGH_data_path": {
+    "data_channel_path": "/data/yh/dataset/channels_positive/channel_sorted/SGH_seq.csv"
+  },
+  "WCY_data_path": {
+    "data_channel_path": "/data/yh/dataset/channels_positive/channel_sorted/WCY_seq.csv"
+  },
+  "SQH_data_path": {
+    "data_channel_path": "/data/yh/dataset/channels_positive/channel_sorted/SQH_seq.csv"
+  },
+  "LXL_data_path": {
+    "data_channel_path": "/data/yh/dataset/channels_positive/channel_sorted/LXL_seq.csv"
+  },
+  "ZD_data_path": {
+    "data_channel_path": "/data/yh/dataset/channels_positive/channel_sorted/ZD_seq.csv"
+  },
+  "JWJ_data_path": {
+    "data_channel_path": "/data/yh/dataset/channels_positive/channel_sorted/JWJ_seq.csv"
+  },
+  "WJ_data_path": {
+    "data_channel_path": "/data/yh/dataset/channels_positive/channel_sorted/WJ_seq.csv"
+  },
+  "TBY_data_path": {
+    "data_channel_path": "/data/yh/dataset/channels_positive/channel_sorted/TBY_seq.csv"
+  },
+  "CYS_data_path": {
+    "data_channel_path": "/data/yh/dataset/channels_positive/channel_sorted/CYS_seq.csv"
+  },
+  "ZTT_data_path": {
+    "data_channel_path": "/data/yh/dataset/channels_positive/channel_sorted/ZTT_seq.csv"
+  },
+  "DHM_data_path": {
+    "data_channel_path": "/data/yh/dataset/channels_positive/channel_sorted/DHM_seq.csv"
+  },
+  "ZXJ_data_path": {
+    "data_channel_path": "/data/yh/dataset/channels_positive/channel_sorted/ZXJ_seq.csv"
+  },
+  "JDL_data_path": {
+    "data_channel_path": "/data/yh/dataset/channels_positive/channel_sorted/JDL_seq.csv"
+  },
+  "TJJ_data_path": {
+    "data_channel_path": "/data/yh/dataset/channels_positive/channel_sorted/TJJ_seq.csv"
+  },
+  "LGQ_data_path": {
+    "data_channel_path": "/data/yh/dataset/channels_positive/channel_sorted/LGQ_seq.csv"
+  },
+  "CYW_data_path": {
+    "data_channel_path": "/data/yh/dataset/channels_positive/channel_sorted/CYW_seq.csv"
+  }
+}
