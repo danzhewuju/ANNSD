@@ -1,4 +1,4 @@
-# Epilepsy Domain Adversarial Neural Network model(EDANN)
+# SEEG-Adversarial Neural Network model(SEEG-ANN)
 
 ## Environment
 
