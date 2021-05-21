@@ -1,4 +1,4 @@
-# SEEG-Adversarial Neural Network model(SEEG-ANN)
+# Adversarial Neural Network Based SEEG Data(ANNSD)
 
 ## Environment
 
